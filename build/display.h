@@ -43,7 +43,7 @@ public:
 
     void draw_TR12();
     void layers();
-    void tracks(int);
+    void tracks(int, bool);
 
     display();
 

@@ -484,7 +484,7 @@ void display::layers(){
 }
 
 
-void display::tracks(int events){
+void display::tracks(int events, bool track_generation){
 
 //TH1F(name, title, nbins, xlow, xup)
 TH1F* hxTR2 = new TH1F("hxTR2", "x_trigger2;x_trigger1;counts", events, -TR2Size[0]*2.5, TR2Size[0]*2.5);
@@ -499,6 +499,73 @@ TH1F* htheta = new TH1F("htheta", "theta;#theta;counts", events, -pi/2, pi/2);
 //puoi settare il seed for reproducibility
 TRandom3 *rnd = new TRandom3(0); 
 
+//MC
+for (int i=0; i < events; i++){
+    double xTR2, yTR2, zTR2, xTR1, yTR1, zTR1, phi, theta; 
+
+    //i layer acquisiscono il segnale quando arriva un segnale AND dagli scintillatori
+    //genero traccie misurabili come traccie che passano nei due scintillatori TR2, TR1
+    if(track_generation){
+        double xTR2_fake = rnd->Uniform(-TR2Size[0]*2,TR2Size[0]*2);     
+        if(xTR2_fake>0 && xTR2_fake<TR2Size[0]){xTR2 = xTR2_fake + 0.5*TR2GapX;}
+        if(xTR2_fake<0 && xTR2_fake>-TR2Size[0]){xTR2 = xTR2_fake - 0.5*TR2GapX;}
+        if(xTR2_fake<2*TR2Size[0] && xTR2_fake>TR2Size[0]){xTR2 = xTR2_fake + 1.5*TR2GapX;}
+        if(xTR2_fake>-2*TR2Size[0] && xTR2_fake<-TR2Size[0]){xTR2 = xTR2_fake - 1.5*TR2GapX;}
+        yTR2 = rnd->Uniform(-TR2Size[1]/2,TR2Size[1]/2);
+        zTR2 = rnd->Uniform(TR2CenterZ-TR2Thickness/2,TR2CenterZ+TR2Thickness/2);
+
+        xTR1 = rnd->Uniform(-TR1Size[0]/2,TR1Size[0]/2);
+        double yTR1_fake = rnd->Uniform(-TR1Size[1]*2.5,TR1Size[1]*2.5);     
+        if(yTR1_fake<TR1Size[1]/2 && yTR1_fake>-TR1Size[1]/2){yTR1 = yTR1_fake;}
+        if(yTR1_fake<1.5*TR1Size[1] && yTR1_fake>0.5*TR1Size[1]){yTR1 = yTR1_fake + TR1GapY;}
+        if(yTR1_fake<2.5*TR1Size[1] && yTR1_fake>1.5*TR1Size[1]){yTR1 = yTR1_fake + 2*TR1GapY;}
+        if(yTR1_fake>-1.5*TR1Size[1] && yTR1_fake<-0.5*TR1Size[1]){yTR1 = yTR1_fake - TR1GapY;}
+        if(yTR1_fake>-2.5*TR1Size[1] && yTR1_fake<-1.5*TR1Size[1]){yTR1 = yTR1_fake - 2*TR1GapY;}
+        zTR1 = rnd->Uniform(TR1CenterZ-TR1Thickness/2,TR1CenterZ+TR1Thickness/2);
+
+        //uso ATan2 instead of ATan to avoid losing information
+        phi = TMath::ATan2((yTR2-yTR1),(xTR2-xTR1));   
+        theta = TMath::ATan2(TMath::Hypot(xTR1-xTR2,yTR1-yTR2),zTR2-zTR1);
+
+    }  
+    if(!track_generation){
+        double xTR2_fake = rnd->Uniform(-TR2Size[0]*2,TR2Size[0]*2);     
+        if(xTR2_fake>0 && xTR2_fake<TR2Size[0]){xTR2 = xTR2_fake + 0.5*TR2GapX;}
+        if(xTR2_fake<0 && xTR2_fake>-TR2Size[0]){xTR2 = xTR2_fake - 0.5*TR2GapX;}
+        if(xTR2_fake<2*TR2Size[0] && xTR2_fake>TR2Size[0]){xTR2 = xTR2_fake + 1.5*TR2GapX;}
+        if(xTR2_fake>-2*TR2Size[0] && xTR2_fake<-TR2Size[0]){xTR2 = xTR2_fake - 1.5*TR2GapX;}
+        yTR2 = rnd->Uniform(-TR2Size[1]/2,TR2Size[1]/2);
+        zTR2 = rnd->Uniform(TR2CenterZ-TR2Thickness/2,TR2CenterZ+TR2Thickness/2);
+
+        phi = rnd->Uniform(2.*pi)-pi;
+        double THETA = rnd->Uniform(pi)-pi/2;
+        theta = pow(TMath::Cos(THETA),2); 
+
+        xTR1 = xTR2 + (zTR2-TR1CenterZ)*(TMath::Sin(theta))*(TMath::Cos(phi))*(1/(TMath::Cos(theta)));
+        yTR1 = yTR2 + (zTR2-TR1CenterZ)*(TMath::Sin(theta))*(TMath::Sin(phi)*(1/(TMath::Cos(theta))));
+    }
+    hxTR2->Fill(xTR2);
+    hyTR2->Fill(yTR2);
+    hzTR2->Fill(zTR2);
+    hxTR1->Fill(xTR1);
+    hyTR1->Fill(yTR1);
+    hzTR1->Fill(zTR1);
+    hphi->Fill(phi);
+    htheta->Fill(theta);
+
+    //plotting tracks
+    Double_t x_line[2] = {xTR2, xTR1};
+    Double_t y_line[2] = {yTR2, yTR1};
+    Double_t z_line[2] = {zTR2, zTR1};
+    TPolyLine3D* line_track = new TPolyLine3D(2, x_line, y_line, z_line);
+    line_track->SetLineColor(kBlue);
+    line_track->SetLineWidth(2);
+    geom->cd();
+    line_track->Draw();
+    geom->Update();
+    reco->Update();
+
+}
 }
 
 

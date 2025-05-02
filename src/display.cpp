@@ -14,6 +14,8 @@
 #include "TMarker3DBox.h"
 #include "../build/display.h"
 
+
+
 using namespace std;
 
 display::display() {
@@ -552,6 +554,12 @@ for (int i=0; i < events; i++){
     hzTR1->Fill(zTR1);
     hphi->Fill(phi);
     htheta->Fill(theta);
+
+    double xL2 = xTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Cos(phi));
+    double yL2 = yTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Sin(phi));
+    double xL0 = xTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Cos(phi));
+    double yL0 = yTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Sin(phi));
+
 
     //plotting tracks
     Double_t x_line[2] = {xTR2, xTR1};

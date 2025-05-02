@@ -10,7 +10,7 @@ using namespace std;
 void run(){
 
     gSystem->AddIncludePath("-Ibuild");
-    gSystem->CompileMacro("./src/display.cxx", "kg", "", "build");
+    gSystem->CompileMacro("./src/display.cpp", "kg", "", "build");
 
     display d;
     d.draw_TR12();
@@ -18,6 +18,9 @@ void run(){
 
     int events = 10;
     d.tracks(events, true);
+ 
+    //for each generated track build a cluster for each layer
+    //use current algorithm to create the track
 
 
 

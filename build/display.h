@@ -38,7 +38,9 @@ public:
     static constexpr double ChipDistanceY = 0.150;
     static constexpr double ChipStaveDistanceY = 7.22312;
     static constexpr std::array<double, 3> StaveZ = {17.825+TR1CenterZ,17.825+8.5+TR1CenterZ,17.825+17+TR1CenterZ};
-
+    static constexpr float pitch_x = 29.24 / 1000; // [mm] pixel pitch
+    static constexpr float pitch_y = 26.88 / 1000; // [mm] pixel pitch
+    double err_cl = 10;
     double pi = TMath::Pi();
 
     void draw_TR12();

@@ -14,6 +14,7 @@
 #include "TMarker3DBox.h"
 #include "../build/display.h"
 #include "../build/stats.h"
+#include "../build/LTrackerTrack.h"
 using namespace std;
 
 display::display() {
@@ -482,8 +483,7 @@ void display::layers(){
 
 }
 
-
-void display::tracks(int events, bool track_generation){
+void display::tracks(int events, bool track_generation, LTrackerTrack& tracker){
 
 //TH1F(name, title, nbins, xlow, xup)
 TH1F* hxTR2 = new TH1F("hxTR2", "x_trigger2;x_trigger1;counts", events, -TR2Size[0]*2.5, TR2Size[0]*2.5);
@@ -556,9 +556,22 @@ for (int i=0; i < events; i++){
 
     double xL2 = xTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Cos(phi));
     double yL2 = yTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Sin(phi));
+    double xL1 = xTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Cos(phi));
+    double yL1 = yTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Sin(phi));
     double xL0 = xTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Cos(phi));
     double yL0 = yTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Sin(phi));
+    
+    LCluster pL2;
+    pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], err_cl, err_cl, err_cl, i);
+    tracker.tidy_clusters_lay2.try_emplace(i,pL2);
 
+    LCluster mL1;
+    mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], err_cl, err_cl, err_cl, i);
+    tracker.tidy_clusters_lay1.try_emplace(i,mL1);
+
+    LCluster qL0;
+    qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], err_cl, err_cl, err_cl, i);
+    tracker.tidy_clusters_lay0.try_emplace(i,qL0);
 
     //plotting tracks
     Double_t x_line[2] = {xTR2, xTR1};
@@ -573,6 +586,8 @@ for (int i=0; i < events; i++){
     //reco->Update();
 
 }
+
+
 }
 
 

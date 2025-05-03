@@ -10,6 +10,7 @@
 #include <TCanvas.h> // Include ROOT's TCanvas header
 #include <TView.h>   // Include ROOT's TView header
 #include "TMath.h"
+#include "./LTrackerTrack.h"
 using namespace std;
 
 
@@ -45,7 +46,7 @@ public:
 
     void draw_TR12();
     void layers();
-    void tracks(int, bool);   //true p-q  //false p-theta-phi
+    void tracks(int, bool, LTrackerTrack&);   //true p-q  //false p-theta-phi
 
     display();
 

@@ -1,4 +1,5 @@
 #include "./build/display.h"
+#include "./build/stats.h"
 #include <string>
 #include <array> 
 #include <map>
@@ -9,9 +10,18 @@ using namespace std;
 
 void run(){
 
+    gSystem->Load("libHist");
+    gSystem->Load("libGraf");
+    gSystem->Load("libGraf3d");
+    gSystem->Load("libMathCore");
+    gSystem->Load("libRIO");
+
     gSystem->AddIncludePath("-Ibuild");
+    gSystem->CompileMacro("./src/stats.cpp", "kg", "", "build");
     gSystem->CompileMacro("./src/display.cpp", "kg", "", "build");
 
+
+    stats s;
     display d;
     d.draw_TR12();
     d.layers();
@@ -21,6 +31,8 @@ void run(){
  
     //for each generated track build a cluster for each layer
     //use current algorithm to create the track
+
+    cout << "stats \n" << s << endl;
 
 
 

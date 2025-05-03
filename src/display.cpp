@@ -13,9 +13,7 @@
 #include "TRandom3.h"
 #include "TMarker3DBox.h"
 #include "../build/display.h"
-
-
-
+#include "../build/stats.h"
 using namespace std;
 
 display::display() {
@@ -24,17 +22,16 @@ display::display() {
     geometry->SetRange(-100, -100, 0, 100, 100, 70);
     geometry->ShowAxis();
 
-    reco = new TCanvas("clusters", "3D View_clusters", 800, 600);
-    evreco = TView::CreateView(1);
-    evreco->SetRange(-100, -100, 0, 100, 100, 70);
-    evreco->ShowAxis();
+    //reco = new TCanvas("clusters", "3D View_clusters", 800, 600);
+    //evreco = TView::CreateView(1);
+    //evreco->SetRange(-100, -100, 0, 100, 100, 70);
+    //evreco->ShowAxis();
 
 }
 
 
 void display::draw_TR12(){
 
-    geom->cd();
     geom->cd();
     //draw trigger 1
     TMarker3DBox *TR1_0 = new TMarker3DBox(0,0,0,TR1Size[0]/2,TR1Size[1]/2,TR1Size[2]/2,0,0);
@@ -417,7 +414,7 @@ void display::layers(){
     stave3_93->Draw();
     TMarker3DBox *stave3_94 = new TMarker3DBox(2*(ChipSizeX+ChipDistanceX),+(2*ChipStaveDistanceY+2.5*ChipDistanceY+4.5*ChipSizeY),StaveZ[2],ChipSizeX/2,ChipSizeY/2,0,0,0);
     stave3_94->Draw();
-
+    /*
     reco->cd();
     stave1_00->Draw();stave1_01->Draw();stave1_02->Draw();stave1_03->Draw();stave1_04->Draw();
     stave1_10->Draw();stave1_11->Draw();stave1_12->Draw();stave1_13->Draw();stave1_14->Draw();
@@ -481,7 +478,7 @@ void display::layers(){
     stave3_80->SetLineWidth(2);stave3_81->SetLineWidth(2);stave3_82->SetLineWidth(2);stave3_83->SetLineWidth(2);stave3_84->SetLineWidth(2);
     stave3_90->SetLineWidth(2);stave3_91->SetLineWidth(2);stave3_92->SetLineWidth(2);stave3_93->SetLineWidth(2);stave3_94->SetLineWidth(2);
     geom->cd();
-
+    */
 
 }
 
@@ -529,6 +526,8 @@ for (int i=0; i < events; i++){
         phi = TMath::ATan2((yTR2-yTR1),(xTR2-xTR1));   
         theta = TMath::ATan2(TMath::Hypot(xTR1-xTR2,yTR1-yTR2),zTR2-zTR1);
 
+        stats::hmgthTR1++;
+
     }  
     if(!track_generation){
         double xTR2_fake = rnd->Uniform(-TR2Size[0]*2,TR2Size[0]*2);     
@@ -571,7 +570,7 @@ for (int i=0; i < events; i++){
     geom->cd();
     line_track->Draw();
     geom->Update();
-    reco->Update();
+    //reco->Update();
 
 }
 }

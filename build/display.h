@@ -45,16 +45,16 @@ public:
 
     void draw_TR12();
     void layers();
-    void tracks(int, bool);
+    void tracks(int, bool);   //true p-q  //false p-theta-phi
 
     display();
 
 
 private:
     TCanvas* geom;
-    TCanvas* reco;
+    //TCanvas* reco;
     TView* geometry;
-    TView* evreco;
+    //TView* evreco;
 
 };
 

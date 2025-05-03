@@ -1,5 +1,6 @@
 #include "./build/display.h"
 #include "./build/stats.h"
+#include "./build/LTrackerTrack.h"
 #include <string>
 #include <array> 
 #include <map>
@@ -18,7 +19,10 @@ void run(){
 
     gSystem->AddIncludePath("-Ibuild");
     gSystem->CompileMacro("./src/stats.cpp", "kg", "", "build");
+    gSystem->CompileMacro("./src/LTrackerTrack.cpp", "kg", "", "build");
     gSystem->CompileMacro("./src/display.cpp", "kg", "", "build");
+
+    gSystem->Load("build/LTrackerTrack_cpp.so");
 
 
     stats s;
@@ -33,6 +37,12 @@ void run(){
     //use current algorithm to create the track
 
     cout << "stats \n" << s << endl;
+
+    LCluster gino;
+    cout << "LCluster prova \n" << gino << endl;
+
+    LTracklet t;
+    cout << "LTracklet prova \n" << t << endl;
 
 
 

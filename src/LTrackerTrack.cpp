@@ -40,4 +40,40 @@ void LCluster::fill_cluster(LCluster& cl, double x, double y, double z, double e
     cl.id = id;
 }
 
+void LTrackerTrack::createTracklet(std::pair<int, LCluster> cl_l0, std::pair<int, LCluster> cl_l1, std::vector<LTracklet> &tracklet_vector, int &tracklet_counter)
+{
+  LTracklet tracklet;
+  tracklet.firstClusterId = cl_l0.first;
+  tracklet.secondClusterId = cl_l1.first;
+  tracklet.id = tracklet_counter++;
+  tracklet_vector.push_back(tracklet);
+}
 
+void LTrackerTrack::computeTracklets()
+{
+  int tracklet_counter = 0;
+  // layer 0 - layer 1
+  for (auto &cl_l0 : tidy_clusters_lay0)
+  {
+    for (auto &cl_l1 : tidy_clusters_lay1)
+    {
+      createTracklet(cl_l0, cl_l1, tracklet_lay01, tracklet_counter);
+    }
+  }
+  // layer 1 - layer 2
+  for (auto &cl_l1 : tidy_clusters_lay1)
+  {
+    for (auto &cl_l2 : tidy_clusters_lay2)
+    {
+      createTracklet(cl_l1, cl_l2, tracklet_lay12, tracklet_counter);
+    }
+  }
+  // layer 0 - layer 2
+  for (auto &cl_l0 : tidy_clusters_lay0)
+  {
+    for (auto &cl_l2 : tidy_clusters_lay2)
+    {
+      createTracklet(cl_l0, cl_l2, tracklet_lay02, tracklet_counter);
+    }
+  }
+}

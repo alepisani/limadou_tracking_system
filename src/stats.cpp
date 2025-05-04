@@ -17,9 +17,9 @@ using namespace std;
 
 
 // Constructor
-stats::stats(){}
+stats::stats(int events){}
 
-double stats::hmgt = 0;
+double stats::hmgt = events;
 double stats::hmgthTR1 = 0;
 double stats::hmgthL2 = 0;
 double stats::hmgthL1 = 0;

@@ -51,6 +51,8 @@ class LTrackerTrack{
 public:
   LTrackerTrack();
   void Reset();
+  void createTracklet(std::pair<int, LCluster> cl_l0, std::pair<int, LCluster> cl_l1, std::vector<LTracklet> &tracklet_vector, int &tracklet_counter);
+  void computeTracklets();
 
 
 

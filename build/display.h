@@ -43,6 +43,9 @@ public:
     static constexpr float pitch_y = 26.88 / 1000; // [mm] pixel pitch
     double err_cl = 10;
     double pi = TMath::Pi();
+    static constexpr float dist_z = 8.5;                      // [mm] distance between planes
+    static constexpr float shift_z = 17.825;                  // [mm] distance between trigger layer and firts tracking layer
+    static constexpr float z_origin_shift = 26.325; // [mm] distance between origin of the reference point for tracks and firts tracking layer
 
     void draw_TR12();
     void layers();

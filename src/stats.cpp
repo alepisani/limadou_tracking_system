@@ -15,17 +15,18 @@
 #include "../build/stats.h"
 using namespace std;
 
-
-// Constructor
-stats::stats(int events){}
-
-double stats::hmgt = events;
+double stats::hmgt = 0;
 double stats::hmgthTR1 = 0;
 double stats::hmgthL2 = 0;
 double stats::hmgthL1 = 0;
 double stats::hmgthL0 = 0;
 double stats::hmgthL012 = 0;
 double stats::hmrt = 0;
+
+// Constructor
+stats::stats(int events){
+    hmgt = events;
+}
 
 // Overload operator<<
 std::ostream &operator<<(std::ostream &output, const stats &s) {

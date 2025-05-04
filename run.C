@@ -1,6 +1,7 @@
 #include "./build/display.h"
 #include "./build/stats.h"
 #include "./build/LTrackerTrack.h"
+#include "./build/LTrackerCluster.h"
 #include <string>
 #include <array> 
 #include <map>
@@ -28,6 +29,7 @@ void run(){
 
     gSystem->AddIncludePath("-Ibuild");
     gSystem->CompileMacro("./src/stats.cpp", "kg", "", "build");
+    gSystem->CompileMacro("./src/LTrackerCluster.cpp", "kg", "", "build");
     gSystem->CompileMacro("./src/LTrackerTrack.cpp", "kg", "", "build");
     gSystem->CompileMacro("./src/display.cpp", "kg", "", "build");
 
@@ -46,7 +48,7 @@ void run(){
     //use current algorithm to create the track
 
     cout << "stats \n" << s << endl;
-
+     
     for (int i = 0; i < events; i++) {
         if (tracker.tidy_clusters_lay2.find(i) != tracker.tidy_clusters_lay2.end()) {
             std::cout << "Cluster: " << tracker.tidy_clusters_lay2.at(i) << std::endl;

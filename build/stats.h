@@ -14,7 +14,7 @@ public:
     static double hmrt;           // how many reco tracks
     static double hmgthL012;      // how many generated tracks hitted all 3 layers
 
-    stats(); // Default constructor
+    stats(int); // Default constructor
 
     friend std::ostream &operator<<(std::ostream &output, const stats &s);
 };

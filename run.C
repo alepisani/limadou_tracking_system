@@ -35,23 +35,39 @@ void run(){
 
     gSystem->Load("build/LTrackerTrack_cpp.so");
 
+    TCanvas* real_tracks = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
+    TView* rt = TView::CreateView(1);
+    rt->SetRange(-100, -100, 0, 100, 100, 70);
+    rt->ShowAxis();
+
+    TCanvas* recon_tracks = new TCanvas("reco_tracks", "3D View_recot", 800, 600);
+    TView* recot = TView::CreateView(1);
+    recot->SetRange(-100, -100, 0, 100, 100, 70);
+    recot->ShowAxis();
 
     int events = 10;
     stats s(events);
-    display d;
-    LTrackerTrack tracker;
-    d.draw_TR12();
-    d.layers();
-    d.tracks(events, false, tracker);
-    // sto riempiendo tidy_clusters_lay012
-
-
     
-    //needs to create vector di cluster per ogni layer
+    display generated_tracks;
+    LTrackerTrack tracker;
+    generated_tracks.draw_TR12(real_tracks);
+    generated_tracks.layers(real_tracks);
+    generated_tracks.tracks(events, false, tracker, real_tracks);
 
+    display reco_tracks;
+    reco_tracks.draw_TR12(recon_tracks);
+    reco_tracks.layers(recon_tracks);    
     tracker.computeTracklets();
-    //need to fill tracklet_lay012
-    tracker.computeTrackCandidates();
+    tracker.computeTrackCandidates(recon_tracks);
+
+    real_tracks->Draw();
+    real_tracks->Update();
+    recon_tracks->Draw();
+    recon_tracks->Update();
+
+
+
+
     
     
 

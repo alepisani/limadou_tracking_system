@@ -51,7 +51,7 @@ void LTrackerTrack::createTracklet(std::pair<int, LCluster> cl_l0, std::pair<int
   tracklet.firstClusterId = cl_l0.first;
   tracklet.secondClusterId = cl_l1.first;
   tracklet.id = tracklet_counter++;
-  tracklet_vector.push_back(tracklet);
+  tracklet_vector.push_back(tracklet); 
 }
 
 void LTrackerTrack::computeTracklets()
@@ -208,7 +208,7 @@ void LTrackerTrack::addSpuriousTracks(std::vector<int> &used_tracklets, std::vec
   }
 }
 
-void LTrackerTrack::computeTrackCandidates()
+void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
 {
   //inside () should have LTrackerCluster &clusterer
   int candidateCounter = 0;
@@ -294,11 +294,11 @@ void LTrackerTrack::computeTrackCandidates()
   //voglio studiare quanti di queste si avvicinano abbastanza (quanto abbastanza?) a quelle create con MC
   //voglio disegnarle (need cluster e unisco i punti as usual)
 
-  for (int i=0; i < tracks.size(); i++){
+  for (int i=0; i < 10; i++){
     LTrackCandidate track;
     track = tracks[i];
     display display;
-    track.print_trackcandidate(track, display.reco);
+    track.print_trackcandidate(track, reco);
   }
   stats::hmrt = tracks.size();
   
@@ -307,14 +307,15 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackCandidate::print_trackcandidate(LTrackCandidate& tr, TCanvas* reco){
   reco->cd();
-  double dz = 5;  //value to be changed, what should i use??????
+  double dz = 50;  //value to be changed, what should i use??????
   double x1 = tr.x0 + (tr.z0 - dz)*(TMath::Tan(tr.theta))*(TMath::Cos(tr.phi));
   double y1 = tr.y0 + (tr.z0 - dz)*(TMath::Tan(tr.theta))*(TMath::Sin(tr.phi));
   Double_t x_line[2] = {tr.x0, x1};
   Double_t y_line[2] = {tr.y0, y1};
   Double_t z_line[2] = {tr.z0, dz};
   TPolyLine3D* line_track = new TPolyLine3D(2, x_line, y_line, z_line);
+  line_track->SetLineWidth(2);
   line_track->SetLineColor(kGreen);
-  line_track->SetLineWidth(8);
   line_track->Draw();
+  reco->Update();
 }

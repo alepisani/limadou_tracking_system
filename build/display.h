@@ -47,16 +47,11 @@ public:
     static constexpr float shift_z = 17.825;                  // [mm] distance between trigger layer and firts tracking layer
     static constexpr float z_origin_shift = 26.325; // [mm] distance between origin of the reference point for tracks and firts tracking layer
 
-    void draw_TR12();
-    void layers();
-    void tracks(int, bool, LTrackerTrack&);   //true p-q  //false p-theta-phi
+    void draw_TR12(TCanvas* geom);
+    void layers(TCanvas* geom);
+    void tracks(int, bool, LTrackerTrack&, TCanvas* geom);   //true p-q  //false p-theta-phi
 
     display();
-
-    TCanvas* geom;
-    TCanvas* reco;
-    TView* geometry;
-    TView* evreco;
 
 };
 

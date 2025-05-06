@@ -53,12 +53,10 @@ public:
 
     display();
 
-
-private:
     TCanvas* geom;
-    //TCanvas* reco;
+    TCanvas* reco;
     TView* geometry;
-    //TView* evreco;
+    TView* evreco;
 
 };
 

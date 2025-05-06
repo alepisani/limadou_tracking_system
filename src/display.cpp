@@ -23,10 +23,10 @@ display::display() {
     geometry->SetRange(-100, -100, 0, 100, 100, 70);
     geometry->ShowAxis();
 
-    //reco = new TCanvas("clusters", "3D View_clusters", 800, 600);
-    //evreco = TView::CreateView(1);
-    //evreco->SetRange(-100, -100, 0, 100, 100, 70);
-    //evreco->ShowAxis();
+    reco = new TCanvas("clusters", "3D View_clusters", 800, 600);
+    evreco = TView::CreateView(1);
+    evreco->SetRange(-100, -100, 0, 100, 100, 70);
+    evreco->ShowAxis();
 
 }
 
@@ -584,6 +584,8 @@ for (int i=0; i < events; i++){
     LCluster qL0;
     qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], err_cl, err_cl, err_cl, i);
     tracker.tidy_clusters_lay0.try_emplace(i,qL0);
+
+    
 
     //plotting tracks
     Double_t x_line[2] = {xTR2, xTR1};

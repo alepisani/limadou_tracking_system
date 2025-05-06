@@ -3,6 +3,9 @@
 #include "Math/Minimizer.h"
 #include "Math/Factory.h"
 #include "Math/Functor.h"
+#include <TPolyLine3D.h>
+#include <TCanvas.h>
+#include <TView.h>
 #include "../build/stats.h"
 #include "../build/display.h"
 #include "../build/LTrackerTrack.h"
@@ -11,6 +14,7 @@
 #include <cmath>
 #include <algorithm>
 #include <functional>
+#include "LTrackerTrack.h"
 
 LCluster::LCluster(){}
 LTracklet::LTracklet(){}
@@ -204,14 +208,15 @@ void LTrackerTrack::addSpuriousTracks(std::vector<int> &used_tracklets, std::vec
   }
 }
 
-void LTrackerTrack::computeTrackCandidates(LTrackerCluster &clusterer)
+void LTrackerTrack::computeTrackCandidates()
 {
+  //inside () should have LTrackerCluster &clusterer
   int candidateCounter = 0;
 
-  std::vector<int> clusterer_indices = clusterer.GetClusterIdx();           //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  int n_cluster_clusterer = (int)clusterer_indices.size();
-  clusterer.cls_res_x_m2.resize(n_cluster_clusterer);
-  clusterer.cls_res_y_m2.resize(n_cluster_clusterer);
+  //std::vector<int> clusterer_indices = clusterer.GetClusterIdx();           
+  //int n_cluster_clusterer = (int)clusterer_indices.size();
+  //clusterer.cls_res_x_m2.resize(n_cluster_clusterer);
+  //clusterer.cls_res_y_m2.resize(n_cluster_clusterer);
 
   for (auto &trkl01 : tracklet_lay01)
   {
@@ -238,9 +243,9 @@ void LTrackerTrack::computeTrackCandidates(LTrackerCluster &clusterer)
           float l_res_x = clus.x - (trkCand.x0 + (clus.z - display::z_origin_shift) * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi));
           float l_res_y = clus.y - (trkCand.y0 + (clus.z - display::z_origin_shift) * TMath::Tan(trkCand.theta) * TMath::Sin(trkCand.phi));
 
-          int position = std::distance(clusterer_indices.begin(), std::find(clusterer_indices.begin(), clusterer_indices.end(), clus.id));
-          clusterer.cls_res_x_m2[position] = l_res_x;
-          clusterer.cls_res_y_m2[position] = l_res_y;
+          //int position = std::distance(clusterer_indices.begin(), std::find(clusterer_indices.begin(), clusterer_indices.end(), clus.id));
+          //clusterer.cls_res_x_m2[position] = l_res_x;
+          //clusterer.cls_res_y_m2[position] = l_res_y;
         }
         trkCand.tracklet_id = {trkl01.id, trkl12.id};
         track_candidates.push_back(trkCand);
@@ -283,4 +288,33 @@ void LTrackerTrack::computeTrackCandidates(LTrackerCluster &clusterer)
   {
     tracks[i].id = i;
   }
+
+  //tracks = insieme di trackcandidate; voglio disegnare queste 
+  //parametri su cui fare della statistica 
+  //voglio studiare quanti di queste si avvicinano abbastanza (quanto abbastanza?) a quelle create con MC
+  //voglio disegnarle (need cluster e unisco i punti as usual)
+
+  for (int i=0; i < tracks.size(); i++){
+    LTrackCandidate track;
+    track = tracks[i];
+    display display;
+    track.print_trackcandidate(track, display.reco);
+  }
+  stats::hmrt = tracks.size();
+  
+
+}
+
+void LTrackCandidate::print_trackcandidate(LTrackCandidate& tr, TCanvas* reco){
+  reco->cd();
+  double dz = 5;  //value to be changed, what should i use??????
+  double x1 = tr.x0 + (tr.z0 - dz)*(TMath::Tan(tr.theta))*(TMath::Cos(tr.phi));
+  double y1 = tr.y0 + (tr.z0 - dz)*(TMath::Tan(tr.theta))*(TMath::Sin(tr.phi));
+  Double_t x_line[2] = {tr.x0, x1};
+  Double_t y_line[2] = {tr.y0, y1};
+  Double_t z_line[2] = {tr.z0, dz};
+  TPolyLine3D* line_track = new TPolyLine3D(2, x_line, y_line, z_line);
+  line_track->SetLineColor(kGreen);
+  line_track->SetLineWidth(8);
+  line_track->Draw();
 }

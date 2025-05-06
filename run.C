@@ -43,12 +43,24 @@ void run(){
     d.draw_TR12();
     d.layers();
     d.tracks(events, false, tracker);
- 
-    //for each generated track build a cluster for each layer
-    //use current algorithm to create the track
+    // sto riempiendo tidy_clusters_lay012
+
+
+    
+    //needs to create vector di cluster per ogni layer
+
+    tracker.computeTracklets();
+    //need to fill tracklet_lay012
+    tracker.computeTrackCandidates();
+    
+    
+
 
     cout << "stats \n" << s << endl;
-     
+}
+
+
+/*
     for (int i = 0; i < events; i++) {
         if (tracker.tidy_clusters_lay2.find(i) != tracker.tidy_clusters_lay2.end()) {
             std::cout << "Cluster: " << tracker.tidy_clusters_lay2.at(i) << std::endl;
@@ -56,6 +68,4 @@ void run(){
             std::cout << "No cluster found for key: " << i << std::endl;
         }
     }
-
-
-}
+    */

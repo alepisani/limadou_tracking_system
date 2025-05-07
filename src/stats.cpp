@@ -22,6 +22,11 @@ double stats::hmgthL1 = 0;
 double stats::hmgthL0 = 0;
 double stats::hmgthL012 = 0;
 double stats::hmrt = 0;
+bool stats::hitL0;
+bool stats::hitL1;
+bool stats::hitL2;
+
+
 
 // Constructor
 stats::stats(int events){
@@ -35,7 +40,7 @@ std::ostream &operator<<(std::ostream &output, const stats &s) {
     output << "how many generated tracks hitted L2: " << stats::hmgthL2 << endl;
     output << "how many generated tracks hitted L1: " << stats::hmgthL1 << endl;
     output << "how many generated tracks hitted L0: " << stats::hmgthL0 << endl;
-    output << "how many generated tracks hitted each layer: " << stats::hmgthL012 << endl;
+    output << "how many generated tracks hitted each layer (TR1+TR2): " << stats::hmgthL012 << endl;
     output << "how many reco tracks: " << stats::hmrt << endl;
     return output;
 }

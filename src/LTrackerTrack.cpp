@@ -289,11 +289,6 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
     tracks[i].id = i;
   }
 
-  //tracks = insieme di trackcandidate; voglio disegnare queste 
-  //parametri su cui fare della statistica 
-  //voglio studiare quanti di queste si avvicinano abbastanza (quanto abbastanza?) a quelle create con MC
-  //voglio disegnarle (need cluster e unisco i punti as usual)
-
   for (int i=0; i < 10; i++){
     LTrackCandidate track;
     track = tracks[i];
@@ -307,7 +302,7 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
 
 void LTrackCandidate::print_trackcandidate(LTrackCandidate& tr, TCanvas* reco){
   reco->cd();
-  double dz = 50;  //value to be changed, what should i use??????
+  double dz = -50;  //value to be changed, what should i use??????
   double x1 = tr.x0 + (tr.z0 - dz)*(TMath::Tan(tr.theta))*(TMath::Cos(tr.phi));
   double y1 = tr.y0 + (tr.z0 - dz)*(TMath::Tan(tr.theta))*(TMath::Sin(tr.phi));
   Double_t x_line[2] = {tr.x0, x1};

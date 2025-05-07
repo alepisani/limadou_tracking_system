@@ -13,6 +13,10 @@ public:
     static double hmgthL0;        // how many generated tracks hitted L0
     static double hmrt;           // how many reco tracks
     static double hmgthL012;      // how many generated tracks hitted all 3 layers
+    static bool hitL0;
+    static bool hitL1;
+    static bool hitL2;
+    
 
     stats(int); // Default constructor
 

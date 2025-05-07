@@ -1,13 +1,14 @@
-#include "./build/display.h"
-#include "./build/stats.h"
-#include "./build/LTrackerTrack.h"
-#include "./build/LTrackerCluster.h"
+#include "../include/display.h"
+#include "../include/stats.h"
+#include "../include/LTrackerTrack.h"
+#include "../include/LTrackerCluster.h"
 #include <string>
 #include <array> 
 #include <map>
 #include <iostream>
 #include <cmath>
 #include "TSystem.h" // Include ROOT's TSystem header
+#include "TApplication.h"
 using namespace std;
 
 
@@ -20,7 +21,7 @@ void printKeysDirectly(const std::unordered_map<int, LCluster>& map) {
 }
 
 void run(){
-
+    /*
     gSystem->Load("libHist");
     gSystem->Load("libGraf");
     gSystem->Load("libGraf3d");
@@ -34,6 +35,7 @@ void run(){
     gSystem->CompileMacro("./src/display.cpp", "kg", "", "build");
 
     gSystem->Load("build/LTrackerTrack_cpp.so");
+    */
 
     TCanvas* real_tracks = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
     TView* rt = TView::CreateView(1);
@@ -65,13 +67,6 @@ void run(){
     recon_tracks->Draw();
     recon_tracks->Update();
 
-
-
-
-    
-    
-
-
     cout << "stats \n" << s << endl;
 }
 
@@ -85,3 +80,14 @@ void run(){
         }
     }
     */
+
+
+
+
+int main(int argc, char** argv) {
+    TApplication app("ROOT Application", &argc, argv); // Inizializza ROOT
+    run();
+    cout << "Premi Invio per chiudere il programma..." << endl;
+    cin.get(); // Aspetta l'input dell'utente
+    return 0;
+}

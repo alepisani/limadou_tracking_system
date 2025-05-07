@@ -6,10 +6,10 @@
 #include <TPolyLine3D.h>
 #include <TCanvas.h>
 #include <TView.h>
-#include "../build/stats.h"
-#include "../build/display.h"
-#include "../build/LTrackerTrack.h"
-#include "../build/LTrackerCluster.h"
+#include "../include/stats.h"
+#include "../include/display.h"
+#include "../include/LTrackerTrack.h"
+#include "../include/LTrackerCluster.h"
 
 #include <cmath>
 #include <algorithm>

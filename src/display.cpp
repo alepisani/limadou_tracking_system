@@ -12,9 +12,9 @@
 #include "TLine.h"
 #include "TRandom3.h"
 #include "TMarker3DBox.h"
-#include "../build/display.h"
-#include "../build/stats.h"
-#include "../build/LTrackerTrack.h"
+#include "../include/display.h"
+#include "../include/stats.h"
+#include "../include/LTrackerTrack.h"
 using namespace std;
 
 display::display() {

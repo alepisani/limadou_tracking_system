@@ -12,7 +12,7 @@
 #include "TLine.h"
 #include "TRandom3.h"
 #include "TMarker3DBox.h"
-#include "../build/stats.h"
+#include "../include/stats.h"
 using namespace std;
 
 double stats::hmgt = 0;

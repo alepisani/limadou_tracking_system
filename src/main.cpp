@@ -9,6 +9,7 @@
 #include <cmath>
 #include "TSystem.h" // Include ROOT's TSystem header
 #include "TApplication.h"
+#include <thread>
 using namespace std;
 
 
@@ -47,7 +48,7 @@ void run(){
     recot->SetRange(-100, -100, 0, 100, 100, 70);
     recot->ShowAxis();
 
-    int events = 10;
+    int events = 50;
     stats s(events);
     
     display generated_tracks;
@@ -83,11 +84,23 @@ void run(){
 
 
 
-
 int main(int argc, char** argv) {
-    TApplication app("ROOT Application", &argc, argv); // Inizializza ROOT
-    run();
-    cout << "Premi Invio per chiudere il programma..." << endl;
-    cin.get(); // Aspetta l'input dell'utente
+    TApplication app("ROOT Application", &argc, argv);
+
+    run(); 
+
+    std::cout << "press ENTER to close everything" << std::endl;
+
+    // Thread secondario per leggere l'input senza bloccare l'interfaccia grafica
+    std::thread inputThread([]() {
+        std::cin.get(); // Attende INVIO
+        gSystem->Exit(0); // Termina il loop di app.Run()
+    });
+
+    // Avvia il loop degli eventi di ROOT (canvas interattivo)
+    app.Run(); // Bloccante ma necessario per l'interazione
+
+    inputThread.join(); // Attende la fine del thread di input
+
     return 0;
 }

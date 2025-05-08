@@ -20,10 +20,10 @@ void run(){
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
 
-    TCanvas* recon_tracks = new TCanvas("reco_tracks", "3D View_recot", 800, 600);
-    TView* recot = TView::CreateView(1);
-    recot->SetRange(-100, -100, 0, 100, 100, 70);
-    recot->ShowAxis();
+    //TCanvas* recon_tracks = new TCanvas("reco_tracks", "3D View_recot", 800, 600);
+    //TView* recot = TView::CreateView(1);
+    //recot->SetRange(-100, -100, 0, 100, 100, 70);
+    //recot->ShowAxis();
 
     int events = 10;
     stats s(events);
@@ -33,19 +33,6 @@ void run(){
     generated_tracks.draw_TR12(real_tracks);
     generated_tracks.layers(real_tracks);
     generated_tracks.tracks(events, tracker, real_tracks);
-
-    /*
-    display reco_tracks;
-    reco_tracks.draw_TR12(recon_tracks);
-    reco_tracks.layers(recon_tracks);    
-    tracker.computeTracklets();
-    tracker.computeTrackCandidates(recon_tracks);
-
-    real_tracks->Draw();
-    real_tracks->Update();
-    recon_tracks->Draw();
-    recon_tracks->Update();
-    */
 
     cout << "stats \n" << s << endl;
 }

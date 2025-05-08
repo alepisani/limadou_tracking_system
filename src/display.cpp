@@ -595,8 +595,6 @@ for (int i=0; i < events; i++){
         hphi0L->Fill(phi);
     }
 
-    //stats::hmgth0L = stats::hmgt - (stats::hmgthL012 + stats::hmgth2L + stats::hmgth1L);
-
     hxTR2->Fill(xTR2);
     hyTR2->Fill(yTR2);
     hzTR2->Fill(zTR2);

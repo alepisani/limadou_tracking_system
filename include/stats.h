@@ -16,6 +16,8 @@ public:
     static bool hitL0;
     static bool hitL1;
     static bool hitL2;
+    static double hmgth1L;        //how many generated tarcks hitted only 1 layer
+    static double hmgth2L;        //how many generated tarcks hitted only 2 layer
     
 
     stats(int); // Default constructor

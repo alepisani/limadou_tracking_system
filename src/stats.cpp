@@ -25,6 +25,8 @@ double stats::hmrt = 0;
 bool stats::hitL0;
 bool stats::hitL1;
 bool stats::hitL2;
+double stats::hmgth1L = 0;
+double stats::hmgth2L = 0;
 
 
 
@@ -35,12 +37,14 @@ stats::stats(int events){
 
 // Overload operator<<
 std::ostream &operator<<(std::ostream &output, const stats &s) {
-    output << "how many generated tracks: " << stats::hmgt << endl;
+    output << "how many generated tracks hitted TR2: " << stats::hmgt << endl;
     output << "how many generated tracks hitted TR1: " << stats::hmgthTR1 << endl;
     output << "how many generated tracks hitted L2: " << stats::hmgthL2 << endl;
     output << "how many generated tracks hitted L1: " << stats::hmgthL1 << endl;
     output << "how many generated tracks hitted L0: " << stats::hmgthL0 << endl;
-    output << "how many generated tracks hitted each layer (TR1+TR2): " << stats::hmgthL012 << endl;
+    output << "how many generated tracks hitted all  3 layer: " << stats::hmgthL012 << endl;
+    output << "how many generated tracks hitted only 2 layer: " << stats::hmgth2L << endl;
+    output << "how many generated tracks hitted only 1 layer: " << stats::hmgth1L << endl;
     output << "how many reco tracks: " << stats::hmrt << endl;
     return output;
 }

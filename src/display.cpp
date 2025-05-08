@@ -417,7 +417,7 @@ void display::layers(TCanvas* geom){
 
 }
 
-void display::tracks(int events, bool track_generation, LTrackerTrack& tracker, TCanvas* geom){
+void display::tracks(int events, LTrackerTrack& tracker, TCanvas* geom){
 
 //TH1F(name, title, nbins, xlow, xup)
 TH1F* hxTR2 = new TH1F("hxTR2", "x_trigger2;x_trigger1;counts", events, -TR2Size[0]*2.5, TR2Size[0]*2.5);
@@ -441,7 +441,8 @@ for (int i=0; i < events; i++){
 
     //i layer acquisiscono il segnale quando arriva un segnale AND dagli scintillatori
     //genero traccie misurabili come traccie che passano nei due scintillatori TR2, TR1
-    if(track_generation){
+    
+    do {
         double xTR2_fake = rnd->Uniform(-TR2Size[0]*2,TR2Size[0]*2);     
         if(xTR2_fake>0 && xTR2_fake<TR2Size[0]){xTR2 = xTR2_fake + 0.5*TR2GapX;}
         if(xTR2_fake<0 && xTR2_fake>-TR2Size[0]){xTR2 = xTR2_fake - 0.5*TR2GapX;}
@@ -449,31 +450,7 @@ for (int i=0; i < events; i++){
         if(xTR2_fake>-2*TR2Size[0] && xTR2_fake<-TR2Size[0]){xTR2 = xTR2_fake - 1.5*TR2GapX;}
         yTR2 = rnd->Uniform(-TR2Size[1]/2,TR2Size[1]/2);
         zTR2 = rnd->Uniform(TR2CenterZ-TR2Thickness/2,TR2CenterZ+TR2Thickness/2);
-
-        xTR1 = rnd->Uniform(-TR1Size[0]/2,TR1Size[0]/2);
-        double yTR1_fake = rnd->Uniform(-TR1Size[1]*2.5,TR1Size[1]*2.5);     
-        if(yTR1_fake<TR1Size[1]/2 && yTR1_fake>-TR1Size[1]/2){yTR1 = yTR1_fake;}
-        if(yTR1_fake<1.5*TR1Size[1] && yTR1_fake>0.5*TR1Size[1]){yTR1 = yTR1_fake + TR1GapY;}
-        if(yTR1_fake<2.5*TR1Size[1] && yTR1_fake>1.5*TR1Size[1]){yTR1 = yTR1_fake + 2*TR1GapY;}
-        if(yTR1_fake>-1.5*TR1Size[1] && yTR1_fake<-0.5*TR1Size[1]){yTR1 = yTR1_fake - TR1GapY;}
-        if(yTR1_fake>-2.5*TR1Size[1] && yTR1_fake<-1.5*TR1Size[1]){yTR1 = yTR1_fake - 2*TR1GapY;}
         zTR1 = rnd->Uniform(TR1CenterZ-TR1Thickness/2,TR1CenterZ+TR1Thickness/2);
-
-        //uso ATan2 instead of ATan to avoid losing information
-        phi = TMath::ATan2((yTR2-yTR1),(xTR2-xTR1));   
-        theta = TMath::ATan2(TMath::Hypot(xTR1-xTR2,yTR1-yTR2),zTR2-zTR1);
-
-        stats::hmgthTR1++;
-
-    }  
-    if(!track_generation){
-        double xTR2_fake = rnd->Uniform(-TR2Size[0]*2,TR2Size[0]*2);     
-        if(xTR2_fake>0 && xTR2_fake<TR2Size[0]){xTR2 = xTR2_fake + 0.5*TR2GapX;}
-        if(xTR2_fake<0 && xTR2_fake>-TR2Size[0]){xTR2 = xTR2_fake - 0.5*TR2GapX;}
-        if(xTR2_fake<2*TR2Size[0] && xTR2_fake>TR2Size[0]){xTR2 = xTR2_fake + 1.5*TR2GapX;}
-        if(xTR2_fake>-2*TR2Size[0] && xTR2_fake<-TR2Size[0]){xTR2 = xTR2_fake - 1.5*TR2GapX;}
-        yTR2 = rnd->Uniform(-TR2Size[1]/2,TR2Size[1]/2);
-        zTR2 = rnd->Uniform(TR2CenterZ-TR2Thickness/2,TR2CenterZ+TR2Thickness/2);
 
         phi = rnd->Uniform(-pi,pi);
         //double THETA = rnd->Uniform(0,pi/2);
@@ -487,7 +464,17 @@ for (int i=0; i < events; i++){
 
         xTR1 = xTR2 + (zTR2-TR1CenterZ)*(TMath::Sin(theta))*(TMath::Cos(phi))*(1/(TMath::Cos(theta)));
         yTR1 = yTR2 + (zTR2-TR1CenterZ)*(TMath::Sin(theta))*(TMath::Sin(phi)*(1/(TMath::Cos(theta))));
-    }
+    } while (!(xTR1 < TR1Size[0]/2 && xTR1 > -TR1Size[0]/2 &&
+        (
+            (yTR1 < (2.5*TR1Size[1]+2*TR1GapY) && yTR1 > (1.5*TR1Size[1]+2*TR1GapY)) ||
+            (yTR1 < (1.5*TR1Size[1]+1*TR1GapY) && yTR1 > (0.5*TR1Size[1]+1*TR1GapY)) ||
+            (yTR1 < (0.5*TR1Size[1]+0*TR1GapY) && yTR1 > -(0.5*TR1Size[1]+0*TR1GapY)) ||
+            (yTR1 < -(0.5*TR1Size[1]+1*TR1GapY) && yTR1 > -(1.5*TR1Size[1]+1*TR1GapY)) ||
+            (yTR1 < -(1.5*TR1Size[1]+2*TR1GapY) && yTR1 > -(2.5*TR1Size[1]+2*TR1GapY)) 
+        )
+    ));
+    
+        
     hxTR2->Fill(xTR2);
     hyTR2->Fill(yTR2);
     hzTR2->Fill(zTR2);
@@ -589,6 +576,12 @@ for (int i=0; i < events; i++){
     if(stats::hitL2 && stats::hitL1 && stats::hitL0 && stats::hmgthTR1){
         stats::hmgthL012++;
     }
+    if((stats::hitL0 && stats::hitL1)||(stats::hitL1 && stats::hitL2)||(stats::hitL0 && stats::hitL2)){
+        stats::hmgth2L++;
+    }
+    if(stats::hitL0 || stats::hitL1 || stats::hitL2){
+        stats::hmgth1L++;
+    }
 
 
     hxTR2->Fill(xTR2);
@@ -602,10 +595,8 @@ for (int i=0; i < events; i++){
 }
 
 char file[200];
-sprintf(file,"../data/geom");
-geom->SaveAs(file);
 //output mc distributions
-sprintf(file,"../data/geomHist.root");
+sprintf(file,"../data/statsHist.root");
 TFile f(file,"RECREATE");
 hxTR2->Write();
 hyTR2->Write();

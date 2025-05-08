@@ -32,7 +32,7 @@ void run(){
     LTrackerTrack tracker;
     generated_tracks.draw_TR12(real_tracks);
     generated_tracks.layers(real_tracks);
-    generated_tracks.tracks(events, false, tracker, real_tracks);
+    generated_tracks.tracks(events, tracker, real_tracks);
 
     /*
     display reco_tracks;
@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
 
     run(); 
 
-    std::cout << "press ENTER to close everything" << std::endl;
+    std::cout << "press ENTER to close" << std::endl;
 
     // Thread secondario per leggere l'input senza bloccare l'interfaccia grafica
     std::thread inputThread([]() {

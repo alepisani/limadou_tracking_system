@@ -427,10 +427,15 @@ TH1F* hxTR1 = new TH1F("hxTR1", "x_trigger1;x_trigger1;counts", events, -TR1Size
 TH1F* hyTR1 = new TH1F("hyTR1", "y_trigger1;y_trigger1;counts", events, -TR1Size[1]*3, TR1Size[1]*3);
 TH1F* hzTR1 = new TH1F("hzTR1", "z_trigger1;z_trigger1;counts", events, -TR1Size[2]/2+TR1CenterZ, TR1Size[2]/2+TR1CenterZ);
 TH1F* hphi = new TH1F("hphi", "phi;#phi;counts", events, -pi, pi);
-TH1F* htheta = new TH1F("htheta", "theta;#theta;counts", 360, 0, pi/2);
-TH1F* htheta3L = new TH1F("htheta3L", "theta;#theta;counts", 360, 0, pi/2);
-TH1F* htheta2L = new TH1F("htheta2L", "theta;#theta;counts", 360, 0, pi/2);
-TH1F* htheta1L = new TH1F("htheta1L", "theta;#theta;counts", 360, 0, pi/2);
+TH1F* htheta = new TH1F("htheta", "theta;#theta;counts", events, 0, pi/2);
+TH1F* htheta3L = new TH1F("htheta3L", "theta;#theta;counts", events, 0, pi/2);
+TH1F* hphi3L = new TH1F("hphi3L", "phi;#phi;counts", events, -pi, pi);
+TH1F* htheta2L = new TH1F("htheta2L", "theta;#theta;counts", events, 0, pi/2);
+TH1F* hphi2L = new TH1F("hphi2L", "phi;#phi;counts", events, -pi, pi);
+TH1F* htheta1L = new TH1F("htheta1L", "theta;#theta;counts", events, 0, pi/2);
+TH1F* hphi1L = new TH1F("hphi1L", "phi;#phi;counts", events, -pi, pi);
+TH1F* htheta0L = new TH1F("htheta0L", "theta;#theta;counts", events, 0, pi/2);
+TH1F* hphi0L = new TH1F("hphi0L", "phi;#phi;counts", events, -pi, pi);
 
 //puoi settare il seed for reproducibility
 TRandom3 *rnd = new TRandom3(0); 
@@ -477,15 +482,6 @@ for (int i=0; i < events; i++){
         )
     ));
     
-        
-    hxTR2->Fill(xTR2);
-    hyTR2->Fill(yTR2);
-    hzTR2->Fill(zTR2);
-    hxTR1->Fill(xTR1);
-    hyTR1->Fill(yTR1);
-    hzTR1->Fill(zTR1);
-    hphi->Fill(phi);
-    htheta->Fill(theta);
 
     double xL2 = xTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Cos(phi));
     double yL2 = yTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Sin(phi));
@@ -576,19 +572,30 @@ for (int i=0; i < events; i++){
     stats::hitL0 = true;
     }
 
+
+    //contiamo quante traccie hanno colpito quanti layer ciascuna (3layer, 2layer, 1layer, 0layer)
     if(stats::hitL2 && stats::hitL1 && stats::hitL0 && stats::hmgthTR1){
         stats::hmgthL012++;
-
+        htheta3L->Fill(theta);
+        hphi3L->Fill(phi);
     }
     if((stats::hitL0 && stats::hitL1 && !stats::hitL2)||(stats::hitL1 && stats::hitL2 && !stats::hitL0)||(stats::hitL0 && stats::hitL2 && !stats::hitL1)){
         stats::hmgth2L++;
+        htheta2L->Fill(theta);
+        hphi2L->Fill(phi);
     }
     if((stats::hitL0 && !stats::hitL1 && !stats::hitL2)||(stats::hitL1 && !stats::hitL2 && !stats::hitL0)||(!stats::hitL0 && stats::hitL2 && !stats::hitL1)){
         stats::hmgth1L++;
+        htheta1L->Fill(theta);
+        hphi1L->Fill(phi);
+    }
+    if(!stats::hitL0 && !stats::hitL1 && !stats::hitL2){
+        stats::hmgth0L++;
+        htheta0L->Fill(theta);
+        hphi0L->Fill(phi);
     }
 
-    stats::hmgth0L = stats::hmgt - (stats::hmgthL012 + stats::hmgth2L + stats::hmgth1L);
-
+    //stats::hmgth0L = stats::hmgt - (stats::hmgthL012 + stats::hmgth2L + stats::hmgth1L);
 
     hxTR2->Fill(xTR2);
     hyTR2->Fill(yTR2);
@@ -602,6 +609,7 @@ for (int i=0; i < events; i++){
 
 char file[200];
 //output mc distributions
+geom->SaveAs("../data/plot.png");
 sprintf(file,"../data/statsHist.root");
 TFile f(file,"RECREATE");
 hxTR2->Write();
@@ -611,7 +619,15 @@ hxTR1->Write();
 hyTR1->Write();
 hzTR1->Write();
 hphi->Write();
+hphi3L->Write();
+hphi2L->Write();
+hphi1L->Write();
+hphi0L->Write();
 htheta->Write();
+htheta3L->Write();
+htheta2L->Write();
+htheta1L->Write();
+htheta0L->Write();
 f.Close();
 
 }

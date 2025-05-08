@@ -427,7 +427,10 @@ TH1F* hxTR1 = new TH1F("hxTR1", "x_trigger1;x_trigger1;counts", events, -TR1Size
 TH1F* hyTR1 = new TH1F("hyTR1", "y_trigger1;y_trigger1;counts", events, -TR1Size[1]*3, TR1Size[1]*3);
 TH1F* hzTR1 = new TH1F("hzTR1", "z_trigger1;z_trigger1;counts", events, -TR1Size[2]/2+TR1CenterZ, TR1Size[2]/2+TR1CenterZ);
 TH1F* hphi = new TH1F("hphi", "phi;#phi;counts", events, -pi, pi);
-TH1F* htheta = new TH1F("htheta", "theta;#theta;counts", events, 0, pi/2);
+TH1F* htheta = new TH1F("htheta", "theta;#theta;counts", 360, 0, pi/2);
+TH1F* htheta3L = new TH1F("htheta3L", "theta;#theta;counts", 360, 0, pi/2);
+TH1F* htheta2L = new TH1F("htheta2L", "theta;#theta;counts", 360, 0, pi/2);
+TH1F* htheta1L = new TH1F("htheta1L", "theta;#theta;counts", 360, 0, pi/2);
 
 //puoi settare il seed for reproducibility
 TRandom3 *rnd = new TRandom3(0); 
@@ -575,13 +578,16 @@ for (int i=0; i < events; i++){
 
     if(stats::hitL2 && stats::hitL1 && stats::hitL0 && stats::hmgthTR1){
         stats::hmgthL012++;
+
     }
-    if((stats::hitL0 && stats::hitL1)||(stats::hitL1 && stats::hitL2)||(stats::hitL0 && stats::hitL2)){
+    if((stats::hitL0 && stats::hitL1 && !stats::hitL2)||(stats::hitL1 && stats::hitL2 && !stats::hitL0)||(stats::hitL0 && stats::hitL2 && !stats::hitL1)){
         stats::hmgth2L++;
     }
-    if(stats::hitL0 || stats::hitL1 || stats::hitL2){
+    if((stats::hitL0 && !stats::hitL1 && !stats::hitL2)||(stats::hitL1 && !stats::hitL2 && !stats::hitL0)||(!stats::hitL0 && stats::hitL2 && !stats::hitL1)){
         stats::hmgth1L++;
     }
+
+    stats::hmgth0L = stats::hmgt - (stats::hmgthL012 + stats::hmgth2L + stats::hmgth1L);
 
 
     hxTR2->Fill(xTR2);

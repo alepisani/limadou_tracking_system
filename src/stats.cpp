@@ -27,6 +27,7 @@ bool stats::hitL1;
 bool stats::hitL2;
 double stats::hmgth1L = 0;
 double stats::hmgth2L = 0;
+double stats::hmgth0L = 0;
 
 
 
@@ -45,6 +46,7 @@ std::ostream &operator<<(std::ostream &output, const stats &s) {
     output << "how many generated tracks hitted all  3 layer: " << stats::hmgthL012 << endl;
     output << "how many generated tracks hitted only 2 layer: " << stats::hmgth2L << endl;
     output << "how many generated tracks hitted only 1 layer: " << stats::hmgth1L << endl;
+    output << "how many generated tracks hitted only 0 layer: " << stats::hmgth0L << endl;
     output << "how many reco tracks: " << stats::hmrt << endl;
     return output;
 }

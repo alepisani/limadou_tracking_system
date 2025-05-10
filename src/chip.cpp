@@ -30,6 +30,7 @@ void chip::print_chip(chip& c, TCanvas* canvas){
     //a,b,c coordinate del centro della box
     //metà delle dimensioni della scatola --> a -+ d / b -+ e / c -+ f
     //g,h angoli di orientazione della box, sempre 0,0
+    canvas->cd();
     if(check_chip_status(c)){
         TMarker3DBox *chip = new TMarker3DBox(c.x, c.y, c.z, chip::x_dim/2, chip::y_dim/2, chip::z_dim/2, 0,0);
         chip->SetLineWidth(2);
@@ -39,9 +40,17 @@ void chip::print_chip(chip& c, TCanvas* canvas){
     if(!check_chip_status(c)){
         cout << "WARNING! Il seguente chip risulta spento, id: " << c.id << endl;
     }
-    
 }
 
+void chip::set_chip_coordinates(chip& c, double x, double y, double z, unsigned short id){
+    c.x = x;
+    c.y = y;
+    c.z = z;
+    c.id = id;
+}
+
+
+chips::chips(){}
 
 chips::chips(const std::array<unsigned short, 150> ChipIds, const std::array<TVector3, 150> chip_coordinates){
     //fill che id_coordinates vector with appropriate values
@@ -54,7 +63,37 @@ chips::chips(const std::array<unsigned short, 150> ChipIds, const std::array<TVe
     }
 }
 
-    static const std::array<unsigned short, 150> ChipIds = {
+void chips::print_all_chips(chips& c, TCanvas* canvas){
+    for(int i = 0; i< ChipIds.size(); i++){
+        const TVector3& coordinates = chip_coordinates[i];
+        double x = coordinates[0];
+        double y = coordinates[1];
+        double z = coordinates[2];
+        chip chip_instance;
+        chip_instance.id = ChipIds[i];
+        chip_instance.set_chip_coordinates(chip_instance,x,y,z, ChipIds[i]);
+        if(!chip_instance.is_chip_dead(chip_instance, chips::dead_chip)){
+            chip_instance.print_chip(chip_instance,canvas);            //chip is alive --> print it
+        }
+        if(chip_instance.is_chip_dead(chip_instance, chips::dead_chip)){
+            cout << "WARNING! THE FOLLOWING CHIP IS TURNED OFF, id: " << ChipIds[i] << endl;
+        }
+    }
+}
+
+bool chip::is_chip_dead(chip& c, const std::vector<unsigned short> dead_chip){
+    for(int i = 0; i < dead_chip.size(); i++){
+        if(c.id == dead_chip[i]){
+            return true;                //chip dead --> function return true
+        }    
+    }
+    return false;               //chip alive --> function return false, means not dead
+}
+
+const std::vector<unsigned short> chips::dead_chip = {0x07c,0x07b,0x07a,0x079,0x078,
+    0x070,0x071,0x072,0x073,0x074};
+
+const std::array<unsigned short, 150> chips::ChipIds = {
     //50 chip per piano
     // top layer
     0x07c,0x07b,0x07a,0x079,0x078,
@@ -91,7 +130,7 @@ chips::chips(const std::array<unsigned short, 150> ChipIds, const std::array<TVe
     0xe70,0xe71,0xe72,0xe73,0xe74
     };
 
-    static const std::array<TVector3, 150> chip_coordinates = {
+const std::array<TVector3, 150> chips::chip_coordinates = {
     // top layer (layer2)
     // row 0
     TVector3(-2*(display::ChipSizeX + display::ChipDistanceX), -(2*display::ChipStaveDistanceY + 2.5*display::ChipDistanceY + 4.5*display::ChipSizeY), display::StaveZ[2]),

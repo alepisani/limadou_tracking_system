@@ -36,6 +36,8 @@ void run(){
     
     chip c;
     c.print_chip(c, real_tracks);
+    chips cc;
+    cc.print_all_chips(cc, real_tracks);
 
 
 

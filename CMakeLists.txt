@@ -10,6 +10,7 @@ set(SOURCES
     src/LTrackerTrack.cpp
     src/stats.cpp
     src/display.cpp
+    src/chip.cpp
     src/main.cpp
 )
 

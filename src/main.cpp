@@ -1,4 +1,5 @@
 #include "../include/display.h"
+#include "../include/chip.h"
 #include "../include/stats.h"
 #include "../include/LTrackerTrack.h"
 #include "../include/LTrackerCluster.h"
@@ -31,7 +32,14 @@ void run(){
     display generated_tracks;
     LTrackerTrack tracker;
     generated_tracks.draw_TR12(real_tracks);
-    generated_tracks.layers(real_tracks);
+    //generated_tracks.layers(real_tracks);
+    
+    chip c;
+    c.print_chip(c, real_tracks);
+
+
+
+
     generated_tracks.tracks(events, tracker, real_tracks);
 
     cout << "stats \n" << s << endl;

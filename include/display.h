@@ -17,6 +17,7 @@ using namespace std;
 class display{
 public:
 
+    //all measure in mm
     
     //trigger 1 (bottom trigger)
     static constexpr double TR1CenterZ = 0.;
@@ -31,10 +32,11 @@ public:
     //layers
     static constexpr int PixelNCols = 1024;
     static constexpr int PixelNRows = 512;
-    static constexpr double PixelSizeCols = 0.02924;
+    static constexpr double PixelSizeCols = 0.02924; 
     static constexpr double PixelSizeRows = 0.02688;
     static constexpr double ChipSizeX = PixelSizeCols*PixelNCols;
     static constexpr double ChipSizeY = PixelSizeRows*PixelNRows;
+    static constexpr double ChipSizeZ = 0.050;     //50microm
     static constexpr double ChipDistanceX = 0.150;
     static constexpr double ChipDistanceY = 0.150;
     static constexpr double ChipStaveDistanceY = 7.22312;
@@ -58,3 +60,7 @@ public:
 
 
 #endif
+
+
+
+

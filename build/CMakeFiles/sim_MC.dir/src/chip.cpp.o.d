@@ -1,8 +1,6 @@
-CMakeFiles/sim_MC.dir/src/main.cpp.o: \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/main.cpp \
- /usr/include/stdc-predef.h \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/display.h \
- /usr/include/c++/11/string \
+CMakeFiles/sim_MC.dir/src/chip.cpp.o: \
+ /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/chip.cpp \
+ /usr/include/stdc-predef.h /usr/include/c++/11/string \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -138,11 +136,7 @@ CMakeFiles/sim_MC.dir/src/main.cpp.o: \
  /usr/include/c++/11/bits/uses_allocator.h \
  /usr/include/c++/11/bits/invoke.h \
  /usr/include/c++/11/bits/stl_multimap.h \
- /usr/include/c++/11/bits/erase_if.h /usr/include/c++/11/vector \
- /usr/include/c++/11/bits/stl_uninitialized.h \
- /usr/include/c++/11/bits/stl_vector.h \
- /usr/include/c++/11/bits/stl_bvector.h \
- /usr/include/c++/11/bits/vector.tcc /usr/include/c++/11/iostream \
+ /usr/include/c++/11/bits/erase_if.h /usr/include/c++/11/iostream \
  /usr/include/c++/11/ostream /usr/include/c++/11/ios \
  /usr/include/c++/11/exception /usr/include/c++/11/bits/exception_ptr.h \
  /usr/include/c++/11/bits/cxxabi_init_exception.h \
@@ -186,8 +180,7 @@ CMakeFiles/sim_MC.dir/src/main.cpp.o: \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /usr/local/root/include/TCanvas.h /usr/local/root/include/TPad.h \
- /usr/local/root/include/TVirtualPad.h /usr/local/root/include/TObject.h \
+ /usr/local/root/include/TApplication.h /usr/local/root/include/TObject.h \
  /usr/local/root/include/Rtypes.h /usr/local/root/include/RtypesCore.h \
  /usr/local/root/include/ROOT/RConfig.hxx \
  /usr/local/root/include/ROOT/../RVersion.h \
@@ -206,15 +199,16 @@ CMakeFiles/sim_MC.dir/src/main.cpp.o: \
  /usr/include/c++/11/atomic /usr/include/c++/11/bits/atomic_base.h \
  /usr/include/c++/11/bits/atomic_lockfree_defines.h \
  /usr/local/root/include/TGenericClassInfo.h \
- /usr/local/root/include/TSchemaHelper.h \
- /usr/local/root/include/TIsAProxy.h \
+ /usr/local/root/include/TSchemaHelper.h /usr/include/c++/11/vector \
+ /usr/include/c++/11/bits/stl_uninitialized.h \
+ /usr/include/c++/11/bits/stl_vector.h \
+ /usr/include/c++/11/bits/stl_bvector.h \
+ /usr/include/c++/11/bits/vector.tcc /usr/local/root/include/TIsAProxy.h \
  /usr/local/root/include/TVirtualIsAProxy.h \
  /usr/local/root/include/TStorage.h \
  /usr/local/root/include/TVersionCheck.h \
- /usr/local/root/include/RVersion.h /usr/local/root/include/TAttLine.h \
- /usr/local/root/include/TAttFill.h /usr/local/root/include/TAttPad.h \
- /usr/local/root/include/TQObject.h /usr/local/root/include/TList.h \
- /usr/local/root/include/TSeqCollection.h \
+ /usr/local/root/include/RVersion.h /usr/local/root/include/TQObject.h \
+ /usr/local/root/include/TList.h /usr/local/root/include/TSeqCollection.h \
  /usr/local/root/include/TCollection.h \
  /usr/local/root/include/TIterator.h /usr/local/root/include/TString.h \
  /usr/local/root/include/TMathBase.h /usr/include/c++/11/algorithm \
@@ -255,6 +249,10 @@ CMakeFiles/sim_MC.dir/src/main.cpp.o: \
  /usr/local/root/include/TDictionary.h /usr/local/root/include/TNamed.h \
  /usr/local/root/include/ESTLType.h \
  /usr/local/root/include/TInterpreterValue.h \
+ /usr/local/root/include/TApplicationImp.h \
+ /usr/local/root/include/TCanvas.h /usr/local/root/include/TPad.h \
+ /usr/local/root/include/TVirtualPad.h /usr/local/root/include/TAttLine.h \
+ /usr/local/root/include/TAttFill.h /usr/local/root/include/TAttPad.h \
  /usr/local/root/include/GuiTypes.h /usr/include/c++/11/climits \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
@@ -266,13 +264,40 @@ CMakeFiles/sim_MC.dir/src/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
  /usr/local/root/include/Buttons.h /usr/local/root/include/TAttBBox2D.h \
  /usr/local/root/include/TAttCanvas.h /usr/local/root/include/TView.h \
- /usr/local/root/include/TMath.h /usr/local/root/include/TError.h \
- /usr/local/root/include/DllImport.h \
+ /usr/local/root/include/TList.h /usr/local/root/include/TPolyLine3D.h \
+ /usr/local/root/include/TAtt3D.h /usr/local/root/include/TH1F.h \
+ /usr/local/root/include/TH1.h /usr/local/root/include/TAxis.h \
+ /usr/local/root/include/TAttAxis.h /usr/local/root/include/TArrayD.h \
+ /usr/local/root/include/TArray.h /usr/local/root/include/TAttMarker.h \
+ /usr/local/root/include/TArrayC.h /usr/local/root/include/TArrayS.h \
+ /usr/local/root/include/TArrayI.h /usr/local/root/include/TArrayF.h \
+ /usr/local/root/include/Foption.h \
+ /usr/local/root/include/ROOT/EExecutionPolicy.hxx \
+ /usr/local/root/include/TVectorFfwd.h \
+ /usr/local/root/include/TVectorDfwd.h \
+ /usr/local/root/include/TFitResultPtr.h /usr/include/c++/11/cfloat \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/float.h \
- /usr/include/c++/11/math.h \
+ /usr/local/root/include/TLine.h /usr/local/root/include/TRandom3.h \
+ /usr/local/root/include/TRandom.h \
+ /usr/local/root/include/Math/TRandomEngine.h \
+ /usr/local/root/include/TMarker3DBox.h /usr/local/root/include/TFile.h \
+ /usr/local/root/include/Compression.h \
+ /usr/local/root/include/TDirectoryFile.h \
+ /usr/local/root/include/TDirectory.h /usr/local/root/include/TClass.h \
+ /usr/local/root/include/TObjArray.h /usr/include/c++/11/unordered_set \
+ /usr/include/c++/11/bits/unordered_set.h /usr/local/root/include/TUUID.h \
+ /usr/local/root/include/TBuffer.h /usr/local/root/include/Bytes.h \
+ /usr/local/root/include/Byteswap.h /usr/local/root/include/TDatime.h \
+ /usr/local/root/include/TUrl.h \
+ /usr/local/root/include/ROOT/RConcurrentHashColl.hxx \
+ /usr/local/root/include/Rtypes.h \
+ /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/display.h \
+ /usr/local/root/include/TMath.h /usr/local/root/include/TError.h \
+ /usr/local/root/include/DllImport.h /usr/include/c++/11/math.h \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/./LTrackerTrack.h \
  /usr/local/root/include/TObject.h \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/././LTrackerCluster.h \
+ /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/stats.h \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/chip.h \
  /usr/local/root/include/TVector3.h /usr/local/root/include/TVector2.h \
  /usr/local/root/include/TMatrix.h /usr/local/root/include/TMatrixF.h \
@@ -280,28 +305,9 @@ CMakeFiles/sim_MC.dir/src/main.cpp.o: \
  /usr/local/root/include/TMatrixTBase.h \
  /usr/local/root/include/TMatrixFBasefwd.h \
  /usr/local/root/include/TMatrixDBasefwd.h \
- /usr/local/root/include/TVectorFfwd.h \
- /usr/local/root/include/TVectorDfwd.h \
  /usr/local/root/include/TMatrixTUtils.h \
  /usr/local/root/include/TMatrixFfwd.h \
  /usr/local/root/include/TMatrixFUtils.h \
  /usr/local/root/include/TMatrixFUtilsfwd.h \
  /usr/local/root/include/TMath.h \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/display.h \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/stats.h \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/LTrackerTrack.h \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/LTrackerCluster.h \
- /usr/local/root/include/TSystem.h /usr/include/fcntl.h \
- /usr/include/x86_64-linux-gnu/bits/fcntl.h \
- /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h \
- /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
- /usr/include/linux/falloc.h /usr/include/x86_64-linux-gnu/bits/stat.h \
- /usr/include/x86_64-linux-gnu/bits/struct_stat.h \
- /usr/local/root/include/TInetAddress.h /usr/local/root/include/TTimer.h \
- /usr/local/root/include/TSysEvtHandler.h /usr/local/root/include/TTime.h \
- /usr/local/root/include/TApplication.h \
- /usr/local/root/include/TApplicationImp.h /usr/include/c++/11/thread \
- /usr/include/c++/11/bits/std_thread.h \
- /usr/include/c++/11/bits/this_thread_sleep.h /usr/include/c++/11/chrono \
- /usr/include/c++/11/ratio /usr/include/c++/11/ctime \
- /usr/include/c++/11/bits/parse_numbers.h
+ /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/display.h

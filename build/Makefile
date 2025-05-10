@@ -153,6 +153,30 @@ src/LTrackerTrack.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/LTrackerTrack.cpp.s
 .PHONY : src/LTrackerTrack.cpp.s
 
+src/chip.o: src/chip.cpp.o
+.PHONY : src/chip.o
+
+# target to build an object file
+src/chip.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/chip.cpp.o
+.PHONY : src/chip.cpp.o
+
+src/chip.i: src/chip.cpp.i
+.PHONY : src/chip.i
+
+# target to preprocess a source file
+src/chip.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/chip.cpp.i
+.PHONY : src/chip.cpp.i
+
+src/chip.s: src/chip.cpp.s
+.PHONY : src/chip.s
+
+# target to generate assembly for a file
+src/chip.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/chip.cpp.s
+.PHONY : src/chip.cpp.s
+
 src/display.o: src/display.cpp.o
 .PHONY : src/display.o
 
@@ -237,6 +261,9 @@ help:
 	@echo "... src/LTrackerTrack.o"
 	@echo "... src/LTrackerTrack.i"
 	@echo "... src/LTrackerTrack.s"
+	@echo "... src/chip.o"
+	@echo "... src/chip.i"
+	@echo "... src/chip.s"
 	@echo "... src/display.o"
 	@echo "... src/display.i"
 	@echo "... src/display.s"

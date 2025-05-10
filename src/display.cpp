@@ -16,7 +16,6 @@
 #include "../include/display.h"
 #include "../include/stats.h"
 #include "../include/LTrackerTrack.h"
-#include "../include/display.h"
 using namespace std;
 
 display::display() {
@@ -541,6 +540,7 @@ for (int i=0; i < events; i++){
     stats::hmgthL2++;
     stats::hitL2 = true;
     }
+    //check if the track hitted the staves in layer 1
     if((xL1 < ChipSizeX*2.5 + ChipDistanceX && xL1 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
     ((yL1 < ChipSizeY*5 + ChipStaveDistanceY*2 + ChipDistanceY*2.5 && yL1 > ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*2.5) ||
     (yL1 < ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*1.5 && yL1 > ChipSizeY*3 + ChipStaveDistanceY*2 + ChipDistanceY*1.5) ||
@@ -556,6 +556,7 @@ for (int i=0; i < events; i++){
     stats::hmgthL1++;
     stats::hitL1 = true;
     }
+    //check if the track hitted the staves in layer 0
     if((xL0 < ChipSizeX*2.5 + ChipDistanceX && xL0 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
     ((yL0 < ChipSizeY*5 + ChipStaveDistanceY*2 + ChipDistanceY*2.5 && yL0 > ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*2.5) ||
     (yL0 < ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*1.5 && yL0 > ChipSizeY*3 + ChipStaveDistanceY*2 + ChipDistanceY*1.5) ||

@@ -1,5 +1,14 @@
 # humble limadou tracking system 
 
-first comparing existing method then imprementing new one, hopefully faster and not less accurate
+to run the code you firstly need to build it: go in the /build directory
 
-to run the code go in the correct path and run the run.C file with root run.C++ 
+$ cmake ..
+
+$ make 
+
+$ ./sim_MC
+
+if the code is set properly and all the libraries are install the code should works (always make a pray first)
+
+
+### ENJOY   

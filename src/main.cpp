@@ -11,6 +11,7 @@
 #include "TSystem.h" // Include ROOT's TSystem header
 #include "TApplication.h"
 #include <thread>
+#include <TStopwatch.h>
 using namespace std;
 
 
@@ -46,10 +47,16 @@ void run(){
 
 
 int main(int argc, char** argv) {
+    TStopwatch timer;       // crea il cronometro
+    timer.Start();          // avvia il timer
+
     TApplication app("ROOT Application", &argc, argv);
     run(); 
 
-    std::cout << "press ENTER to close" << std::endl;
+    timer.Stop();           // ferma il timer
+
+    std::cout << "Real time: " << timer.RealTime() << " s\n";
+    std::cout << "CPU time:  " << timer.CpuTime()  << " s\n";
 
     // Thread secondario per leggere l'input senza bloccare l'interfaccia grafica
     std::thread inputThread([]() {

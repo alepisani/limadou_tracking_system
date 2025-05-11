@@ -43,13 +43,16 @@ stats::stats(int events){
 std::ostream &operator<<(std::ostream &output, const stats &s) {
     output << "how many generated tracks hitted TR2: " << stats::hmgt << endl;
     output << "how many generated tracks hitted TR1: " << stats::hmgthTR1 << endl;
-    output << "how many generated tracks hitted L2: " << stats::hmgthL2 << endl;
-    output << "how many generated tracks hitted L1: " << stats::hmgthL1 << endl;
-    output << "how many generated tracks hitted L0: " << stats::hmgthL0 << endl;
+    output << "how many generated tracks hitted L2: " << stats::hmgthL2-stats::hmgthdcL2 << endl;
+    output << "how many generated tracks hitted L1: " << stats::hmgthL1-stats::hmgthdcL1 << endl;
+    output << "how many generated tracks hitted L0: " << stats::hmgthL0-stats::hmgthdcL0 << endl;
     output << "how many generated tracks hitted all  3 layer: " << stats::hmgthL012 << endl;
     output << "how many generated tracks hitted only 2 layer: " << stats::hmgth2L << endl;
     output << "how many generated tracks hitted only 1 layer: " << stats::hmgth1L << endl;
     output << "how many generated tracks hitted only 0 layer: " << stats::hmgth0L << endl;
+    output << "how many generated tracks hitted dead chip on layer 2: " << stats::hmgthdcL2 << endl;
+    output << "how many generated tracks hitted dead chip on layer 1: " << stats::hmgthdcL1 << endl;
+    output << "how many generated tracks hitted dead chip on layer 0: " << stats::hmgthdcL0 << endl;
     output << "how many reco tracks: " << stats::hmrt << endl;
     return output;
 }

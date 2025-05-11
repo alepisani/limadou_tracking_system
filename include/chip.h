@@ -28,25 +28,23 @@ struct chip{
     bool status = true;         //status (acceso = true/spento = false)
 
     bool check_chip_status(chip& c);
-    void print_chip(chip& c, TCanvas* canvas);
+    void print_chip(chip& c, TCanvas* canvas, int);
     void set_chip_coordinates(chip& c, double x, double y, double z, unsigned short id);
     bool is_chip_dead(chip& c, const std::vector<unsigned short> dead_chip);
+    void is_dead_chip_tracking_smt(chip& c, LCluster pL2, LCluster mL1, LCluster qL0);
 };
 
-struct chips{
+struct chips {
     chips();
-    chips(const std::array<unsigned short, 150> ChipIds, const std::array<TVector3, 150> chip_coordinates);
+    //chips(const std::array<unsigned short, 150>& ChipIds, const std::array<TVector3, 150>& chip_coordinates);
     void print_all_chips(chips& c, TCanvas* canvas);
-    
-    std::unordered_map<unsigned short, std::vector<TVector3>> id_coordinates;
+    void print_id_coordinates();
 
+    static const std::vector<unsigned short> dead_chip;
     static const std::array<unsigned short, 150> ChipIds;
     static const std::array<TVector3, 150> chip_coordinates;
-    
-    //crea vector con tutti i chip spenti e controlla su questo array
-    static const std::vector<unsigned short> dead_chip;
+    static std::unordered_map<unsigned short, TVector3> id_coordinates; 
 };
-
 
 #endif
 

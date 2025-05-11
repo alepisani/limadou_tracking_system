@@ -28,6 +28,9 @@ bool stats::hitL2;
 double stats::hmgth1L = 0;
 double stats::hmgth2L = 0;
 double stats::hmgth0L = 0;
+double stats::hmgthdcL2 = 0;
+double stats::hmgthdcL1 = 0;
+double stats::hmgthdcL0 = 0;
 
 
 

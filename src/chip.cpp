@@ -16,6 +16,8 @@
 #include "../include/display.h"
 #include "../include/stats.h"
 #include "../include/chip.h"
+#include "../include/LTrackerTrack.h"
+#include "chip.h"
 
 using namespace std;
 
@@ -25,7 +27,7 @@ bool chip::check_chip_status(chip& c){
     return c.status;
 }
 
-void chip::print_chip(chip& c, TCanvas* canvas){
+void chip::print_chip(chip& c, TCanvas* canvas, int color){
     //TMarker3DBox *chip = new TMarker3DBox(a,b,c,d,e,f,g,h);
     //a,b,c coordinate del centro della box
     //metà delle dimensioni della scatola --> a -+ d / b -+ e / c -+ f
@@ -34,7 +36,7 @@ void chip::print_chip(chip& c, TCanvas* canvas){
     if(check_chip_status(c)){
         TMarker3DBox *chip = new TMarker3DBox(c.x, c.y, c.z, chip::x_dim/2, chip::y_dim/2, chip::z_dim/2, 0,0);
         chip->SetLineWidth(2);
-        chip->SetLineColor(kCyan);
+        chip->SetLineColor(color);
         chip->Draw();   
     }
     if(!check_chip_status(c)){
@@ -50,16 +52,12 @@ void chip::set_chip_coordinates(chip& c, double x, double y, double z, unsigned 
 }
 
 
-chips::chips(){}
 
-chips::chips(const std::array<unsigned short, 150> ChipIds, const std::array<TVector3, 150> chip_coordinates){
-    //fill che id_coordinates vector with appropriate values
+chips::chips() {
     for (size_t i = 0; i < ChipIds.size(); ++i) {
         unsigned short chipId = ChipIds[i];
         const TVector3& coordinates = chip_coordinates[i];
-
-        // Aggiungi il TVector3 alla lista (vector) associata al ChipId
-        id_coordinates[chipId].push_back(coordinates);
+        chips::id_coordinates[chipId] = coordinates;
     }
 }
 
@@ -73,10 +71,11 @@ void chips::print_all_chips(chips& c, TCanvas* canvas){
         chip_instance.id = ChipIds[i];
         chip_instance.set_chip_coordinates(chip_instance,x,y,z, ChipIds[i]);
         if(!chip_instance.is_chip_dead(chip_instance, chips::dead_chip)){
-            chip_instance.print_chip(chip_instance,canvas);            //chip is alive --> print it
+            chip_instance.print_chip(chip_instance,canvas, 7);            //chip is alive --> print it
         }
         if(chip_instance.is_chip_dead(chip_instance, chips::dead_chip)){
             cout << "WARNING! THE FOLLOWING CHIP IS TURNED OFF, id: " << ChipIds[i] << endl;
+            chip_instance.print_chip(chip_instance,canvas, 2);
         }
     }
 }
@@ -90,8 +89,81 @@ bool chip::is_chip_dead(chip& c, const std::vector<unsigned short> dead_chip){
     return false;               //chip alive --> function return false, means not dead
 }
 
+void chip::is_dead_chip_tracking_smt(chip &c, LCluster pL2, LCluster mL1, LCluster qL0) {
+    if (chips::id_coordinates.empty()) {
+        cout << "Errore: id_coordinates non è stato popolato!       AAAAAAAAAAAAAAAAAAAAAAAAAAAAa" << endl;
+    }
+    for (int i = 0; i < chips::dead_chip.size(); i++) {
+        // Controlla se la chiave esiste in id_coordinates
+        auto it = chips::id_coordinates.find(chips::dead_chip[i]);
+        if (it != chips::id_coordinates.end()) {
+            TVector3 dead_chip_coordinates = it->second;
+            c.x = dead_chip_coordinates[0];
+            c.y = dead_chip_coordinates[1];
+            c.z = dead_chip_coordinates[2];
+
+            // Controlla se pL2 è all'interno del chip morto
+            if (pL2.x < c.x + c.x_dim / 2 && pL2.x > c.x - c.x_dim / 2 &&
+                pL2.y < c.y + c.y_dim / 2 && pL2.y > c.y - c.y_dim / 2 &&
+                pL2.z < c.z + c.z_dim / 2 && pL2.z > c.z - c.z_dim / 2) {
+                cout << "WARNING, IL CHIP MORTO CON ID: " << chips::dead_chip[i] 
+                     << ", non sta rilevando la track sul layer 2" << endl;
+                stats::hmgthdcL2++;
+            }
+
+            // Controlla se mL1 è all'interno del chip morto
+            if (mL1.x < c.x + c.x_dim / 2 && mL1.x > c.x - c.x_dim / 2 &&
+                mL1.y < c.y + c.y_dim / 2 && mL1.y > c.y - c.y_dim / 2 &&
+                mL1.z < c.z + c.z_dim / 2 && mL1.z > c.z - c.z_dim / 2) {
+                cout << "WARNING, IL CHIP MORTO CON ID: " << chips::dead_chip[i] 
+                     << ", non sta rilevando la track sul layer 1" << endl;
+                stats::hmgthdcL1++;
+            }
+
+            // Controlla se qL0 è all'interno del chip morto
+            if (qL0.x < c.x + c.x_dim / 2 && qL0.x > c.x - c.x_dim / 2 &&
+                qL0.y < c.y + c.y_dim / 2 && qL0.y > c.y - c.y_dim / 2 &&
+                qL0.z < c.z + c.z_dim / 2 && qL0.z > c.z - c.z_dim / 2) {
+                cout << "WARNING, IL CHIP MORTO CON ID: " << chips::dead_chip[i] 
+                     << ", non sta rilevando la track sul layer 0" << endl;
+                stats::hmgthdcL0++;
+            }
+        } else {
+            // Messaggio di errore se la chiave non esiste
+            cout << "Errore: Chip ID " << chips::dead_chip[i] 
+                 << " non trovato in id_coordinates." << endl;
+        }
+    }
+}
+
+void chips::print_id_coordinates() {
+    if (id_coordinates.empty()) {
+        cout << "id_coordinates è vuoto!" << endl;
+        return;
+    }
+
+    cout << "Contenuto di id_coordinates:" << endl;
+    for (const auto& pair : id_coordinates) {
+        cout << "Chip ID: " << pair.first 
+             << ", Coordinates: (" << pair.second[0] 
+             << ", " << pair.second[1] 
+             << ", " << pair.second[2] << ")" << endl;
+    }
+}
+
+
 const std::vector<unsigned short> chips::dead_chip = {0x07c,0x07b,0x07a,0x079,0x078,
-    0x070,0x071,0x072,0x073,0x074};
+    0x070,0x071,0x072,0x073,0x074,
+    0x37c,0x37b,0x37a,0x379,0x378,
+    0x370,0x371,0x372,0x373,0x374,
+    0x67c,0x67b,0x67a,0x679,0x678,
+    0x670,0x671,0x672,0x673,0x674,
+    0x97c,0x97b,0x97a,0x979,0x978,
+    0x970,0x971,0x972,0x973,0x974,
+    0xc7c,0xc7b,0xc7a,0xc79,0xc78,
+    0xc70,0xc71,0xc72,0xc73,0xc74};  //add here dead chip
+
+std::unordered_map<unsigned short, TVector3> chips::id_coordinates;
 
 const std::array<unsigned short, 150> chips::ChipIds = {
     //50 chip per piano

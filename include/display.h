@@ -50,7 +50,6 @@ public:
     static constexpr float z_origin_shift = 26.325; // [mm] distance between origin of the reference point for tracks and firts tracking layer
 
     void draw_TR12(TCanvas* geom);
-    void layers(TCanvas* geom);
     void tracks(int, LTrackerTrack&, TCanvas* geom);   //true p-q  //false p-theta-phi
     
 

@@ -19,6 +19,9 @@ public:
     static double hmgth1L;        //how many generated tarcks hitted only 1 layer
     static double hmgth2L;        //how many generated tarcks hitted only 2 layer
     static double hmgth0L;        //how many generated tarcks hitted only 0 layer
+    static double hmgthdcL2;      //how many generated tracks hitted dead chip on layer 2
+    static double hmgthdcL1;      //how many generated tracks hitted dead chip on layer 1
+    static double hmgthdcL0;      //how many generated tracks hitted dead chip on layer 0
     
 
     stats(int); // Default constructor

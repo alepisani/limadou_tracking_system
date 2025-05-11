@@ -298,4 +298,17 @@ CMakeFiles/sim_MC.dir/src/display.cpp.o: \
  /usr/local/root/include/TObject.h \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/././LTrackerCluster.h \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/stats.h \
+ /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/chip.h \
+ /usr/local/root/include/TVector3.h /usr/local/root/include/TVector2.h \
+ /usr/local/root/include/TMatrix.h /usr/local/root/include/TMatrixF.h \
+ /usr/local/root/include/TMatrixT.h \
+ /usr/local/root/include/TMatrixTBase.h \
+ /usr/local/root/include/TMatrixFBasefwd.h \
+ /usr/local/root/include/TMatrixDBasefwd.h \
+ /usr/local/root/include/TMatrixTUtils.h \
+ /usr/local/root/include/TMatrixFfwd.h \
+ /usr/local/root/include/TMatrixFUtils.h \
+ /usr/local/root/include/TMatrixFUtilsfwd.h \
+ /usr/local/root/include/TMath.h \
+ /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/display.h \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/LTrackerTrack.h

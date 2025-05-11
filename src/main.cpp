@@ -34,13 +34,10 @@ void run(){
     generated_tracks.draw_TR12(real_tracks);
     //generated_tracks.layers(real_tracks);
     
-    chip c;
-    c.print_chip(c, real_tracks);
+    //chip c;
+    //c.print_chip(c, real_tracks);
     chips cc;
     cc.print_all_chips(cc, real_tracks);
-
-
-
 
     generated_tracks.tracks(events, tracker, real_tracks);
 
@@ -50,7 +47,6 @@ void run(){
 
 int main(int argc, char** argv) {
     TApplication app("ROOT Application", &argc, argv);
-
     run(); 
 
     std::cout << "press ENTER to close" << std::endl;

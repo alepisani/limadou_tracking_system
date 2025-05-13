@@ -27,7 +27,7 @@ void run(){
     //recot->SetRange(-100, -100, 0, 100, 100, 70);
     //recot->ShowAxis();
 
-    int events = 10;
+    int events = 10000;
     stats s(events);
     
     display generated_tracks;

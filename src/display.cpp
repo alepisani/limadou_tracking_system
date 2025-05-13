@@ -263,8 +263,8 @@ for (int i=0; i < events; i++){
 
 char file[200];
 //output mc distributions
-geom->SaveAs("../data/plot.png");
-sprintf(file,"../data/statsHist.root");
+//geom->SaveAs("../data/plot.png");
+sprintf(file,"../data/statsHisttracks.root");
 TFile f(file,"RECREATE");
 hxTR2->Write();
 hyTR2->Write();

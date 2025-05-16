@@ -1,7 +1,13 @@
-#dati ottenuti da varie MC al variare del numero di track utilizzate per stimare accettanza
+dati ottenuti da varie MC al variare del numero di track utilizzate per stimare accettanza
 
-## track generate con distribuzione phi,xTR2,yTR2,zTR2 costnte e cos^2(theta)
+track generate con distribuzione phi,xTR2,yTR2,zTR2 costnte e cos^2(theta)
 
+
+^     TR2
+|     L2
+|     L1
+|     L0
+|     TR1
 
 
 generazione track considerando spessore proprio dei trigger (8,2)mm
@@ -41,4 +47,18 @@ how many generated tracks hitted all  3 layer: 6672
 how many generated tracks hitted only 2 layer: 1689
 how many generated tracks hitted only 1 layer: 804
 how many generated tracks hitted only 0 layer: 835
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+considerando lo spessore dei trigger e distro di theta uniforme e non cos^2
+
+how many generated tracks hitted TR2: 10000
+how many generated tracks hitted TR1: 10000
+how many generated tracks hitted L2: 6896
+how many generated tracks hitted L1: 6717
+how many generated tracks hitted L0: 6368
+how many generated tracks hitted all  3 layer: 4875
+how many generated tracks hitted only 2 layer: 2129
+how many generated tracks hitted only 1 layer: 1098
+how many generated tracks hitted only 0 layer: 1898
 

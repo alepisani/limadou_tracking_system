@@ -112,17 +112,16 @@ for (int i=0; i < events; i++){
         zTR1 = rnd->Uniform(TR1CenterZ-TR1Thickness/2,TR1CenterZ+TR1Thickness/2);
 
         phi = rnd->Uniform(-pi,pi);
-        //double THETA = rnd->Uniform(0,pi/2);
-        //theta = pow(TMath::Cos(THETA),2); 
         double THETA; double y;
         do {
             THETA = gRandom->Uniform(0, TMath::Pi());
             y = gRandom->Uniform(0, 1);
         } while (y > TMath::Cos(THETA) * TMath::Cos(THETA));
         theta = THETA;
+        
 
-        xTR1 = xTR2 + (zTR2-TR1CenterZ)*(TMath::Sin(theta))*(TMath::Cos(phi))*(1/(TMath::Cos(theta)));
-        yTR1 = yTR2 + (zTR2-TR1CenterZ)*(TMath::Sin(theta))*(TMath::Sin(phi)*(1/(TMath::Cos(theta))));
+        xTR1 = xTR2 + (zTR2-TR1CenterZ)*(TMath::Sin(theta))*(TMath::Cos(phi));
+        yTR1 = yTR2 + (zTR2-TR1CenterZ)*(TMath::Sin(theta))*(TMath::Sin(phi));
     } while (!(xTR1 < TR1Size[0]/2 && xTR1 > -TR1Size[0]/2 &&
         (
             (yTR1 < (2.5*TR1Size[1]+2*TR1GapY) && yTR1 > (1.5*TR1Size[1]+2*TR1GapY)) ||

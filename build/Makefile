@@ -201,6 +201,30 @@ src/display.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/display.cpp.s
 .PHONY : src/display.cpp.s
 
+src/eventdata.o: src/eventdata.cpp.o
+.PHONY : src/eventdata.o
+
+# target to build an object file
+src/eventdata.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/eventdata.cpp.o
+.PHONY : src/eventdata.cpp.o
+
+src/eventdata.i: src/eventdata.cpp.i
+.PHONY : src/eventdata.i
+
+# target to preprocess a source file
+src/eventdata.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/eventdata.cpp.i
+.PHONY : src/eventdata.cpp.i
+
+src/eventdata.s: src/eventdata.cpp.s
+.PHONY : src/eventdata.s
+
+# target to generate assembly for a file
+src/eventdata.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/eventdata.cpp.s
+.PHONY : src/eventdata.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -267,6 +291,9 @@ help:
 	@echo "... src/display.o"
 	@echo "... src/display.i"
 	@echo "... src/display.s"
+	@echo "... src/eventdata.o"
+	@echo "... src/eventdata.i"
+	@echo "... src/eventdata.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

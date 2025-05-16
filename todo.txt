@@ -1,0 +1,14 @@
+to do:
+
+-estrai le stats dalla run di muoni che hai in data_beam_test
+    -stats:
+        -hmgthTR2
+        -hmgthTR1
+        -hmgthL2
+        -hmgthL1
+        -hmgthL2
+        -hmgth3L
+        -hmgth2L
+        -hmgth1L
+        -hmgth0L
+        

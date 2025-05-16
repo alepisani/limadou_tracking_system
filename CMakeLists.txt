@@ -12,6 +12,7 @@ set(SOURCES
     src/display.cpp
     src/chip.cpp
     src/main.cpp
+    src/eventdata.cpp
 )
 
 # Aggiungi la directory include

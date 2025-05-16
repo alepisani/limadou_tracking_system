@@ -3,6 +3,7 @@
 #include "../include/stats.h"
 #include "../include/LTrackerTrack.h"
 #include "../include/LTrackerCluster.h"
+#include "../include/eventdata.h"
 #include <string>
 #include <array> 
 #include <map>
@@ -27,7 +28,7 @@ void run(){
     //recot->SetRange(-100, -100, 0, 100, 100, 70);
     //recot->ShowAxis();
 
-    int events = 10000;
+    int events = 100;
     stats s(events);
     
     display generated_tracks;
@@ -43,6 +44,8 @@ void run(){
     generated_tracks.tracks(events, tracker, real_tracks);
 
     cout << "stats \n" << s << endl;
+
+
 }
 
 
@@ -51,7 +54,8 @@ int main(int argc, char** argv) {
     timer.Start();          // avvia il timer
 
     TApplication app("ROOT Application", &argc, argv);
-    run(); 
+    eventdata e;
+    e.takedata();
 
     timer.Stop();           // ferma il timer
 

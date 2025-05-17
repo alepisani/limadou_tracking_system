@@ -7,8 +7,8 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
-#include <TCanvas.h> // Include ROOT's TCanvas header
-#include <TView.h>   // Include ROOT's TView header
+#include <TCanvas.h> 
+#include <TView.h>   
 #include "TMath.h"
 using namespace std;
 
@@ -30,10 +30,9 @@ struct eventdata{
     std::vector<int> DIR_cls_idx;
 
     eventdata();       //default constructor
+    friend std::ostream &operator<<(std::ostream &output, const eventdata &ev);
     void takedata();    
-    // data();
-    // from_int_to_hex();
-    // print_data_on_canvas();
+    void print_data_on_canvas(TCanvas* can);
 
 };
 

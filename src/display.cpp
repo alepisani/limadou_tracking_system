@@ -9,7 +9,6 @@
 #include <TList.h>
 #include <TPolyLine3D.h>
 #include "TH1F.h"
-#include "TLine.h"
 #include "TRandom3.h"
 #include "TMarker3DBox.h"
 #include "TFile.h"
@@ -87,6 +86,8 @@ TH1F* htheta1L = new TH1F("htheta1L", "theta;#theta;counts", events, 0, pi/2);
 TH1F* hphi1L = new TH1F("hphi1L", "phi;#phi;counts", events, -pi, pi);
 TH1F* htheta0L = new TH1F("htheta0L", "theta;#theta;counts", events, 0, pi/2);
 TH1F* hphi0L = new TH1F("hphi0L", "phi;#phi;counts", events, -pi, pi);
+TH1F* hx = new TH1F("x", "x;x;counts", events, -TR2Size[0]*2.5, TR2Size[0]*2.5);
+TH1F* hy = new TH1F("y", "y;y;counts", events, -100, 100);
 
 //puoi settare il seed for reproducibility
 TRandom3 *rnd = new TRandom3(0); 
@@ -258,6 +259,17 @@ for (int i=0; i < events; i++){
     hzTR1->Fill(zTR1);
     hphi->Fill(phi);
     htheta->Fill(theta);
+
+    if(stats::hitL2 || stats::hitL1 || stats::hitL0){
+        hx->Fill(xL2);
+        hx->Fill(xL1);
+        hx->Fill(xL0);
+        hy->Fill(yL2);
+        hy->Fill(yL1);
+        hy->Fill(yL0);
+    }
+
+
 }
 
 char file[200];
@@ -281,6 +293,8 @@ htheta3L->Write();
 htheta2L->Write();
 htheta1L->Write();
 htheta0L->Write();
+hx->Write();
+hy->Write();
 f.Close();
 
 }

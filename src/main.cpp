@@ -23,12 +23,7 @@ void run(){
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
 
-    //TCanvas* recon_tracks = new TCanvas("reco_tracks", "3D View_recot", 800, 600);
-    //TView* recot = TView::CreateView(1);
-    //recot->SetRange(-100, -100, 0, 100, 100, 70);
-    //recot->ShowAxis();
-
-    int events = 100;
+    int events = 10000;
     stats s(events);
     
     display generated_tracks;
@@ -50,12 +45,21 @@ void run(){
 
 
 int main(int argc, char** argv) {
+    TApplication app("ROOT Application", &argc, argv);
     TStopwatch timer;       // crea il cronometro
     timer.Start();          // avvia il timer
 
-    TApplication app("ROOT Application", &argc, argv);
-    eventdata e;
-    e.takedata();
+
+    // TCanvas* can = new TCanvas("can", "3D View", 800, 600);
+    // TView* rt = TView::CreateView(1);
+    // rt->SetRange(-100, -100, 0, 100, 100, 70);
+    // rt->ShowAxis();
+    
+    // eventdata e;
+    // e.takedata();
+    // e.print_data_on_canvas(can);
+
+    run();
 
     timer.Stop();           // ferma il timer
 

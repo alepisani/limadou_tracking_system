@@ -120,9 +120,8 @@ for (int i=0; i < events; i++){
         } while (y > TMath::Cos(THETA) * TMath::Cos(THETA));
         theta = THETA;
         
-
-        xTR1 = xTR2 + (zTR2-TR1CenterZ)*(TMath::Sin(theta))*(TMath::Cos(phi));
-        yTR1 = yTR2 + (zTR2-TR1CenterZ)*(TMath::Sin(theta))*(TMath::Sin(phi));
+        xTR1 = xTR2 + (zTR2-TR1CenterZ)*(TMath::Tan(theta))*(TMath::Cos(phi));
+        yTR1 = yTR2 + (zTR2-TR1CenterZ)*(TMath::Tan(theta))*(TMath::Sin(phi));
     } while (!(xTR1 < TR1Size[0]/2 && xTR1 > -TR1Size[0]/2 &&
         (
             (yTR1 < (2.5*TR1Size[1]+2*TR1GapY) && yTR1 > (1.5*TR1Size[1]+2*TR1GapY)) ||
@@ -133,13 +132,13 @@ for (int i=0; i < events; i++){
         )
     ));
     
-
     double xL2 = xTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Cos(phi));
     double yL2 = yTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Sin(phi));
     double xL1 = xTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Cos(phi));
     double yL1 = yTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Sin(phi));
     double xL0 = xTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Cos(phi));
     double yL0 = yTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Sin(phi));
+
 
     if(xTR1 < TR1Size[0]/2 && xTR1 > -TR1Size[0]/2 &&
         (
@@ -179,6 +178,7 @@ for (int i=0; i < events; i++){
     line_track->Draw();
     //geom->Update();
 
+
     //check if the track hitted the staves in layer 2
     if((xL2 < ChipSizeX*2.5 + ChipDistanceX && xL2 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
     ((yL2 < ChipSizeY*5 + ChipStaveDistanceY*2 + ChipDistanceY*2.5 && yL2 > ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*2.5) ||
@@ -194,6 +194,8 @@ for (int i=0; i < events; i++){
     ){
     stats::hmgthL2++;
     stats::hitL2 = true;
+    TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], 2,2,0,0,0);
+    p->Draw();
     }
     //check if the track hitted the staves in layer 1
     if((xL1 < ChipSizeX*2.5 + ChipDistanceX && xL1 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
@@ -210,6 +212,8 @@ for (int i=0; i < events; i++){
     ){
     stats::hmgthL1++;
     stats::hitL1 = true;
+    TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], 2,2,0,0,0);
+    m->Draw();
     }
     //check if the track hitted the staves in layer 0
     if((xL0 < ChipSizeX*2.5 + ChipDistanceX && xL0 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
@@ -226,8 +230,9 @@ for (int i=0; i < events; i++){
     ){
     stats::hmgthL0++;
     stats::hitL0 = true;
+    TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], 2,2,0,0,0);
+    q->Draw();
     }
-
 
     //contiamo quante traccie hanno colpito quanti layer ciascuna (3layer, 2layer, 1layer, 0layer)
     if(stats::hitL2 && stats::hitL1 && stats::hitL0 && stats::hmgthTR1){

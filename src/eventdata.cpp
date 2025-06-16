@@ -37,6 +37,9 @@ std::ostream &operator<<(std::ostream &output, const eventdata &ev) {
 
 void eventdata::takedata(){
 
+    //cambia nome file in base a cosa vuoi
+    //TFile *file = TFile::Open("../data_beam_test/");
+    
     TFile *file = TFile::Open("../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
     if (!file || file->IsZombie()) {
         std::cerr << "Errore nell'aprire il file ROOT\n";

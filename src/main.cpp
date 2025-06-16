@@ -23,7 +23,7 @@ void run(){
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
 
-    int events = 10000;
+    int events = 10;
     stats s(events);
     
     display generated_tracks;
@@ -50,16 +50,20 @@ int main(int argc, char** argv) {
     timer.Start();          // avvia il timer
 
 
-    // TCanvas* can = new TCanvas("can", "3D View", 800, 600);
-    // TView* rt = TView::CreateView(1);
-    // rt->SetRange(-100, -100, 0, 100, 100, 70);
-    // rt->ShowAxis();
+    //TCanvas* can = new TCanvas("can", "3D View", 800, 600);
+    //TView* rt = TView::CreateView(1);
+    //rt->SetRange(-100, -100, 0, 100, 100, 70);
+    //rt->ShowAxis();
     
-    // eventdata e;
-    // e.takedata();
-    // e.print_data_on_canvas(can);
+    //eventdata e;
+    //e.takedata();
+    //e.print_data_on_canvas(can);
 
     run();
+
+
+    
+
 
     timer.Stop();           // ferma il timer
 

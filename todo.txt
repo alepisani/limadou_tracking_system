@@ -1,14 +1,15 @@
 to do:
 
--estrai le stats dalla run di muoni che hai in data_beam_test
-    -stats:
-        -hmgthTR2
-        -hmgthTR1
-        -hmgthL2
-        -hmgthL1
-        -hmgthL2
-        -hmgth3L
-        -hmgth2L
-        -hmgth1L
-        -hmgth0L
-        
+dal calcolo dell'accettazione:
+    come faccio ad estrarre le info se i dait che ho sono solo i cluster accesi?
+    che info dovrei estrarre?
+
+
+
+
+
+GIGA IDEA:
+
+si potrebbe usare la distribuzione dell'angolo per evitare di fare il combinatoriale su tutto ma conosciuto 
+il punto sul top layer si fa il combinatoriale solo con il cono di punti possibili in base all'angolo
+(angolo medio 22gradi +- 17gradi).

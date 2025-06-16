@@ -1568,7 +1568,8 @@ CMakeFiles/sim_MC.dir/src/eventdata.cpp.o: ../src/eventdata.cpp \
   ../include/LTrackerTrack.h \
   /usr/local/root/include/TObject.h \
   ../include/LTrackerCluster.h \
-  ../include/display.h
+  ../include/display.h \
+  ../include/stats.h
 
 CMakeFiles/sim_MC.dir/src/main.cpp.o: ../src/main.cpp \
   /usr/include/stdc-predef.h \

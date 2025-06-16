@@ -24,7 +24,7 @@ void run(){
     rt->ShowAxis();
 
     int events = 10;
-    stats s(events);
+    stats s;
     
     display generated_tracks;
     LTrackerTrack tracker;
@@ -34,7 +34,7 @@ void run(){
     //chip c;
     //c.print_chip(c, real_tracks);
     chips cc;
-    cc.print_all_chips(cc, real_tracks);
+    //cc.print_all_chips(cc, real_tracks);
 
     generated_tracks.tracks(events, tracker, real_tracks);
 
@@ -49,17 +49,21 @@ int main(int argc, char** argv) {
     TStopwatch timer;       // crea il cronometro
     timer.Start();          // avvia il timer
 
+    //take data from beam test
+    TCanvas* can = new TCanvas("can", "3D View", 800, 600);
+    TView* rt = TView::CreateView(1);
+    rt->SetRange(-100, -100, 0, 100, 100, 70);
+    rt->ShowAxis();
+    eventdata e;
+    e.takedata();
+    e.print_data_on_canvas(can);
+    stats s;
+    cout << "stats \n" << s << endl;
 
-    //TCanvas* can = new TCanvas("can", "3D View", 800, 600);
-    //TView* rt = TView::CreateView(1);
-    //rt->SetRange(-100, -100, 0, 100, 100, 70);
-    //rt->ShowAxis();
     
-    //eventdata e;
-    //e.takedata();
-    //e.print_data_on_canvas(can);
 
-    run();
+    //track simulation
+    //run();
 
 
     

@@ -11,12 +11,14 @@
 #include "../include/eventdata.h"
 #include "../include/chip.h"
 #include "../include/display.h"
+#include "../include/stats.h"
 using namespace std;
 
 eventdata::eventdata(){}
 
 std::unordered_map<int, eventdata> alldata;
 
+/*
 std::ostream &operator<<(std::ostream &output, const eventdata &ev) {
     for (size_t i = 0; i < ev.DIR_xpos.size(); i++) {
         // output << "turret_idx: " << (int)ev.DIR_turret_idx[i] << " ";
@@ -24,15 +26,19 @@ std::ostream &operator<<(std::ostream &output, const eventdata &ev) {
         // output << "chip_idx0: " << (int)ev.DIR_chip_idx0[i] << " ";
         // output << "chip_idx1: " << (int)ev.DIR_chip_idx1[i] << " ";
         // output << "chip_id:   " << ev.DIR_chip_id[i] << " ";
-        output << "xpos:      " << ev.DIR_xpos[i] << " || ";
-        output << "ypos:      " << ev.DIR_ypos[i] << " || ";
-        output << "zpos:      " << ev.DIR_zpos[i] << " || ";
-        output << "cls_idx:   " << ev.DIR_cls_idx[i];
+        // output << "xpos:      " << ev.DIR_xpos[i] << " || ";
+        // output << "ypos:      " << ev.DIR_ypos[i] << " || ";
+        //output << "zpos:      " << ev.DIR_zpos[i] << " || ";
+        // output << "cls_idx:   " << ev.DIR_cls_idx[i];
+        output << "total events: " << alldata.size();
+        //output << "hmthL2: " << ;
+        //output << "hmthL1: " << ;
+        //output << "hmthL0: " << ;
         output << endl;
     }
     return output;
 }
-
+*/
 
 
 void eventdata::takedata(){
@@ -89,8 +95,37 @@ void eventdata::takedata(){
         ev.DIR_zpos       = *DIR_zpos;
         ev.DIR_cls_idx    = *DIR_cls_idx;
         alldata[i] = ev;
+
+        
     }
     file->Close();
+
+    for (size_t m = 0; m < alldata.size(); m++){
+        for (size_t n = 0; n < alldata[m].DIR_zpos.size(); n++){
+            if(alldata[m].DIR_zpos[n] < 19 && alldata[m].DIR_zpos[n] > 16){
+                stats::hmthL0++;
+                break;
+            }
+        }
+        for (size_t n = 0; n < alldata[m].DIR_zpos.size(); n++){
+            if(alldata[m].DIR_zpos[n] < 28 && alldata[m].DIR_zpos[n] > 24){
+                stats::hmthL1++;
+                break;
+            }
+        }
+        for (size_t n = 0; n < alldata[m].DIR_zpos.size(); n++){
+            if(alldata[m].DIR_zpos[n] < 36 && alldata[m].DIR_zpos[n] > 32){
+                stats::hmthL2++;
+                break;
+            }
+        }
+    }
+
+
+    cout << "alldatasize: " << alldata.size() << endl;
+    
+    
+
     
 
 }

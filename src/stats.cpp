@@ -31,12 +31,14 @@ double stats::hmgth0L = 0;
 double stats::hmgthdcL2 = 0;
 double stats::hmgthdcL1 = 0;
 double stats::hmgthdcL0 = 0;
+double stats::hmthL2 = 0;
+double stats::hmthL1 = 0;
+double stats::hmthL0 = 0;
 
 
 
 // Constructor
-stats::stats(int events){
-    hmgt = events;
+stats::stats(){
 }
 
 // Overload operator<<
@@ -54,6 +56,9 @@ std::ostream &operator<<(std::ostream &output, const stats &s) {
     output << "how many generated tracks hitted dead chip on layer 1: " << stats::hmgthdcL1 << endl;
     output << "how many generated tracks hitted dead chip on layer 0: " << stats::hmgthdcL0 << endl;
     output << "how many reco tracks: " << stats::hmrt << endl;
+    output << "how many tracks (beam test) hitted layer 2: " << stats::hmthL2 << endl;
+    output << "how many tracks (beam test) hitted layer 1: " << stats::hmthL1 << endl;
+    output << "how many tracks (beam test) hitted layer 0: " << stats::hmthL0 << endl;
     return output;
 }
 

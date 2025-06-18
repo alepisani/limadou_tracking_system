@@ -68,8 +68,12 @@ how many generated tracks hitted only 0 layer: 1898
 
 usando i dati dei beam test (in L0 una fila di chip non ha rivelevato nulla, spenti)
 
+eventi totali: 175085
 how many tracks (beam test) hitted layer 2: 120299
 how many tracks (beam test) hitted layer 1: 105341
 how many tracks (beam test) hitted layer 0: 108917
+
+*percentuale di tracks rivelate compatile con la simulazione con theta uniforme 120299/175085 = 0.687
+*che distribuzione avevano i beam test? 
 
 

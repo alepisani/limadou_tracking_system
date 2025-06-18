@@ -23,20 +23,30 @@ void run(){
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
 
-    int events = 10;
+    int events = 2;
     stats s;
-    
     display generated_tracks;
-    LTrackerTrack tracker;
-    generated_tracks.draw_TR12(real_tracks);
-    //generated_tracks.layers(real_tracks);
-    
-    //chip c;
-    //c.print_chip(c, real_tracks);
     chips cc;
-    //cc.print_all_chips(cc, real_tracks);
+    LTrackerTrack tracker;
+    LTrackCandidate tc;
+    
+    //interfaccia rivelatore
+    cc.print_all_chips(cc, real_tracks);
+    generated_tracks.draw_TR12(real_tracks);
 
+    //funzione MC
     generated_tracks.tracks(events, tracker, real_tracks);
+
+
+    //algoritmo di ricostruzione tracce
+    tracker.computeTracklets();
+    tracker.computeTrackCandidates(real_tracks);
+    tracker.printRecoTracks(real_tracks);
+    
+
+    
+
+    
 
     cout << "stats \n" << s << endl;
 
@@ -50,6 +60,7 @@ int main(int argc, char** argv) {
     timer.Start();          // avvia il timer
 
     //take data from beam test
+    /*
     TCanvas* can = new TCanvas("can", "3D View", 800, 600);
     TView* rt = TView::CreateView(1);
     rt->SetRange(-100, -100, 0, 100, 100, 70);
@@ -59,11 +70,13 @@ int main(int argc, char** argv) {
     e.print_data_on_canvas(can);
     stats s;
     cout << "stats \n" << s << endl;
+    */
 
     
 
     //track simulation
-    //run();
+    run();
+    
 
 
     

@@ -52,10 +52,12 @@ void LTrackerTrack::createTracklet(std::pair<int, LCluster> cl_l0, std::pair<int
   tracklet.secondClusterId = cl_l1.first;
   tracklet.id = tracklet_counter++;
   tracklet_vector.push_back(tracklet); 
+  
 }
 
 void LTrackerTrack::computeTracklets()
 {
+  cout << "gg" << endl;
   int tracklet_counter = 0;
   // layer 0 - layer 1
   for (auto &cl_l0 : tidy_clusters_lay0)
@@ -218,6 +220,10 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
   //clusterer.cls_res_x_m2.resize(n_cluster_clusterer);
   //clusterer.cls_res_y_m2.resize(n_cluster_clusterer);
 
+  cout << "trackelt_lay01: " << tracklet_lay01.size() << endl;
+  cout << "trackelt_lay12: " << tracklet_lay12.size() << endl;
+  cout << "trackelt_lay02: " << tracklet_lay02.size() << endl;
+
   for (auto &trkl01 : tracklet_lay01)
   {
     if (candidateCounter > 1000)
@@ -289,28 +295,37 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
     tracks[i].id = i;
   }
 
-  for (int i=0; i < 10; i++){
-    LTrackCandidate track;
-    track = tracks[i];
-    display display;
-    track.print_trackcandidate(track, reco);
+
+  cout << "tracce ricostruite: " << tracks.size() << endl;
+
+
+}
+
+
+void LTrackerTrack::printRecoTracks(TCanvas* reco) {
+
+  for (auto &trk : tracks){
+    float x1, y1, dz, x2, y2, t, p;
+    dz = 100;         
+    t = (trk.theta/90)*2*TMath::Pi();
+    p = (trk.phi/90)*2*TMath::Pi();
+    x1 = trk.x0 + (trk.z0 - dz)*(TMath::Tan(t))*(TMath::Cos(p));
+    y1 = trk.y0 + (trk.z0 - dz)*(TMath::Tan(t))*(TMath::Sin(p));
+    x2 = trk.x0 + (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Cos(p));
+    y2 = trk.y0 + (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Sin(p));
+    Double_t x_line[3] = {x2, trk.x0, x1};
+    Double_t y_line[3] = {y2, trk.y0, y1};
+    Double_t z_line[3] = {-dz, trk.z0, dz};
+    TPolyLine3D* line_track = new TPolyLine3D(3, x_line, y_line, z_line);
+    line_track->SetLineWidth(2);
+    line_track->SetLineColor(kRed);
+    line_track->Draw();
+    reco->Update();
+    
+    cout << "theta: " << trk.theta << endl;
+    cout << "phi: " << trk.phi << endl;
+
   }
-  stats::hmrt = tracks.size();
-  
 
 }
 
-void LTrackCandidate::print_trackcandidate(LTrackCandidate& tr, TCanvas* reco){
-  reco->cd();
-  double dz = -50;  //value to be changed, what should i use??????
-  double x1 = tr.x0 + (tr.z0 - dz)*(TMath::Tan(tr.theta))*(TMath::Cos(tr.phi));
-  double y1 = tr.y0 + (tr.z0 - dz)*(TMath::Tan(tr.theta))*(TMath::Sin(tr.phi));
-  Double_t x_line[2] = {tr.x0, x1};
-  Double_t y_line[2] = {tr.y0, y1};
-  Double_t z_line[2] = {tr.z0, dz};
-  TPolyLine3D* line_track = new TPolyLine3D(2, x_line, y_line, z_line);
-  line_track->SetLineWidth(2);
-  line_track->SetLineColor(kGreen);
-  line_track->Draw();
-  reco->Update();
-}

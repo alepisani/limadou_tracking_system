@@ -69,6 +69,8 @@ void display::draw_TR12(TCanvas* geom){
 
 void display::tracks(int events, LTrackerTrack& tracker, TCanvas* geom){
 
+stats::hmgt = events;
+
 //TH1F(name, title, nbins, xlow, xup)
 TH1F* hxTR2 = new TH1F("hxTR2", "x_trigger2;x_trigger1;counts", events, -TR2Size[0]*2.5, TR2Size[0]*2.5);
 TH1F* hyTR2 = new TH1F("hyTR2", "y_trigger2;y_trigger1;counts", events, -TR2Size[1]/2, TR2Size[1]/2);
@@ -152,6 +154,8 @@ for (int i=0; i < events; i++){
         stats::hmgthTR1++;
     }
     
+
+    //riempio i tidy_cluester for each layer con cluster dei punti generati da MC
     LCluster pL2;
     pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], err_cl, err_cl, err_cl, i);
     tracker.tidy_clusters_lay2.try_emplace(i,pL2);
@@ -168,6 +172,7 @@ for (int i=0; i < events; i++){
     c.is_dead_chip_tracking_smt(c, pL2, mL1, qL0);
 
     //plotting tracks
+    /*
     Double_t x_line[2] = {xTR2, xTR1};
     Double_t y_line[2] = {yTR2, yTR1};
     Double_t z_line[2] = {zTR2, zTR1};
@@ -176,7 +181,7 @@ for (int i=0; i < events; i++){
     line_track->SetLineWidth(2);
     geom->cd();
     line_track->Draw();
-    //geom->Update();
+    */
 
 
     //check if the track hitted the staves in layer 2

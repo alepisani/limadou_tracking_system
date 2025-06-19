@@ -6,6 +6,7 @@
 #include <TPolyLine3D.h>
 #include <TCanvas.h>
 #include <TView.h>
+#include "TMarker3DBox.h"
 #include "../include/stats.h"
 #include "../include/display.h"
 #include "../include/LTrackerTrack.h"
@@ -305,25 +306,40 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
 void LTrackerTrack::printRecoTracks(TCanvas* reco) {
 
   for (auto &trk : tracks){
-    float x1, y1, dz, x2, y2, t, p;
-    dz = 100;         
-    t = (trk.theta/90)*2*TMath::Pi();
-    p = (trk.phi/90)*2*TMath::Pi();
-    x1 = trk.x0 + (trk.z0 - dz)*(TMath::Tan(t))*(TMath::Cos(p));
-    y1 = trk.y0 + (trk.z0 - dz)*(TMath::Tan(t))*(TMath::Sin(p));
+    float x1, y1, z1, dz, x2, y2, z2, t, p;
+    dz = 10;         
+    t = (trk.theta/180)*TMath::Pi();
+    p = (trk.phi/180)*TMath::Pi();
     x2 = trk.x0 + (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Cos(p));
     y2 = trk.y0 + (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Sin(p));
-    Double_t x_line[3] = {x2, trk.x0, x1};
-    Double_t y_line[3] = {y2, trk.y0, y1};
-    Double_t z_line[3] = {-dz, trk.z0, dz};
+    z2 = trk.z0 + dz;
+    x1 = trk.x0 - (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Cos(p));
+    y1 = trk.y0 - (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Sin(p));
+    z1 = trk.z0 - dz;
+    Double_t x_line[3] = {x1, trk.x0, x2};
+    Double_t y_line[3] = {y1, trk.y0, y2};
+    Double_t z_line[3] = {z1, trk.z0, z2};
     TPolyLine3D* line_track = new TPolyLine3D(3, x_line, y_line, z_line);
     line_track->SetLineWidth(2);
     line_track->SetLineColor(kRed);
     line_track->Draw();
+
+    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 5,5,0,0,0);
+    g->Draw();
+    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 7,7,0,0,0);
+    m->Draw();
+    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 9,9,0,0,0);
+    f->Draw();
+
     reco->Update();
     
-    cout << "theta: " << trk.theta << endl;
-    cout << "phi: " << trk.phi << endl;
+    cout << "L2 ------ x:" << x2 << ",   y: " << y2 << ",    z: " << z2 << endl; 
+    cout << "L1 ------ x:" << trk.x0 << ",   y: " << trk.y0 << ",    z: " << trk.z0 << endl; 
+    cout << "L0 ------ x:" << x1 << ",   y: " << y1 << ",    z: " << z1 << endl; 
+    cout << "(rad) theta: " << t << "     phi: " << p << endl;
+    cout << "(gra) theta: " << trk.theta << "     phi: " << trk.phi << endl;
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+
 
   }
 

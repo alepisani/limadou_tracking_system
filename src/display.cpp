@@ -172,7 +172,7 @@ for (int i=0; i < events; i++){
     c.is_dead_chip_tracking_smt(c, pL2, mL1, qL0);
 
     //plotting tracks
-    /*
+    
     Double_t x_line[2] = {xTR2, xTR1};
     Double_t y_line[2] = {yTR2, yTR1};
     Double_t z_line[2] = {zTR2, zTR1};
@@ -181,7 +181,14 @@ for (int i=0; i < events; i++){
     line_track->SetLineWidth(2);
     geom->cd();
     line_track->Draw();
-    */
+    
+    cout << "real data" << endl;
+    cout << "L2 ------ x:" << xL2 << ",   y: " << yL2 << ",    z: " << StaveZ[2] << endl; 
+    cout << "L1 ------ x:" << xL1 << ",   y: " << yL1 << ",    z: " << StaveZ[1] << endl; 
+    cout << "L0 ------ x:" << xL0 << ",   y: " << yL0 << ",    z: " << StaveZ[0] << endl; 
+    cout << "(rad)theta" << theta << ",     phi" << phi << endl;
+    cout << "(gra)theta" << (theta*180)/TMath::Pi() << ",     phi" << (phi*180)/TMath::Pi() << endl;
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"; 
 
 
     //check if the track hitted the staves in layer 2

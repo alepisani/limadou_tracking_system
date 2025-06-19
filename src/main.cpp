@@ -48,7 +48,7 @@ void run(){
 
     
 
-    cout << "stats \n" << s << endl;
+    //cout << "stats \n" << s << endl;
 
 
 }

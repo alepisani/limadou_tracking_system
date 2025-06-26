@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o"
+  "CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o.d"
   "CMakeFiles/sim_MC.dir/src/LTrackerTrack.cpp.o"
   "CMakeFiles/sim_MC.dir/src/LTrackerTrack.cpp.o.d"
   "CMakeFiles/sim_MC.dir/src/chip.cpp.o"

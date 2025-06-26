@@ -34,6 +34,10 @@ double stats::hmgthdcL0 = 0;
 double stats::hmthL2 = 0;
 double stats::hmthL1 = 0;
 double stats::hmthL0 = 0;
+double stats::hmbh3L = 0;
+double stats::hmbh2L = 0;
+double stats::hmbh1L = 0;
+double stats::hmbh0L = 0;
 
 
 
@@ -56,9 +60,14 @@ std::ostream &operator<<(std::ostream &output, const stats &s) {
     output << "how many generated tracks hitted dead chip on layer 1: " << stats::hmgthdcL1 << endl;
     output << "how many generated tracks hitted dead chip on layer 0: " << stats::hmgthdcL0 << endl;
     output << "how many reco tracks: " << stats::hmrt << endl;
-    output << "how many tracks (beam test) hitted layer 2: " << stats::hmthL2 << endl;
-    output << "how many tracks (beam test) hitted layer 1: " << stats::hmthL1 << endl;
-    output << "how many tracks (beam test) hitted layer 0: " << stats::hmthL0 << endl;
+    output << "how many cluster (beam test) on layer 2: " << stats::hmthL2 << endl;
+    output << "how many cluster (beam test) on layer 1: " << stats::hmthL1 << endl;
+    output << "how many cluster (beam test) on layer 0: " << stats::hmthL0 << endl;
+    output << "how many beam hitted all  3 layer: " << stats::hmbh3L << endl;
+    output << "how many beam hitted only 2 layer: " << stats::hmbh2L << endl;
+    output << "how many beam hitted only 1 layer: " << stats::hmbh1L << endl;
+    output << "how many beam hitted only 0 layer: " << stats::hmbh0L << endl;
+    
     return output;
 }
 

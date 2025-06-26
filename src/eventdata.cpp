@@ -12,13 +12,14 @@
 #include "../include/chip.h"
 #include "../include/display.h"
 #include "../include/stats.h"
+#include "../include/LTrackerCluster.h"
 using namespace std;
 
 eventdata::eventdata(){}
 
 std::unordered_map<int, eventdata> alldata;
 
-/*
+
 std::ostream &operator<<(std::ostream &output, const eventdata &ev) {
     for (size_t i = 0; i < ev.DIR_xpos.size(); i++) {
         // output << "turret_idx: " << (int)ev.DIR_turret_idx[i] << " ";
@@ -26,11 +27,11 @@ std::ostream &operator<<(std::ostream &output, const eventdata &ev) {
         // output << "chip_idx0: " << (int)ev.DIR_chip_idx0[i] << " ";
         // output << "chip_idx1: " << (int)ev.DIR_chip_idx1[i] << " ";
         // output << "chip_id:   " << ev.DIR_chip_id[i] << " ";
-        // output << "xpos:      " << ev.DIR_xpos[i] << " || ";
-        // output << "ypos:      " << ev.DIR_ypos[i] << " || ";
-        //output << "zpos:      " << ev.DIR_zpos[i] << " || ";
+        output << "xpos:      " << ev.DIR_xpos[i] << " || ";
+        output << "ypos:      " << ev.DIR_ypos[i] << " || ";
+        output << "zpos:      " << ev.DIR_zpos[i] << " || ";
         // output << "cls_idx:   " << ev.DIR_cls_idx[i];
-        output << "total events: " << alldata.size();
+        // output << "total events: " << alldata.size();
         //output << "hmthL2: " << ;
         //output << "hmthL1: " << ;
         //output << "hmthL0: " << ;
@@ -38,7 +39,7 @@ std::ostream &operator<<(std::ostream &output, const eventdata &ev) {
     }
     return output;
 }
-*/
+
 
 
 void eventdata::takedata(){
@@ -99,35 +100,6 @@ void eventdata::takedata(){
         
     }
     file->Close();
-
-    for (size_t m = 0; m < alldata.size(); m++){
-        for (size_t n = 0; n < alldata[m].DIR_zpos.size(); n++){
-            if(alldata[m].DIR_zpos[n] < 19 && alldata[m].DIR_zpos[n] > 16){
-                stats::hmthL0++;
-                break;
-            }
-        }
-        for (size_t n = 0; n < alldata[m].DIR_zpos.size(); n++){
-            if(alldata[m].DIR_zpos[n] < 28 && alldata[m].DIR_zpos[n] > 24){
-                stats::hmthL1++;
-                break;
-            }
-        }
-        for (size_t n = 0; n < alldata[m].DIR_zpos.size(); n++){
-            if(alldata[m].DIR_zpos[n] < 36 && alldata[m].DIR_zpos[n] > 32){
-                stats::hmthL2++;
-                break;
-            }
-        }
-    }
-
-
-    cout << "alldatasize: " << alldata.size() << endl;
-    
-    
-
-    
-
 }
 
 
@@ -140,26 +112,39 @@ void eventdata::print_data_on_canvas(TCanvas* can){
     c.print_all_chips(c, can);
 
     int events = alldata.size();
+    //int events = 5;
     TH1F* hx = new TH1F("x", "x;x;counts", events, -display::TR2Size[0]*2.5, display::TR2Size[0]*2.5);
     TH1F* hy = new TH1F("y", "y;y;counts", events, -100, 100);
     TH1F* hz = new TH1F("z", "z;z;counts", events, 10, 40);
 
     eventdata ev;
-    for (int i = 0; i < alldata.size(); i++){
+    LTrackerCluster cluster;
+    for (int i = 0; i < events; i++){
         ev = alldata[i];
-        for (size_t i = 0; i < ev.DIR_xpos.size(); i++){
-        TMarker3DBox *p = new TMarker3DBox(ev.DIR_xpos[i],ev.DIR_ypos[i],ev.DIR_zpos[i],1,1,0,0,0);
+        cluster.CalculateClusterPosition(ev);
+    }    
+
+    cout << "quanti cluster: " << cluster.cls_mean_x.size() << endl;
+    cout << "events: " << events << endl;
+    for(int i=0; i<cluster.cls_mean_x.size(); i++){
+        //cout << "p: " << cluster.cls_mean_x[i] << " , y: " << cluster.cls_mean_y[i] << "  , z: " << cluster.cls_mean_z[i] << endl;
+        TMarker3DBox *p = new TMarker3DBox(cluster.cls_mean_x[i],cluster.cls_mean_y[i],cluster.cls_mean_z[i],2,2,0,0,0);
         p->SetLineColor(kRed);
         p->SetLineWidth(3);
         p->Draw();
+        hx->Fill(cluster.cls_mean_x[i]);
+        hy->Fill(cluster.cls_mean_y[i]);
+        hz->Fill(cluster.cls_mean_z[i]);
 
-        hx->Fill(ev.DIR_xpos[i]);
-        hy->Fill(ev.DIR_ypos[i]);
-        hz->Fill(ev.DIR_zpos[i]);
-        
-        
-        }
-    }    
+        //stats
+        if(cluster.cls_mean_z[i] < 36 && cluster.cls_mean_z[i] > 30){stats::hmthL2++;}
+        if(cluster.cls_mean_z[i] < 29 && cluster.cls_mean_z[i] > 22){stats::hmthL1++;}
+        if(cluster.cls_mean_z[i] < 20 && cluster.cls_mean_z[i] > 15){stats::hmthL0++;}
+    }
+    stats::hmbh0L = cluster.cls_mean_x.size() - stats::hmthL2 - stats::hmthL1 - stats::hmthL0; 
+
+
+
 
     char file[200];
     sprintf(file,"../data_beam_test/data.root");

@@ -5,18 +5,18 @@
 #include <cstddef>
 #include <iostream>
 #include "TMath.h"
+#include "./eventdata.h"
 
 class LTrackerCluster {
 public:
     LTrackerCluster();
     void Reset();
     std::vector<int> GetClusterIdx() {return cls_idx;}
+    void CalculateClusterPosition(eventdata ev);
 
     // residuals for the second tracking methos
     std::vector<float> cls_res_x_m2;
     std::vector<float> cls_res_y_m2;
-
-private:
     std::vector<float> cls_mean_x;
     std::vector<float> cls_mean_y;
     std::vector<float> cls_mean_z;

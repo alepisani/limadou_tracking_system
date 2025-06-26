@@ -129,6 +129,30 @@ sim_MC/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/build
 .PHONY : sim_MC/fast
 
+src/LTrackerCluster.o: src/LTrackerCluster.cpp.o
+.PHONY : src/LTrackerCluster.o
+
+# target to build an object file
+src/LTrackerCluster.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o
+.PHONY : src/LTrackerCluster.cpp.o
+
+src/LTrackerCluster.i: src/LTrackerCluster.cpp.i
+.PHONY : src/LTrackerCluster.i
+
+# target to preprocess a source file
+src/LTrackerCluster.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.i
+.PHONY : src/LTrackerCluster.cpp.i
+
+src/LTrackerCluster.s: src/LTrackerCluster.cpp.s
+.PHONY : src/LTrackerCluster.s
+
+# target to generate assembly for a file
+src/LTrackerCluster.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.s
+.PHONY : src/LTrackerCluster.cpp.s
+
 src/LTrackerTrack.o: src/LTrackerTrack.cpp.o
 .PHONY : src/LTrackerTrack.o
 
@@ -282,6 +306,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... sim_MC"
+	@echo "... src/LTrackerCluster.o"
+	@echo "... src/LTrackerCluster.i"
+	@echo "... src/LTrackerCluster.s"
 	@echo "... src/LTrackerTrack.o"
 	@echo "... src/LTrackerTrack.i"
 	@echo "... src/LTrackerTrack.s"

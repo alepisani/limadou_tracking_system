@@ -25,6 +25,10 @@ public:
     static double hmthL2;         //how many tracks (beam test) hitted layer 2  
     static double hmthL1;         //how many tracks (beam test) hitted layer 1
     static double hmthL0;         //how many tracks (beam test) hitted layer 0  
+    static double hmbh3L;         //how many beam hitted all 3 layer
+    static double hmbh2L;         //how many beam hitted only 2 layer
+    static double hmbh1L;         //how many beam hitted only 1 layer
+    static double hmbh0L;         //how many beam hitted only 0 layer
     
 
     stats(); // Default constructor

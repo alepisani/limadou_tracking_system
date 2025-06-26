@@ -42,7 +42,7 @@ void run(){
     tracker.computeTracklets();
     tracker.computeTrackCandidates(real_tracks);
     tracker.printRecoTracks(real_tracks);
-    
+    //cout << "ostream tracker" << tracker << endl;
 
     
 
@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
     timer.Start();          // avvia il timer
 
     //take data from beam test
-    /*
+    
     TCanvas* can = new TCanvas("can", "3D View", 800, 600);
     TView* rt = TView::CreateView(1);
     rt->SetRange(-100, -100, 0, 100, 100, 70);
@@ -70,12 +70,12 @@ int main(int argc, char** argv) {
     e.print_data_on_canvas(can);
     stats s;
     cout << "stats \n" << s << endl;
-    */
+    
 
     
 
     //track simulation
-    run();
+    //run();
     
 
 

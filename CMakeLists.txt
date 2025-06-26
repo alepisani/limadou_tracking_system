@@ -13,6 +13,7 @@ set(SOURCES
     src/chip.cpp
     src/main.cpp
     src/eventdata.cpp
+    src/LTrackerCluster.cpp
 )
 
 # Aggiungi la directory include

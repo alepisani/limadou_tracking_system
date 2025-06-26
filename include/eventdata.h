@@ -30,7 +30,7 @@ struct eventdata{
     std::vector<int> DIR_cls_idx;
 
     eventdata();       //default constructor
-    //friend std::ostream &operator<<(std::ostream &output, const eventdata &ev);
+    friend std::ostream &operator<<(std::ostream &output, const eventdata &ev);
     void takedata();    
     void print_data_on_canvas(TCanvas* can);
 

@@ -303,12 +303,68 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
 }
 
 
+std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker)
+{
+  output << "CLUSTERS" << std::endl
+         << std::endl;
+  output << "-------------------" << std::endl;
+  output << "layer 0 " << std::endl
+         << std::endl;
+  for (auto &cl : tracker.tidy_clusters_lay0)
+  {
+    output << cl.second << std::endl;
+  }
+
+  output << "-------------------" << std::endl;
+  output << "layer 1 " << std::endl
+         << std::endl;
+  for (auto &cl : tracker.tidy_clusters_lay1)
+  {
+    output << cl.second << std::endl;
+  }
+  output << "-------------------" << std::endl;
+  output << "layer 2 " << std::endl
+         << std::endl;
+  for (auto &cl : tracker.tidy_clusters_lay2)
+  {
+    output << cl.second << std::endl;
+  }
+  /*
+  output << std::endl
+         << "TRACKLETS" << std::endl
+         << std::endl;
+  output << "-------------------" << std::endl;
+  output << "layer 0 - layer 1" << std::endl
+         << std::endl;
+  for (auto &trkl : tracker.tracklet_lay01)
+  {
+    output << trkl << std::endl;
+  }
+  output << "-------------------" << std::endl;
+  output << "layer 1 - layer 2" << std::endl
+         << std::endl;
+  for (auto &trkl : tracker.tracklet_lay12)
+  {
+    output << trkl << std::endl;
+  }
+  output << "-------------------" << std::endl;
+  output << "layer 0 - layer 2 " << std::endl
+         << std::endl;
+  for (auto &trkl : tracker.tracklet_lay02)
+  {
+    output << trkl << std::endl;
+  }
+    */
+  return output;
+}
+
+
 void LTrackerTrack::printRecoTracks(TCanvas* reco) {
 
   for (auto &trk : tracks){
     float x1, y1, z1, dz, x2, y2, z2, t, p;
-    dz = 10;         
-    t = (trk.theta/180)*TMath::Pi();
+    dz = 20;         
+    t = ((trk.theta/180)*TMath::Pi())+TMath::Pi();    //output sono in gradi, li passo in rad
     p = (trk.phi/180)*TMath::Pi();
     x2 = trk.x0 + (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Cos(p));
     y2 = trk.y0 + (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Sin(p));

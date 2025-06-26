@@ -105,6 +105,7 @@ public:
   void addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer);
   void computeTrackCandidates(TCanvas* reco);
   void printRecoTracks(TCanvas* reco);
+  friend std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker);
 
 
   // clusters separated by layer

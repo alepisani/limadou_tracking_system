@@ -115,13 +115,17 @@ for (int i=0; i < events; i++){
         zTR1 = rnd->Uniform(TR1CenterZ-TR1Thickness/2,TR1CenterZ+TR1Thickness/2);
 
         phi = rnd->Uniform(-pi,pi);
+        /*
         double THETA; double y;
         do {
             THETA = gRandom->Uniform(0, TMath::Pi());
             y = gRandom->Uniform(0, 1);
         } while (y > TMath::Cos(THETA) * TMath::Cos(THETA));
         theta = THETA;
-        
+        */
+        theta = rnd->Uniform(0,pi/2);
+
+
         xTR1 = xTR2 + (zTR2-TR1CenterZ)*(TMath::Tan(theta))*(TMath::Cos(phi));
         yTR1 = yTR2 + (zTR2-TR1CenterZ)*(TMath::Tan(theta))*(TMath::Sin(phi));
     } while (!(xTR1 < TR1Size[0]/2 && xTR1 > -TR1Size[0]/2 &&
@@ -182,6 +186,7 @@ for (int i=0; i < events; i++){
     geom->cd();
     line_track->Draw();
     
+    /*
     cout << "real data" << endl;
     cout << "L2 ------ x:" << xL2 << ",   y: " << yL2 << ",    z: " << StaveZ[2] << endl; 
     cout << "L1 ------ x:" << xL1 << ",   y: " << yL1 << ",    z: " << StaveZ[1] << endl; 
@@ -189,6 +194,7 @@ for (int i=0; i < events; i++){
     cout << "(rad)theta" << theta << ",     phi" << phi << endl;
     cout << "(gra)theta" << (theta*180)/TMath::Pi() << ",     phi" << (phi*180)/TMath::Pi() << endl;
     cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"; 
+    */
 
 
     //check if the track hitted the staves in layer 2

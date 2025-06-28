@@ -112,7 +112,7 @@ void eventdata::print_data_on_canvas(TCanvas* can){
     c.print_all_chips(c, can);
 
     int events = alldata.size();
-    //int events = 5;
+    //int events = 20;
     TH1F* hx = new TH1F("x", "x;x;counts", events, -display::TR2Size[0]*2.5, display::TR2Size[0]*2.5);
     TH1F* hy = new TH1F("y", "y;y;counts", events, -100, 100);
     TH1F* hz = new TH1F("z", "z;z;counts", events, 10, 40);
@@ -141,7 +141,7 @@ void eventdata::print_data_on_canvas(TCanvas* can){
         if(cluster.cls_mean_z[i] < 29 && cluster.cls_mean_z[i] > 22){stats::hmthL1++;}
         if(cluster.cls_mean_z[i] < 20 && cluster.cls_mean_z[i] > 15){stats::hmthL0++;}
     }
-    stats::hmbh0L = cluster.cls_mean_x.size() - stats::hmthL2 - stats::hmthL1 - stats::hmthL0; 
+    stats::hmbh0L = events - stats::hmbh3L - stats::hmbh2L - stats::hmbh1L; 
 
 
 

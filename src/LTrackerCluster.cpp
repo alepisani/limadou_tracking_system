@@ -51,7 +51,7 @@ void LTrackerCluster::CalculateClusterPosition(eventdata ev) {
         }
     }
     // calculate cluster mean position
-    int counter = 0;
+    //int counter = 0;
     for (int i = 0; i < unique_cls_id.size(); ++i)
     {
         float mean_x = 0;
@@ -133,5 +133,12 @@ void LTrackerCluster::CalculateClusterPosition(eventdata ev) {
         if(i==0){stats::hmbh1L++;}
         if(i==1){stats::hmbh2L++; stats::hmbh1L--;}
         if(i==2){stats::hmbh3L++; stats::hmbh2L--;}
+        
+
+
     }
 }
+
+
+
+// 0 2 6 9 11 14 17 20 21 24     9eventi

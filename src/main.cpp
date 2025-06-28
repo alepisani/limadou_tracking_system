@@ -23,7 +23,7 @@ void run(){
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
 
-    int events = 2;
+    int events = 175;
     stats s;
     display generated_tracks;
     chips cc;
@@ -39,16 +39,16 @@ void run(){
 
 
     //algoritmo di ricostruzione tracce
-    tracker.computeTracklets();
-    tracker.computeTrackCandidates(real_tracks);
-    tracker.printRecoTracks(real_tracks);
+    //tracker.computeTracklets();
+    //tracker.computeTrackCandidates(real_tracks);
+    //tracker.printRecoTracks(real_tracks);
     //cout << "ostream tracker" << tracker << endl;
 
     
 
     
 
-    //cout << "stats \n" << s << endl;
+    cout << "stats \n" << s << endl;
 
 
 }

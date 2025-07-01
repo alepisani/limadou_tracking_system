@@ -48,9 +48,16 @@ public:
     static constexpr float dist_z = 8.5;                      // [mm] distance between planes
     static constexpr float shift_z = 17.825;                  // [mm] distance between trigger layer and firts tracking layer
     static constexpr float z_origin_shift = 26.325; // [mm] distance between origin of the reference point for tracks and firts tracking layer
+    std::vector<float> *theta = nullptr;
+    std::vector<float> *phi = nullptr;
+    std::vector<float> allTheta;
+    std::vector<float> allPhi;
+
+
 
     void draw_TR12(TCanvas* geom);
     void tracks(int, LTrackerTrack&, TCanvas* geom);   //true p-q  //false p-theta-phi
+    void take_angle_distribution();
     
 
     display();

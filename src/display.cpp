@@ -7,6 +7,7 @@
 #include <TCanvas.h>
 #include <TView.h>
 #include <TList.h>
+#include <TTree.h>
 #include <TPolyLine3D.h>
 #include "TH1F.h"
 #include "TRandom3.h"
@@ -67,6 +68,42 @@ void display::draw_TR12(TCanvas* geom){
     
 }
 
+void display::take_angle_distribution(){
+    
+    TFile *file = TFile::Open("../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
+    if (!file || file->IsZombie()) {
+        std::cerr << "Errore nell'aprire il file ROOT\n";
+    }
+
+    // Carica il TTree (sostituisci con il nome corretto se diverso)
+    TTree *tree = (TTree*)file->Get("L2;1");
+    if (!tree) {
+        std::cerr << "TTree non trovato nel file\n";
+    }
+
+    tree->SetBranchAddress("theta", &theta);
+    tree->SetBranchAddress("phi", &phi);
+    Long64_t n = tree->GetEntries();
+
+    for (Long64_t i = 0; i < n; ++i) {
+        tree->GetEntry(i);
+        if (theta) {
+            allTheta.insert(allTheta.end(), theta->begin(), theta->end());
+        }
+        if (phi) {
+            allPhi.insert(allPhi.end(), phi->begin(), phi->end());
+        }
+    }
+
+    /*
+    cout << "size theta: " << allTheta.size() << "size phi: " << allPhi.size();
+    for (int i = 0; i < allTheta.size(); i++){
+        cout << allTheta[i] << ", " << allPhi[i] << "           ";
+
+    }
+    */
+}
+
 void display::tracks(int events, LTrackerTrack& tracker, TCanvas* geom){
 
 stats::hmgt = events;
@@ -94,9 +131,12 @@ TH1F* hy = new TH1F("y", "y;y;counts", events, -100, 100);
 //puoi settare il seed for reproducibility
 TRandom3 *rnd = new TRandom3(0); 
 
+
+
 //MC
 for (int i=0; i < events; i++){
-    double xTR2, yTR2, zTR2, xTR1, yTR1, zTR1, phi, theta; 
+    double xTR2, yTR2, zTR2, xTR1, yTR1, zTR1;
+    float phi, theta; 
     stats::hitL0=false;
     stats::hitL1=false;
     stats::hitL2=false;
@@ -114,16 +154,26 @@ for (int i=0; i < events; i++){
         zTR2 = rnd->Uniform(TR2CenterZ-TR2Thickness/2,TR2CenterZ+TR2Thickness/2);
         zTR1 = rnd->Uniform(TR1CenterZ-TR1Thickness/2,TR1CenterZ+TR1Thickness/2);
 
-        phi = rnd->Uniform(-pi,pi);
+        //phi = rnd->Uniform(-pi,pi);
+        
         /*
         double THETA; double y;
         do {
-            THETA = gRandom->Uniform(0, TMath::Pi());
+            THETA = gRandom->Uniform(0, TMath::Pi()/2);
             y = gRandom->Uniform(0, 1);
-        } while (y > TMath::Cos(THETA) * TMath::Cos(THETA));
+        } while (y > TMath::Sin(THETA) * TMath::Cos(THETA) * TMath::Cos(THETA));
         theta = THETA;
         */
-        theta = rnd->Uniform(0,pi/2);
+        //theta = rnd->Uniform(0,pi/2);
+
+        //prendo gli angoli dalla distribuzione di muoni
+        int ind_theta = rnd->Uniform(0, allTheta.size()-1);
+        int ind_phi = rnd->Uniform(0, allPhi.size()-1);
+        theta = (allTheta[ind_theta]/180)*TMath::Pi();
+        phi = (allPhi[ind_phi]/180)*TMath::Pi();
+        cout << theta << ", " << phi << "           ";
+
+
 
 
         xTR1 = xTR2 + (zTR2-TR1CenterZ)*(TMath::Tan(theta))*(TMath::Cos(phi));
@@ -191,9 +241,8 @@ for (int i=0; i < events; i++){
     cout << "L2 ------ x:" << xL2 << ",   y: " << yL2 << ",    z: " << StaveZ[2] << endl; 
     cout << "L1 ------ x:" << xL1 << ",   y: " << yL1 << ",    z: " << StaveZ[1] << endl; 
     cout << "L0 ------ x:" << xL0 << ",   y: " << yL0 << ",    z: " << StaveZ[0] << endl; 
-    cout << "(rad)theta" << theta << ",     phi" << phi << endl;
     cout << "(gra)theta" << (theta*180)/TMath::Pi() << ",     phi" << (phi*180)/TMath::Pi() << endl;
-    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"; 
+    cout << "-----------------------------------------------------------------------------"; 
     */
 
 

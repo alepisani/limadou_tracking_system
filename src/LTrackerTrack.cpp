@@ -53,12 +53,10 @@ void LTrackerTrack::createTracklet(std::pair<int, LCluster> cl_l0, std::pair<int
   tracklet.secondClusterId = cl_l1.first;
   tracklet.id = tracklet_counter++;
   tracklet_vector.push_back(tracklet); 
-  
 }
 
 void LTrackerTrack::computeTracklets()
 {
-  cout << "gg" << endl;
   int tracklet_counter = 0;
   // layer 0 - layer 1
   for (auto &cl_l0 : tidy_clusters_lay0)
@@ -84,6 +82,12 @@ void LTrackerTrack::computeTracklets()
       createTracklet(cl_l0, cl_l2, tracklet_lay02, tracklet_counter);
     }
   }
+  cout << "~~~~~~~~~~~~~~~~~~~~~" << endl;
+  cout << "tracklet_counter: " << tracklet_counter << endl;
+  cout << "trackelt_lay01: " << tracklet_lay01.size() << endl;
+  cout << "trackelt_lay12: " << tracklet_lay12.size() << endl;
+  cout << "trackelt_lay02: " << tracklet_lay02.size() << endl;
+  cout << "~~~~~~~~~~~~~~~~~~~~~" << endl;
 }
 
 // Distance function to be minimised
@@ -109,6 +113,7 @@ double LTrackerTrack::fct(const std::vector<LCluster> &clusters, const double *p
 
 void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrackCandidate &trkCand)
 {
+ 
   if (clusters.size() < 3)
   {
     return;
@@ -148,8 +153,8 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
   trkCand.x0 = params[0];
   trkCand.y0 = params[1];
   trkCand.z0 = display::z_origin_shift;
-  trkCand.theta = params[2] * 180 / TMath::Pi();
-  trkCand.phi = params[3] * 180 / TMath::Pi();
+  trkCand.theta = params[2] * 180 / TMath::Pi();        //from rad -> gradi
+  trkCand.phi = params[3] * 180 / TMath::Pi();          //from rad -> gradi
   trkCand.err_x0 = errors[0];
   trkCand.err_y0 = errors[1];
   trkCand.err_theta = errors[2] * 180 / TMath::Pi();
@@ -184,7 +189,7 @@ void LTrackerTrack::addSpuriousTracks(std::vector<int> &used_tracklets, std::vec
     double delta_r = TMath::Sqrt(delta_y * delta_y + delta_x * delta_x);
     double cos_phi = delta_x / delta_r;
     double sin_phi = delta_y / delta_r;
-    double x0 = (double)first_cluster.x - ((double)first_cluster.z - display::z_origin_shift) * tan_theta * cos_phi;
+    double x0 = (double)first_cluster.x - ((double)first_cluster.z - display::z_origin_shift) * tan_theta * cos_phi;          //theta e phi in rad
     double y0 = (double)first_cluster.y - ((double)first_cluster.z - display::z_origin_shift) * tan_theta * sin_phi;
     double z0 = (double)first_cluster.z;
 
@@ -221,9 +226,6 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
   //clusterer.cls_res_x_m2.resize(n_cluster_clusterer);
   //clusterer.cls_res_y_m2.resize(n_cluster_clusterer);
 
-  cout << "trackelt_lay01: " << tracklet_lay01.size() << endl;
-  cout << "trackelt_lay12: " << tracklet_lay12.size() << endl;
-  cout << "trackelt_lay02: " << tracklet_lay02.size() << endl;
 
   for (auto &trkl01 : tracklet_lay01)
   {
@@ -247,7 +249,7 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
         // compute residuals
         for (auto &clus : clus_vec)
         {
-          float l_res_x = clus.x - (trkCand.x0 + (clus.z - display::z_origin_shift) * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi));
+          float l_res_x = clus.x - (trkCand.x0 + (clus.z - display::z_origin_shift) * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi));         //trkCand esce in gradi e qua viene usato in rad
           float l_res_y = clus.y - (trkCand.y0 + (clus.z - display::z_origin_shift) * TMath::Tan(trkCand.theta) * TMath::Sin(trkCand.phi));
 
           //int position = std::distance(clusterer_indices.begin(), std::find(clusterer_indices.begin(), clusterer_indices.end(), clus.id));
@@ -259,6 +261,8 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
       }
     }
   }
+  cout << "track_candidates: " << track_candidates.size() << endl; 
+
   // Sort track candidates by descending chi2
   std::sort(track_candidates.begin(), track_candidates.end(), [](LTrackCandidate &a, LTrackCandidate &b)
             { return a.chi2 < b.chi2; });
@@ -284,6 +288,7 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
     tracks.push_back(trk);
     used_tracklets.insert(used_tracklets.end(), trk.tracklet_id.begin(), trk.tracklet_id.end());
     used_clusters.insert(used_clusters.end(), trk.clus_id.begin(), trk.clus_id.end());
+    //cout << "chi2: " << trk.chi2 << endl;
   }
 
   addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay01, tidy_clusters_lay0, tidy_clusters_lay1);
@@ -359,13 +364,16 @@ std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker)
 }
 
 
-void LTrackerTrack::printRecoTracks(TCanvas* reco) {
+void LTrackerTrack::printRecoTracks(TCanvas* reco, int events) {
 
+  int i=0;
   for (auto &trk : tracks){
+    if(i>=events){break;}
+    ++i;
     float x1, y1, z1, dz, x2, y2, z2, t, p;
-    dz = 20;         
-    t = ((trk.theta/180)*TMath::Pi())+TMath::Pi();    //output sono in gradi, li passo in rad
-    p = (trk.phi/180)*TMath::Pi();
+    dz = display::dist_z;         
+    t = ((trk.theta/180)*TMath::Pi());    //output sono in gradi, li passo in rad
+    p = ((trk.phi)/180)*TMath::Pi();
     x2 = trk.x0 + (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Cos(p));
     y2 = trk.y0 + (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Sin(p));
     z2 = trk.z0 + dz;
@@ -387,17 +395,18 @@ void LTrackerTrack::printRecoTracks(TCanvas* reco) {
     TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 9,9,0,0,0);
     f->Draw();
 
-    reco->Update();
+    //reco->Update();
+    
     
     cout << "L2 ------ x:" << x2 << ",   y: " << y2 << ",    z: " << z2 << endl; 
     cout << "L1 ------ x:" << trk.x0 << ",   y: " << trk.y0 << ",    z: " << trk.z0 << endl; 
     cout << "L0 ------ x:" << x1 << ",   y: " << y1 << ",    z: " << z1 << endl; 
-    cout << "(rad) theta: " << t << "     phi: " << p << endl;
-    cout << "(gra) theta: " << trk.theta << "     phi: " << trk.phi << endl;
+    cout << "(gradi) theta: " << trk.theta << "     phi: " << trk.phi << endl;
     cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-
+    
 
   }
 
+  reco->Update();
 }
 

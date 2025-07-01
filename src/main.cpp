@@ -9,6 +9,8 @@
 #include <map>
 #include <iostream>
 #include <cmath>
+#include <TTree.h>
+#include "TFile.h"
 #include "TSystem.h" // Include ROOT's TSystem header
 #include "TApplication.h"
 #include <thread>
@@ -23,7 +25,7 @@ void run(){
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
 
-    int events = 175;
+    int events = 10000;
     stats s;
     display generated_tracks;
     chips cc;
@@ -35,14 +37,21 @@ void run(){
     generated_tracks.draw_TR12(real_tracks);
 
     //funzione MC
+    generated_tracks.take_angle_distribution();
     generated_tracks.tracks(events, tracker, real_tracks);
 
 
     //algoritmo di ricostruzione tracce
+    TStopwatch t;
+    t.Start();
     //tracker.computeTracklets();
     //tracker.computeTrackCandidates(real_tracks);
-    //tracker.printRecoTracks(real_tracks);
-    //cout << "ostream tracker" << tracker << endl;
+    t.Stop();
+    //tracker.printRecoTracks(real_tracks, events);
+    cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
+    cout << "Real time: " << t.RealTime() << " s\n";
+    cout << "CPU time:  " << t.CpuTime()  << " s\n";
+    cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
 
     
 
@@ -56,11 +65,9 @@ void run(){
 
 int main(int argc, char** argv) {
     TApplication app("ROOT Application", &argc, argv);
-    TStopwatch timer;       // crea il cronometro
-    timer.Start();          // avvia il timer
 
     //take data from beam test
-    
+    /*
     TCanvas* can = new TCanvas("can", "3D View", 800, 600);
     TView* rt = TView::CreateView(1);
     rt->SetRange(-100, -100, 0, 100, 100, 70);
@@ -70,22 +77,17 @@ int main(int argc, char** argv) {
     e.print_data_on_canvas(can);
     stats s;
     cout << "stats \n" << s << endl;
-    
+    */
 
     
 
     //track simulation
-    //run();
-    
+    run();
 
 
-    
 
 
-    timer.Stop();           // ferma il timer
 
-    std::cout << "Real time: " << timer.RealTime() << " s\n";
-    std::cout << "CPU time:  " << timer.CpuTime()  << " s\n";
 
     // Thread secondario per leggere l'input senza bloccare l'interfaccia grafica
     std::thread inputThread([]() {

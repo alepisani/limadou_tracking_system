@@ -55,7 +55,7 @@ std::ostream &operator<<(std::ostream &output, const stats &s) {
     output << "how many generated tracks hitted all  3 layer: " << stats::hmgthL012 << endl;
     output << "how many generated tracks hitted only 2 layer: " << stats::hmgth2L << endl;
     output << "how many generated tracks hitted only 1 layer: " << stats::hmgth1L << endl;
-    output << "how many generated tracks hitted only 0 layer: " << stats::hmgth0L << endl;
+    output << "how many generated tracks hitted      0 layer: " << stats::hmgth0L << endl;
     output << "how many generated tracks hitted dead chip on layer 2: " << stats::hmgthdcL2 << endl;
     output << "how many generated tracks hitted dead chip on layer 1: " << stats::hmgthdcL1 << endl;
     output << "how many generated tracks hitted dead chip on layer 0: " << stats::hmgthdcL0 << endl;
@@ -66,7 +66,7 @@ std::ostream &operator<<(std::ostream &output, const stats &s) {
     output << "how many beam hitted all  3 layer: " << stats::hmbh3L << endl;
     output << "how many beam hitted only 2 layer: " << stats::hmbh2L << endl;
     output << "how many beam hitted only 1 layer: " << stats::hmbh1L << endl;
-    output << "how many beam hitted only 0 layer: " << stats::hmbh0L << endl;
+    output << "how many beam hitted      0 layer: " << stats::hmbh0L << endl;
     
     return output;
 }

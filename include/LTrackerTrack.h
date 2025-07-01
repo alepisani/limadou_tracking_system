@@ -79,7 +79,7 @@ struct LTracklet
 {
   
   LTracklet();
-    int id = -1;
+  int id = -1;
   int firstClusterId = -1;
   int secondClusterId = -1;
 
@@ -104,7 +104,7 @@ public:
   void fitStraightLine(const std::vector<LCluster> &clusters, LTrackCandidate &trkCand);
   void addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer);
   void computeTrackCandidates(TCanvas* reco);
-  void printRecoTracks(TCanvas* reco);
+  void printRecoTracks(TCanvas* reco, int);
   friend std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker);
 
 

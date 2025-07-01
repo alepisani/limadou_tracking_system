@@ -47,7 +47,7 @@ void eventdata::takedata(){
     //cambia nome file in base a cosa vuoi
     //TFile *file = TFile::Open("../data_beam_test/");
     
-    TFile *file = TFile::Open("../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
+    TFile *file = TFile::Open("../data_beam_test/TEST_PROTON_p_MAIN_70.0MeV_0.0deg_-1.0V_boot94_run11_L2.root");
     if (!file || file->IsZombie()) {
         std::cerr << "Errore nell'aprire il file ROOT\n";
         return;

@@ -22,6 +22,7 @@ public:
     static double hmgthdcL2;      //how many generated tracks hitted dead chip on layer 2
     static double hmgthdcL1;      //how many generated tracks hitted dead chip on layer 1
     static double hmgthdcL0;      //how many generated tracks hitted dead chip on layer 0
+    static double fakehit;        //how many fake hit
     static double hmthL2;         //how many tracks (beam test) hitted layer 2  
     static double hmthL1;         //how many tracks (beam test) hitted layer 1
     static double hmthL0;         //how many tracks (beam test) hitted layer 0  

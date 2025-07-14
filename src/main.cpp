@@ -25,7 +25,7 @@ void run(){
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
 
-    int events = 10000;
+    int events = 30;
     stats s;
     display generated_tracks;
     chips cc;

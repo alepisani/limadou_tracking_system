@@ -107,26 +107,29 @@ void display::take_angle_distribution(){
 void display::tracks(int events, LTrackerTrack& tracker, TCanvas* geom){
 
 stats::hmgt = events;
+int nbins = events/20;
 
 //TH1F(name, title, nbins, xlow, xup)
-TH1F* hxTR2 = new TH1F("hxTR2", "x_trigger2;x_trigger1;counts", events, -TR2Size[0]*2.5, TR2Size[0]*2.5);
-TH1F* hyTR2 = new TH1F("hyTR2", "y_trigger2;y_trigger1;counts", events, -TR2Size[1]/2, TR2Size[1]/2);
-TH1F* hzTR2 = new TH1F("hzTR2", "z_trigger2;z_trigger2;counts", events, -TR2Size[2]/2+TR2CenterZ, TR2Size[2]/2+TR2CenterZ);
-TH1F* hxTR1 = new TH1F("hxTR1", "x_trigger1;x_trigger1;counts", events, -TR1Size[0]/2, TR1Size[0]/2);
-TH1F* hyTR1 = new TH1F("hyTR1", "y_trigger1;y_trigger1;counts", events, -TR1Size[1]*3, TR1Size[1]*3);
-TH1F* hzTR1 = new TH1F("hzTR1", "z_trigger1;z_trigger1;counts", events, -TR1Size[2]/2+TR1CenterZ, TR1Size[2]/2+TR1CenterZ);
-TH1F* hphi = new TH1F("hphi", "phi;#phi;counts", events, -pi, pi);
-TH1F* htheta = new TH1F("htheta", "theta;#theta;counts", events, 0, pi/2);
-TH1F* htheta3L = new TH1F("htheta3L", "theta;#theta;counts", events, 0, pi/2);
-TH1F* hphi3L = new TH1F("hphi3L", "phi;#phi;counts", events, -pi, pi);
-TH1F* htheta2L = new TH1F("htheta2L", "theta;#theta;counts", events, 0, pi/2);
-TH1F* hphi2L = new TH1F("hphi2L", "phi;#phi;counts", events, -pi, pi);
-TH1F* htheta1L = new TH1F("htheta1L", "theta;#theta;counts", events, 0, pi/2);
-TH1F* hphi1L = new TH1F("hphi1L", "phi;#phi;counts", events, -pi, pi);
-TH1F* htheta0L = new TH1F("htheta0L", "theta;#theta;counts", events, 0, pi/2);
-TH1F* hphi0L = new TH1F("hphi0L", "phi;#phi;counts", events, -pi, pi);
-TH1F* hx = new TH1F("x", "x;x;counts", events, -TR2Size[0]*2.5, TR2Size[0]*2.5);
-TH1F* hy = new TH1F("y", "y;y;counts", events, -100, 100);
+TH1F* hxTR2 = new TH1F("hxTR2", "x_trigger2;x_trigger1;counts", nbins, -TR2Size[0]*2.5, TR2Size[0]*2.5);
+TH1F* hyTR2 = new TH1F("hyTR2", "y_trigger2;y_trigger1;counts", nbins, -TR2Size[1]/2, TR2Size[1]/2);
+TH1F* hzTR2 = new TH1F("hzTR2", "z_trigger2;z_trigger2;counts", nbins, -TR2Size[2]/2+TR2CenterZ, TR2Size[2]/2+TR2CenterZ);
+TH1F* hxTR1 = new TH1F("hxTR1", "x_trigger1;x_trigger1;counts", nbins, -TR1Size[0]/2, TR1Size[0]/2);
+TH1F* hyTR1 = new TH1F("hyTR1", "y_trigger1;y_trigger1;counts", nbins, -TR1Size[1]*3, TR1Size[1]*3);
+TH1F* hzTR1 = new TH1F("hzTR1", "z_trigger1;z_trigger1;counts", nbins, -TR1Size[2]/2+TR1CenterZ, TR1Size[2]/2+TR1CenterZ);
+TH1F* hphi = new TH1F("hphi", "phi;#phi;counts", nbins, -pi, pi);
+TH1F* htheta = new TH1F("htheta", "theta;#theta;counts", nbins, 0, pi/2);
+/*
+TH1F* htheta3L = new TH1F("htheta3L", "theta;#theta;counts", nbins, 0, pi/2);
+TH1F* hphi3L = new TH1F("hphi3L", "phi;#phi;counts", nbins, -pi, pi);
+TH1F* htheta2L = new TH1F("htheta2L", "theta;#theta;counts", nbins, 0, pi/2);
+TH1F* hphi2L = new TH1F("hphi2L", "phi;#phi;counts", nbins, -pi, pi);
+TH1F* htheta1L = new TH1F("htheta1L", "theta;#theta;counts", nbins, 0, pi/2);
+TH1F* hphi1L = new TH1F("hphi1L", "phi;#phi;counts", nbins, -pi, pi);
+TH1F* htheta0L = new TH1F("htheta0L", "theta;#theta;counts", nbins, 0, pi/2);
+TH1F* hphi0L = new TH1F("hphi0L", "phi;#phi;counts", nbins, -pi, pi);
+*/
+TH1F* hx = new TH1F("x", "x;x;counts", nbins, -TR2Size[0]*2.5, TR2Size[0]*2.5);
+TH1F* hy = new TH1F("y", "y;y;counts", nbins, -100, 100);
 
 //puoi settare il seed for reproducibility
 TRandom3 *rnd = new TRandom3(0); 
@@ -171,7 +174,7 @@ for (int i=0; i < events; i++){
         int ind_phi = rnd->Uniform(0, allPhi.size()-1);
         theta = (allTheta[ind_theta]/180)*TMath::Pi();
         phi = (allPhi[ind_phi]/180)*TMath::Pi();
-        cout << theta << ", " << phi << "           ";
+        //cout << theta << ", " << phi << "           ";
 
 
 
@@ -224,6 +227,40 @@ for (int i=0; i < events; i++){
 
     chip c;
     c.is_dead_chip_tracking_smt(c, pL2, mL1, qL0);
+
+
+    //fake hit rate (rate = 10^-6 per event)
+    double rate = rnd->Uniform(0,1);
+    if (rate < 1./1000000.){
+        //x
+        double fakehit_x = rnd->Uniform(-(2.5*display::ChipSizeX+2*display::ChipDistanceX),+(2.5*display::ChipSizeX+2*display::ChipDistanceX));
+        //y
+        double FAKEhit_y = rnd->Uniform(-(5*display::ChipSizeY+2.5*display::ChipDistanceY),+(5*display::ChipSizeY+2.5*display::ChipDistanceY));
+        double fakehit_y;
+        if(FAKEhit_y < (0.5*display::ChipDistanceY+1*display::ChipSizeY) && FAKEhit_y > -(0.5*display::ChipDistanceY+1*display::ChipSizeY)){
+            fakehit_y = FAKEhit_y;
+        }
+        if((FAKEhit_y < (1.5*display::ChipDistanceY+3*display::ChipSizeY) && FAKEhit_y > (0.5*display::ChipDistanceY+1*display::ChipSizeY)) ||
+          (FAKEhit_y > -(1.5*display::ChipDistanceY+3*display::ChipSizeY) && FAKEhit_y < -(0.5*display::ChipDistanceY+1*display::ChipSizeY))){
+            fakehit_y = FAKEhit_y + display::ChipStaveDistanceY;
+          }
+        if((FAKEhit_y < (2.5*display::ChipDistanceY+5*display::ChipSizeY) && FAKEhit_y > (1.5*display::ChipDistanceY+3*display::ChipSizeY)) ||
+          (FAKEhit_y > -(2.5*display::ChipDistanceY+5*display::ChipSizeY) && FAKEhit_y < -(1.5*display::ChipDistanceY+3*display::ChipSizeY))){
+            fakehit_y = FAKEhit_y + 2*display::ChipStaveDistanceY;
+          }
+        //z
+        int r = 1 + (int)(rnd->Uniform(0,3));
+        double fakehit_z;
+        if(r == 1){fakehit_z = display::StaveZ[0];}
+        if(r == 2){fakehit_z = display::StaveZ[1];}
+        if(r == 3){fakehit_z = display::StaveZ[2];}
+
+        TMarker3DBox *fake_hit = new TMarker3DBox(fakehit_x, fakehit_y, fakehit_z, display::err_cl, display::err_cl, 0, 0, 0);
+        fake_hit->Draw();
+
+        stats::fakehit++;
+    }
+
 
     //plotting tracks
     
@@ -301,6 +338,7 @@ for (int i=0; i < events; i++){
     q->Draw();
     }
 
+    /*
     //contiamo quante traccie hanno colpito quanti layer ciascuna (3layer, 2layer, 1layer, 0layer)
     if(stats::hitL2 && stats::hitL1 && stats::hitL0 && stats::hmgthTR1){
         stats::hmgthL012++;
@@ -322,6 +360,7 @@ for (int i=0; i < events; i++){
         htheta0L->Fill(theta);
         hphi0L->Fill(phi);
     }
+    */
 
     hxTR2->Fill(xTR2);
     hyTR2->Fill(yTR2);
@@ -355,16 +394,18 @@ hzTR2->Write();
 hxTR1->Write();
 hyTR1->Write();
 hzTR1->Write();
+htheta->Write();
 hphi->Write();
+/*
 hphi3L->Write();
 hphi2L->Write();
 hphi1L->Write();
 hphi0L->Write();
-htheta->Write();
 htheta3L->Write();
 htheta2L->Write();
 htheta1L->Write();
 htheta0L->Write();
+*/
 hx->Write();
 hy->Write();
 f.Close();

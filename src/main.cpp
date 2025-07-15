@@ -25,7 +25,7 @@ void run(){
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
 
-    int events = 5;
+    int events = 3;
     stats s;
     display generated_tracks;
     chips cc;
@@ -45,7 +45,9 @@ void run(){
     TStopwatch t;
     t.Start();
     tracker.computeTracklets();
-    tracker.computeTrackCandidates(real_tracks);
+    //tracker.computeTrackCandidates(real_tracks);
+    tracker.new_computing(real_tracks);
+
     t.Stop();
     tracker.printRecoTracks(real_tracks, events);
     cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
@@ -83,6 +85,31 @@ int main(int argc, char** argv) {
 
     //track simulation
     run();
+
+
+
+    /* //prove varie
+    TFile *file = TFile::Open("../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
+    TTree *tree = (TTree*)file->Get("L2;1");
+    //Long64_t nentries = tree->GetEntries();
+    Long64_t nentries = 15000;
+
+
+    Bool_t trig_conf_flag[6];
+    tree->SetBranchAddress("trig_conf_flag", trig_conf_flag);
+    for (Long64_t i=8000; i<nentries; ++i) {
+        tree->GetEntry(i);
+        cout << "Evento " << i << ": ";
+        for (int j=0; j<6; ++j) {
+            cout << "flag[" << j << "]=" << trig_conf_flag[j] << " ";
+        }
+        cout << endl;
+    } 
+
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+ */
+
+
 
 
 

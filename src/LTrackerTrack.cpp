@@ -90,6 +90,25 @@ void LTrackerTrack::computeTracklets()
   cout << "~~~~~~~~~~~~~~~~~~~~~" << endl;
 }
 
+void LTrackerTrack::print_tracklet(const LCluster cl_0, const LCluster cl_2){
+
+  double x0, y0, z0, x2, y2, z2;
+  x0 = cl_0.x;
+  y0 = cl_0.y;
+  z0 = cl_0.z;
+  x2 = cl_2.x;
+  y2 = cl_2.y;
+  z2 = cl_2.z;
+  Double_t x_line[2] = {x0, x2};
+  Double_t y_line[2] = {y0, y2};
+  Double_t z_line[2] = {z0, z2};
+  TPolyLine3D* trk = new TPolyLine3D(2, x_line, y_line, z_line);
+  trk->SetLineWidth(2);
+  trk->SetLineColor(kRed);
+  trk->Draw();
+
+}
+
 // Distance function to be minimised
 double LTrackerTrack::fct(const std::vector<LCluster> &clusters, const double *par)
 {
@@ -267,11 +286,8 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
   std::sort(track_candidates.begin(), track_candidates.end(), [](LTrackCandidate &a, LTrackCandidate &b)
             { return a.chi2 < b.chi2; });
   // Remove candidates with large chi2
-  //change chi2_cut
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~       
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  //chi2_cut = 5;
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+  
   auto new_end = std::remove_if(track_candidates.begin(), track_candidates.end(), [&](LTrackCandidate &trk)
                                 { return trk.chi2 > chi2_cut; });
   track_candidates.erase(new_end, track_candidates.end());
@@ -288,7 +304,7 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
   std::vector<int> used_tracklets;
   std::vector<int> used_clusters;
 
-  cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+chi2 " << endl;
+  cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+chi2 (<100) " << endl;
   for (auto &trk : track_candidates)
   {
     tracks.push_back(trk);
@@ -312,6 +328,41 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
 
 }
 
+
+void LTrackerTrack::new_computing(TCanvas* reco){
+
+  for (auto &trkl02 : tracklet_lay02){
+
+    //calcola punto sul layer 1
+    LCluster clus_0 = tidy_clusters_lay0[trkl02.firstClusterId];
+    LCluster clus_2 = tidy_clusters_lay2[trkl02.secondClusterId];
+
+    double x1, y1, z1;
+    x1 = (clus_2.x+ clus_0.x)/2;
+    y1 = (clus_2.y+ clus_0.y)/2;
+    z1 = display::StaveZ[1];
+
+    TMarker3DBox *p = new TMarker3DBox(x1, y1, z1, 8,8,0,0,0);
+    p->Draw();
+    
+    //definisci una regione di coordinate x+-dx, y+-dy
+    double r = 10;
+    for(int i=0; i < tidy_clusters_lay1.size(); i++){
+      if(tidy_clusters_lay1[i].x < x1 + r && tidy_clusters_lay1[i].x > x1 - r &&
+         tidy_clusters_lay1[i].y < y1 + r && tidy_clusters_lay1[i].y > y1 - r){
+          cout << "hihihihihihiihihihihih" << endl;
+          LTrackerTrack t;
+          t.print_tracklet(clus_0, clus_2);
+
+         }
+    }
+    //funzione print tracklet
+    //valuta se in quella regione è presente un cluster acceso
+    //nota bene, i cluster sono confinati in un chip
+    //crea distribuzioni per valutare raggio migliore 
+
+  }
+}
 
 std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker)
 {
@@ -404,14 +455,14 @@ void LTrackerTrack::printRecoTracks(TCanvas* reco, int events) {
 
     //reco->Update();
     
-    
+    /*
     cout << "L2 ------ x:" << x2 << ",   y: " << y2 << ",    z: " << z2 << endl; 
     cout << "L1 ------ x:" << trk.x0 << ",   y: " << trk.y0 << ",    z: " << trk.z0 << endl; 
     cout << "L0 ------ x:" << x1 << ",   y: " << y1 << ",    z: " << z1 << endl; 
     cout << "(gradi) theta: " << trk.theta << "     phi: " << trk.phi << endl;
     cout << "(rad)   theta: " << t         << "     phi: " <<     p   << endl;
     cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-    
+    */
 
   }
 

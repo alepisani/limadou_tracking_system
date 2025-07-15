@@ -209,22 +209,7 @@ for (int i=0; i < events; i++){
         stats::hmgthTR1++;
     }
     
-
-    //riempio i tidy_cluester for each layer con cluster dei punti generati da MC
-    LCluster pL2;
-    pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], err_cl, err_cl, err_cl, i);
-    tracker.tidy_clusters_lay2.try_emplace(i,pL2);
-
-    LCluster mL1;
-    mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], err_cl, err_cl, err_cl, i);
-    tracker.tidy_clusters_lay1.try_emplace(i,mL1);
-
-    LCluster qL0;
-    qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], err_cl, err_cl, err_cl, i);
-    tracker.tidy_clusters_lay0.try_emplace(i,qL0);
-
-    chip c;
-    c.is_dead_chip_tracking_smt(c, pL2, mL1, qL0);
+    
 
 
     //fake hit rate (rate = 10^-6 per event)
@@ -272,6 +257,7 @@ for (int i=0; i < events; i++){
     line_track->Draw();
     
     
+    /*
     cout << "real data" << endl;
     cout << "L2 ------ x:" << xL2 << ",   y: " << yL2 << ",    z: " << StaveZ[2] << endl; 
     cout << "L1 ------ x:" << xL1 << ",   y: " << yL1 << ",    z: " << StaveZ[1] << endl; 
@@ -279,9 +265,9 @@ for (int i=0; i < events; i++){
     cout << "(gra)theta" << (theta*180)/TMath::Pi() << ",     phi" << (phi*180)/TMath::Pi() << endl;
     cout << "(rad) theta: " << theta << "     phi: " << phi << endl;
     cout << "-----------------------------------------------------------------------------"; 
-    
+    */
 
-
+    LCluster pL2; LCluster mL1; LCluster qL0;
     //check if the track hitted the staves in layer 2
     if((xL2 < ChipSizeX*2.5 + ChipDistanceX && xL2 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
     ((yL2 < ChipSizeY*5 + ChipStaveDistanceY*2 + ChipDistanceY*2.5 && yL2 > ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*2.5) ||
@@ -297,6 +283,9 @@ for (int i=0; i < events; i++){
     ){
     stats::hmgthL2++;
     stats::hitL2 = true;
+    //only if hitted the chips goes to tidy_clusters
+    pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], err_cl, err_cl, err_cl, i);
+    tracker.tidy_clusters_lay2.try_emplace(i,pL2);
     TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], 2,2,0,0,0);
     p->Draw();
     }
@@ -315,6 +304,8 @@ for (int i=0; i < events; i++){
     ){
     stats::hmgthL1++;
     stats::hitL1 = true;
+    mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], err_cl, err_cl, err_cl, i);
+    tracker.tidy_clusters_lay1.try_emplace(i,mL1);
     TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], 2,2,0,0,0);
     m->Draw();
     }
@@ -333,9 +324,14 @@ for (int i=0; i < events; i++){
     ){
     stats::hmgthL0++;
     stats::hitL0 = true;
+    qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], err_cl, err_cl, err_cl, i);
+    tracker.tidy_clusters_lay0.try_emplace(i,qL0);
     TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], 2,2,0,0,0);
     q->Draw();
     }
+
+    chip c;
+    c.is_dead_chip_tracking_smt(c, pL2, mL1, qL0);
 
     
     //contiamo quante traccie hanno colpito quanti layer ciascuna (3layer, 2layer, 1layer, 0layer)

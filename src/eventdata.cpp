@@ -52,8 +52,6 @@ void eventdata::takedata(){
         std::cerr << "Errore nell'aprire il file ROOT\n";
         return;
     }
-
-    // Carica il TTree (sostituisci con il nome corretto se diverso)
     TTree *tree = (TTree*)file->Get("L2;1");
     if (!tree) {
         std::cerr << "TTree non trovato nel file\n";

@@ -100,10 +100,12 @@ public:
   void Reset();
   void createTracklet(std::pair<int, LCluster> cl_l0, std::pair<int, LCluster> cl_l1, std::vector<LTracklet> &tracklet_vector, int &tracklet_counter);
   void computeTracklets();
+  void print_tracklet(const LCluster, const LCluster);
   static double fct(const std::vector<LCluster> &clusters, const double *par);
   void fitStraightLine(const std::vector<LCluster> &clusters, LTrackCandidate &trkCand);
   void addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer);
   void computeTrackCandidates(TCanvas* reco);
+  void new_computing(TCanvas* reco);
   void printRecoTracks(TCanvas* reco, int);
   friend std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker);
 

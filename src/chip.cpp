@@ -127,6 +127,7 @@ void chip::is_dead_chip_tracking_smt(chip &c, LCluster pL2, LCluster mL1, LClust
                 cout << "WARNING, IL CHIP MORTO CON ID: " << chips::dead_chip[i] 
                      << ", non sta rilevando la track sul layer 0" << endl;
                 stats::hmgthdcL0++;
+                
             }
         } else {
             // Messaggio di errore se la chiave non esiste
@@ -152,6 +153,7 @@ void chips::print_id_coordinates() {
 }
 
 
+//const std::vector<unsigned short> chips::dead_chip = {0xe7c,0xe7b,0xe7a,0xe79,0xe78,0x77c,0x77b,0x77a,0x779,0x778};  //add here dead chip
 const std::vector<unsigned short> chips::dead_chip = {};  //add here dead chip
 
 std::unordered_map<unsigned short, TVector3> chips::id_coordinates;

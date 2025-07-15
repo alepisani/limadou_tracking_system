@@ -25,7 +25,7 @@ void run(){
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
 
-    int events = 30;
+    int events = 5;
     stats s;
     display generated_tracks;
     chips cc;
@@ -44,10 +44,10 @@ void run(){
     //algoritmo di ricostruzione tracce
     TStopwatch t;
     t.Start();
-    //tracker.computeTracklets();
-    //tracker.computeTrackCandidates(real_tracks);
+    tracker.computeTracklets();
+    tracker.computeTrackCandidates(real_tracks);
     t.Stop();
-    //tracker.printRecoTracks(real_tracks, events);
+    tracker.printRecoTracks(real_tracks, events);
     cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
     cout << "Real time: " << t.RealTime() << " s\n";
     cout << "CPU time:  " << t.CpuTime()  << " s\n";

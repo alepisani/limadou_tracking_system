@@ -30,7 +30,20 @@ void LTrackerCluster::Reset() {
     return;
 }
 
-
+std::ostream &operator<<(std::ostream &output, const LTrackerCluster &cluster) {
+    output << "N. clusters: " << cluster.cls_mean_x.size() << std::endl;
+    for (size_t i = 0; i < cluster.cls_mean_x.size(); ++i) {
+        output << "Cluster " << i
+               << " | mean_x: " << cluster.cls_mean_x[i]
+               << " | mean_y: " << cluster.cls_mean_y[i]
+               << " | mean_z: " << cluster.cls_mean_z[i]
+               << " | chip_id: " << cluster.cls_chip_id[i]
+               << " | size: " << cluster.cls_size[i]
+               << " | idx: " << cluster.cls_idx[i]
+               << std::endl;
+    }
+    return output;
+} 
 
 //sostituisci signal con i dati presi da eventdata
 void LTrackerCluster::CalculateClusterPosition(eventdata ev) {
@@ -130,10 +143,11 @@ void LTrackerCluster::CalculateClusterPosition(eventdata ev) {
         //cls_pattern_position.push_back(position);
         //cls_pattern.insert(cls_pattern.end(), pattern.begin(), pattern.end());
         cls_idx.push_back(unique_cls_id[i]);
+        /*
         if(i==0){stats::hmbh1L++;}
         if(i==1){stats::hmbh2L++; stats::hmbh1L--;}
         if(i==2){stats::hmbh3L++; stats::hmbh2L--;}
-        
+        */
 
 
     }
@@ -141,4 +155,4 @@ void LTrackerCluster::CalculateClusterPosition(eventdata ev) {
 
 
 
-// 0 2 6 9 11 14 17 20 21 24     9eventi
+

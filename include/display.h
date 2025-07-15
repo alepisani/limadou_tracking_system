@@ -43,7 +43,7 @@ public:
     static constexpr std::array<double, 3> StaveZ = {17.825+TR1CenterZ,17.825+8.5+TR1CenterZ,17.825+17+TR1CenterZ};
     static constexpr float pitch_x = 29.24 / 1000; // [mm] pixel pitch
     static constexpr float pitch_y = 26.88 / 1000; // [mm] pixel pitch
-    double err_cl = 10;
+    double err_cl = 2;
     double pi = TMath::Pi();
     static constexpr float dist_z = 8.5;                      // [mm] distance between planes
     static constexpr float shift_z = 17.825;                  // [mm] distance between trigger layer and firts tracking layer

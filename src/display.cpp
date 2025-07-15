@@ -107,7 +107,7 @@ void display::take_angle_distribution(){
 void display::tracks(int events, LTrackerTrack& tracker, TCanvas* geom){
 
 stats::hmgt = events;
-int nbins = events/20;
+int nbins = events;
 
 //TH1F(name, title, nbins, xlow, xup)
 TH1F* hxTR2 = new TH1F("hxTR2", "x_trigger2;x_trigger1;counts", nbins, -TR2Size[0]*2.5, TR2Size[0]*2.5);
@@ -118,7 +118,6 @@ TH1F* hyTR1 = new TH1F("hyTR1", "y_trigger1;y_trigger1;counts", nbins, -TR1Size[
 TH1F* hzTR1 = new TH1F("hzTR1", "z_trigger1;z_trigger1;counts", nbins, -TR1Size[2]/2+TR1CenterZ, TR1Size[2]/2+TR1CenterZ);
 TH1F* hphi = new TH1F("hphi", "phi;#phi;counts", nbins, -pi, pi);
 TH1F* htheta = new TH1F("htheta", "theta;#theta;counts", nbins, 0, pi/2);
-/*
 TH1F* htheta3L = new TH1F("htheta3L", "theta;#theta;counts", nbins, 0, pi/2);
 TH1F* hphi3L = new TH1F("hphi3L", "phi;#phi;counts", nbins, -pi, pi);
 TH1F* htheta2L = new TH1F("htheta2L", "theta;#theta;counts", nbins, 0, pi/2);
@@ -127,7 +126,6 @@ TH1F* htheta1L = new TH1F("htheta1L", "theta;#theta;counts", nbins, 0, pi/2);
 TH1F* hphi1L = new TH1F("hphi1L", "phi;#phi;counts", nbins, -pi, pi);
 TH1F* htheta0L = new TH1F("htheta0L", "theta;#theta;counts", nbins, 0, pi/2);
 TH1F* hphi0L = new TH1F("hphi0L", "phi;#phi;counts", nbins, -pi, pi);
-*/
 TH1F* hx = new TH1F("x", "x;x;counts", nbins, -TR2Size[0]*2.5, TR2Size[0]*2.5);
 TH1F* hy = new TH1F("y", "y;y;counts", nbins, -100, 100);
 
@@ -273,14 +271,15 @@ for (int i=0; i < events; i++){
     geom->cd();
     line_track->Draw();
     
-    /*
+    
     cout << "real data" << endl;
     cout << "L2 ------ x:" << xL2 << ",   y: " << yL2 << ",    z: " << StaveZ[2] << endl; 
     cout << "L1 ------ x:" << xL1 << ",   y: " << yL1 << ",    z: " << StaveZ[1] << endl; 
     cout << "L0 ------ x:" << xL0 << ",   y: " << yL0 << ",    z: " << StaveZ[0] << endl; 
     cout << "(gra)theta" << (theta*180)/TMath::Pi() << ",     phi" << (phi*180)/TMath::Pi() << endl;
+    cout << "(rad) theta: " << theta << "     phi: " << phi << endl;
     cout << "-----------------------------------------------------------------------------"; 
-    */
+    
 
 
     //check if the track hitted the staves in layer 2
@@ -338,7 +337,7 @@ for (int i=0; i < events; i++){
     q->Draw();
     }
 
-    /*
+    
     //contiamo quante traccie hanno colpito quanti layer ciascuna (3layer, 2layer, 1layer, 0layer)
     if(stats::hitL2 && stats::hitL1 && stats::hitL0 && stats::hmgthTR1){
         stats::hmgthL012++;
@@ -360,7 +359,7 @@ for (int i=0; i < events; i++){
         htheta0L->Fill(theta);
         hphi0L->Fill(phi);
     }
-    */
+    
 
     hxTR2->Fill(xTR2);
     hyTR2->Fill(yTR2);
@@ -396,7 +395,6 @@ hyTR1->Write();
 hzTR1->Write();
 htheta->Write();
 hphi->Write();
-/*
 hphi3L->Write();
 hphi2L->Write();
 hphi1L->Write();
@@ -405,7 +403,6 @@ htheta3L->Write();
 htheta2L->Write();
 htheta1L->Write();
 htheta0L->Write();
-*/
 hx->Write();
 hy->Write();
 f.Close();

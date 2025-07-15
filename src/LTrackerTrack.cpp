@@ -267,6 +267,11 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
   std::sort(track_candidates.begin(), track_candidates.end(), [](LTrackCandidate &a, LTrackCandidate &b)
             { return a.chi2 < b.chi2; });
   // Remove candidates with large chi2
+  //change chi2_cut
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~       
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //chi2_cut = 5;
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   auto new_end = std::remove_if(track_candidates.begin(), track_candidates.end(), [&](LTrackCandidate &trk)
                                 { return trk.chi2 > chi2_cut; });
   track_candidates.erase(new_end, track_candidates.end());
@@ -283,13 +288,15 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
   std::vector<int> used_tracklets;
   std::vector<int> used_clusters;
 
+  cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+chi2 " << endl;
   for (auto &trk : track_candidates)
   {
     tracks.push_back(trk);
     used_tracklets.insert(used_tracklets.end(), trk.tracklet_id.begin(), trk.tracklet_id.end());
     used_clusters.insert(used_clusters.end(), trk.clus_id.begin(), trk.clus_id.end());
-    //cout << "chi2: " << trk.chi2 << endl;
+    cout << trk.chi2 << endl;
   }
+  cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;    
 
   addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay01, tidy_clusters_lay0, tidy_clusters_lay1);
   addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay12, tidy_clusters_lay1, tidy_clusters_lay2);
@@ -301,9 +308,7 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
     tracks[i].id = i;
   }
 
-
-  cout << "tracce ricostruite: " << tracks.size() << endl;
-
+  stats::hmrt = tracks.size();
 
 }
 
@@ -372,13 +377,15 @@ void LTrackerTrack::printRecoTracks(TCanvas* reco, int events) {
     ++i;
     float x1, y1, z1, dz, x2, y2, z2, t, p;
     dz = display::dist_z;         
-    t = ((trk.theta/180)*TMath::Pi());    //output sono in gradi, li passo in rad
-    p = ((trk.phi)/180)*TMath::Pi();
-    x2 = trk.x0 + (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Cos(p));
-    y2 = trk.y0 + (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Sin(p));
+    //t = (trk.theta/180)*TMath::Pi();    //output sono in gradi, li passo in rad
+    //p = (trk.phi/180)*TMath::Pi();
+    t = trk.theta*TMath::DegToRad();
+    p = trk.phi*TMath::DegToRad();
+    x2 = trk.x0 + dz *(TMath::Tan(t))*(TMath::Cos(p));
+    y2 = trk.y0 + dz *(TMath::Tan(t))*(TMath::Sin(p));
     z2 = trk.z0 + dz;
-    x1 = trk.x0 - (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Cos(p));
-    y1 = trk.y0 - (trk.z0 + dz)*(TMath::Tan(t))*(TMath::Sin(p));
+    x1 = trk.x0 - dz *(TMath::Tan(t))*(TMath::Cos(p));
+    y1 = trk.y0 - dz *(TMath::Tan(t))*(TMath::Sin(p));
     z1 = trk.z0 - dz;
     Double_t x_line[3] = {x1, trk.x0, x2};
     Double_t y_line[3] = {y1, trk.y0, y2};
@@ -388,11 +395,11 @@ void LTrackerTrack::printRecoTracks(TCanvas* reco, int events) {
     line_track->SetLineColor(kRed);
     line_track->Draw();
 
-    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 5,5,0,0,0);
+    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 1,1,0,0,0);
     g->Draw();
-    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 7,7,0,0,0);
+    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, trk.err_x0, trk.err_y0, 0, 0, 0);
     m->Draw();
-    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 9,9,0,0,0);
+    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 1,1,0,0,0);
     f->Draw();
 
     //reco->Update();
@@ -402,6 +409,7 @@ void LTrackerTrack::printRecoTracks(TCanvas* reco, int events) {
     cout << "L1 ------ x:" << trk.x0 << ",   y: " << trk.y0 << ",    z: " << trk.z0 << endl; 
     cout << "L0 ------ x:" << x1 << ",   y: " << y1 << ",    z: " << z1 << endl; 
     cout << "(gradi) theta: " << trk.theta << "     phi: " << trk.phi << endl;
+    cout << "(rad)   theta: " << t         << "     phi: " <<     p   << endl;
     cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     
 

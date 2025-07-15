@@ -47,7 +47,7 @@ void eventdata::takedata(){
     //cambia nome file in base a cosa vuoi
     //TFile *file = TFile::Open("../data_beam_test/");
     
-    TFile *file = TFile::Open("../data_beam_test/TEST_PROTON_p_MAIN_70.0MeV_0.0deg_-1.0V_boot94_run11_L2.root");
+    TFile *file = TFile::Open("../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
     if (!file || file->IsZombie()) {
         std::cerr << "Errore nell'aprire il file ROOT\n";
         return;
@@ -99,6 +99,7 @@ void eventdata::takedata(){
 
         
     }
+    
     file->Close();
 }
 
@@ -112,37 +113,66 @@ void eventdata::print_data_on_canvas(TCanvas* can){
     c.print_all_chips(c, can);
 
     int events = alldata.size();
-    //int events = 20;
+    //int events = 10;
     TH1F* hx = new TH1F("x", "x;x;counts", events, -display::TR2Size[0]*2.5, display::TR2Size[0]*2.5);
     TH1F* hy = new TH1F("y", "y;y;counts", events, -100, 100);
     TH1F* hz = new TH1F("z", "z;z;counts", events, 10, 40);
 
     eventdata ev;
-    LTrackerCluster cluster;
+    std::vector<LTrackerCluster> clusters;
+
     for (int i = 0; i < events; i++){
+        LTrackerCluster cluster;
         ev = alldata[i];
         cluster.CalculateClusterPosition(ev);
+
+        clusters.push_back(cluster);
     }    
 
-    cout << "quanti cluster: " << cluster.cls_mean_x.size() << endl;
     cout << "events: " << events << endl;
-    for(int i=0; i<cluster.cls_mean_x.size(); i++){
-        //cout << "p: " << cluster.cls_mean_x[i] << " , y: " << cluster.cls_mean_y[i] << "  , z: " << cluster.cls_mean_z[i] << endl;
-        TMarker3DBox *p = new TMarker3DBox(cluster.cls_mean_x[i],cluster.cls_mean_y[i],cluster.cls_mean_z[i],2,2,0,0,0);
-        p->SetLineColor(kRed);
-        p->SetLineWidth(3);
-        p->Draw();
-        hx->Fill(cluster.cls_mean_x[i]);
-        hy->Fill(cluster.cls_mean_y[i]);
-        hz->Fill(cluster.cls_mean_z[i]);
 
-        //stats
-        if(cluster.cls_mean_z[i] < 36 && cluster.cls_mean_z[i] > 30){stats::hmthL2++;}
-        if(cluster.cls_mean_z[i] < 29 && cluster.cls_mean_z[i] > 22){stats::hmthL1++;}
-        if(cluster.cls_mean_z[i] < 20 && cluster.cls_mean_z[i] > 15){stats::hmthL0++;}
+    for(int i=0; i<clusters.size(); i++){
+        //cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+        //cout << clusters[i] << endl;
+        bool hit_L2 = false;
+        bool hit_L1 = false;
+        bool hit_L0 = false;
+        if(clusters[i].cls_mean_x.size() == 0){
+        stats::hmbh0L++;
+        }
+        for(int j=0; j<clusters[i].cls_mean_x.size(); j++){
+
+            TMarker3DBox *p = new TMarker3DBox(clusters[i].cls_mean_x[j],clusters[i].cls_mean_y[j],clusters[i].cls_mean_z[j],2,2,0,0,0);
+            p->SetLineColor(kRed);
+            p->SetLineWidth(3);
+            p->Draw();
+            hx->Fill(clusters[i].cls_mean_x[j]);
+            hy->Fill(clusters[i].cls_mean_y[j]);
+            hz->Fill(clusters[i].cls_mean_z[j]);    
+                 
+            //stats
+
+            if(clusters[i].cls_mean_z[j] < 36. && clusters[i].cls_mean_z[j] > 30.){
+                stats::hmthL2++;
+                hit_L2 = true;
+            }
+            if(clusters[i].cls_mean_z[j] < 29. && clusters[i].cls_mean_z[j] > 22.){
+                stats::hmthL1++;
+                hit_L1 = true;
+            }
+            if(clusters[i].cls_mean_z[j] < 20. && clusters[i].cls_mean_z[j] > 15.){
+                stats::hmthL0++;
+                hit_L0 = true;
+            }
+        }   
+        if(hit_L2 && hit_L1 && hit_L0){
+            stats::hmbh3L++;}
+        if((hit_L2 && hit_L1 && !hit_L0) || (hit_L2 && !hit_L1 && hit_L0) || (!hit_L2 && hit_L1 && hit_L0)){
+            stats::hmbh2L++;}
+        if((hit_L2 && !hit_L1 && !hit_L0) || (!hit_L2 && hit_L1 && !hit_L0) || (!hit_L2 && !hit_L1 && hit_L0)){
+            stats::hmbh1L++;}
     }
-    stats::hmbh0L = events - stats::hmbh3L - stats::hmbh2L - stats::hmbh1L; 
-
+    
 
 
 

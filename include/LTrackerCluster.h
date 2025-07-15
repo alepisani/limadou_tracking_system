@@ -11,6 +11,7 @@ class LTrackerCluster {
 public:
     LTrackerCluster();
     void Reset();
+    friend std::ostream &operator<<(std::ostream &output, const LTrackerCluster &cluster);
     std::vector<int> GetClusterIdx() {return cls_idx;}
     void CalculateClusterPosition(eventdata ev);
 
@@ -32,6 +33,8 @@ public:
     std::vector<int> cls_pattern_position;
     std::vector<int> cls_idx;
     std::vector<int> cls_track_idx;
+
+
 
 
 };

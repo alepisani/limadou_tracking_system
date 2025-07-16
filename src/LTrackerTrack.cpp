@@ -331,38 +331,205 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
 
 void LTrackerTrack::new_computing(TCanvas* reco){
 
+  int candidateCounter = 0;
+
   for (auto &trkl02 : tracklet_lay02){
 
     //calcola punto sul layer 1
     LCluster clus_0 = tidy_clusters_lay0[trkl02.firstClusterId];
     LCluster clus_2 = tidy_clusters_lay2[trkl02.secondClusterId];
 
-    double x1, y1, z1;
+    //intorno del punto nel quale si cerca un cluster
+    double x1, y1, z1, r;
     x1 = (clus_2.x+ clus_0.x)/2;
     y1 = (clus_2.y+ clus_0.y)/2;
     z1 = display::StaveZ[1];
+    //nb il raggio massimo è dato dalla dimensione del chip, 256 pixel; display::chipsizey
+    //r = display::ChipSizeY/2;
+    r = 1;
 
-    TMarker3DBox *p = new TMarker3DBox(x1, y1, z1, 8,8,0,0,0);
-    p->Draw();
+
+    //print della regione 
+    /* TMarker3DBox *p = new TMarker3DBox(x1, y1, z1, 8,8,0,0,0);
+    p->Draw(); */
+    int n = 100;                          // N° di punti per approssimare il cerchio
+    double cx=x1, cy=y1, cz=z1;           // Centro e raggio
+    TPolyLine3D *circ = new TPolyLine3D(n);
+    for(int i=0; i<n; ++i) {
+      double phi = 2*M_PI * i / (n-1);
+      double x = cx + r * cos(phi);
+      double y = cy + r * sin(phi);
+      circ->SetPoint(i, x, y, cz);
+    }
+    circ->SetLineColor(kRed);
+    circ->Draw();
+
     
     //definisci una regione di coordinate x+-dx, y+-dy
-    double r = 10;
     for(int i=0; i < tidy_clusters_lay1.size(); i++){
       if(tidy_clusters_lay1[i].x < x1 + r && tidy_clusters_lay1[i].x > x1 - r &&
          tidy_clusters_lay1[i].y < y1 + r && tidy_clusters_lay1[i].y > y1 - r){
-          cout << "hihihihihihiihihihihih" << endl;
           LTrackerTrack t;
-          t.print_tracklet(clus_0, clus_2);
+          LCluster clus_1 = tidy_clusters_lay1[i];
+
+          std::vector<LCluster> clus_vec = {clus_0, clus_1, clus_2};
+          LTrackCandidate trkCand;
+          fitStraightLine(clus_vec, trkCand);
+          trkCand.id = candidateCounter++;
+          trkCand.n_clus = clus_vec.size();
+          trkCand.tracklet_id = {trkl02.id};
+
+          track_candidates.push_back(trkCand);
 
          }
     }
-    //funzione print tracklet
+  }
+
+
+  //Sort track candidates by descending chi2
+  std::sort(track_candidates.begin(), track_candidates.end(), [](LTrackCandidate &a, LTrackCandidate &b)
+            { return a.chi2 < b.chi2; });
+  //Remove candidates with large chi2
+  auto new_end = std::remove_if(track_candidates.begin(), track_candidates.end(), [&](LTrackCandidate &trk)
+                                { return trk.chi2 > chi2_cut; });
+  track_candidates.erase(new_end, track_candidates.end());
+
+  // Record used tracklets and clusters
+  std::vector<int> used_tracklets;
+  std::vector<int> used_clusters;
+
+  cout << "track_candidates" << track_candidates.size() << endl;
+
+  cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+chi2 (<100) " << endl;
+  for (auto &trk : track_candidates)
+  {
+    tracks.push_back(trk);
+    used_tracklets.insert(used_tracklets.end(), trk.tracklet_id.begin(), trk.tracklet_id.end());
+    used_clusters.insert(used_clusters.end(), trk.clus_id.begin(), trk.clus_id.end());
+    cout << trk.chi2 << endl;
+  }
+  cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;    
+
+  //addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay01, tidy_clusters_lay0, tidy_clusters_lay1);
+  //addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay12, tidy_clusters_lay1, tidy_clusters_lay2);
+  //addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay02, tidy_clusters_lay0, tidy_clusters_lay2);
+
+
+  // Reassigning track id
+  for (int i = 0; i < tracks.size(); i++)
+  {
+    tracks[i].id = i;
+  }
+
+  stats::hmrt = tracks.size();
+
     //valuta se in quella regione è presente un cluster acceso
     //nota bene, i cluster sono confinati in un chip
     //crea distribuzioni per valutare raggio migliore 
 
-  }
 }
+
+
+
+
+void LTrackerTrack::printRecoTracks_old_alg(TCanvas* reco, int events) {
+
+  int i=0;
+  for (auto &trk : tracks){
+    if(i>=events){break;}
+    ++i;
+    float x1, y1, z1, dz, x2, y2, z2, t, p;
+    dz = display::dist_z;         
+    t = trk.theta*TMath::DegToRad();
+    p = trk.phi*TMath::DegToRad();
+    x2 = trk.x0 + dz *(TMath::Tan(t))*(TMath::Cos(p));
+    y2 = trk.y0 + dz *(TMath::Tan(t))*(TMath::Sin(p));
+    z2 = trk.z0 + dz;
+    x1 = trk.x0 - dz *(TMath::Tan(t))*(TMath::Cos(p));
+    y1 = trk.y0 - dz *(TMath::Tan(t))*(TMath::Sin(p));
+    z1 = trk.z0 - dz;
+    Double_t x_line[3] = {x1, trk.x0, x2};
+    Double_t y_line[3] = {y1, trk.y0, y2};
+    Double_t z_line[3] = {z1, trk.z0, z2};
+    TPolyLine3D* line_track = new TPolyLine3D(3, x_line, y_line, z_line);
+    line_track->SetLineWidth(2);
+    line_track->SetLineColor(kRed);
+    line_track->Draw();
+
+    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 1,1,0,0,0);
+    g->Draw();
+    //TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, trk.err_x0, trk.err_y0, 0, 0, 0);
+    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 10, 10, 0, 0, 0);
+    m->Draw();
+    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 1,1,0,0,0);
+    f->Draw();
+        
+    cout << "L2 ------ x:" << x2 << ",   y: " << y2 << ",    z: " << z2 << endl; 
+    cout << "L1 ------ x:" << trk.x0 << "+- " << trk.err_x0 << ",   y: " << trk.y0 << "+- " << trk.err_y0 << ",    z: " << trk.z0 << endl; 
+    cout << "L0 ------ x:" << x1 << ",   y: " << y1 << ",    z: " << z1 << endl; 
+    cout << "(gradi) theta: " << trk.theta << "     phi: " << trk.phi << endl;
+    cout << "(rad)   theta: " << t         << "     phi: " <<     p   << endl;
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    
+
+  }
+
+  reco->Update();
+}
+
+
+void LTrackerTrack::printRecoTracks_new_alg(TCanvas* reco, int events){
+
+  int i=0;
+  for (auto &trk : tracks){
+    if(i>=events){break;}
+    ++i;
+    float x1, y1, z1, dz, x2, y2, z2, t, p;
+    //dz = display::dist_z;         
+    dz = 100;
+    t = trk.theta*TMath::DegToRad();
+    p = trk.phi*TMath::DegToRad();
+    x2 = trk.x0 + dz *(TMath::Tan(t))*(TMath::Cos(p));
+    y2 = trk.y0 + dz *(TMath::Tan(t))*(TMath::Sin(p));
+    z2 = trk.z0 + dz;
+    x1 = trk.x0 - dz *(TMath::Tan(t))*(TMath::Cos(p));
+    y1 = trk.y0 - dz *(TMath::Tan(t))*(TMath::Sin(p));
+    z1 = trk.z0 - dz;
+    Double_t x_line[3] = {x1, trk.x0, x2};
+    Double_t y_line[3] = {y1, trk.y0, y2};
+    Double_t z_line[3] = {z1, trk.z0, z2};
+    TPolyLine3D* line_track = new TPolyLine3D(3, x_line, y_line, z_line);
+    line_track->SetLineWidth(2);
+    line_track->SetLineColor(kRed);
+    line_track->Draw();
+
+    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 1,1,0,0,0);
+    g->Draw();
+    //TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, trk.err_x0, trk.err_y0, 0, 0, 0);
+    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 5, 5, 0, 0, 0);
+    m->Draw();
+    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 1,1,0,0,0);
+    f->Draw();
+
+    
+    
+    
+    
+    
+    
+    //cout << "x: " << trk.x0 << "+- " << trk.err_x0 << "| y: " << trk.y0 << "+- " << trk.err_y0 << "| z: " << trk.z0 << endl; 
+
+
+
+
+  }
+
+
+
+
+  reco->Update();
+}
+
 
 std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker)
 {
@@ -417,55 +584,5 @@ std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker)
   }
     */
   return output;
-}
-
-
-void LTrackerTrack::printRecoTracks(TCanvas* reco, int events) {
-
-  int i=0;
-  for (auto &trk : tracks){
-    if(i>=events){break;}
-    ++i;
-    float x1, y1, z1, dz, x2, y2, z2, t, p;
-    dz = display::dist_z;         
-    //t = (trk.theta/180)*TMath::Pi();    //output sono in gradi, li passo in rad
-    //p = (trk.phi/180)*TMath::Pi();
-    t = trk.theta*TMath::DegToRad();
-    p = trk.phi*TMath::DegToRad();
-    x2 = trk.x0 + dz *(TMath::Tan(t))*(TMath::Cos(p));
-    y2 = trk.y0 + dz *(TMath::Tan(t))*(TMath::Sin(p));
-    z2 = trk.z0 + dz;
-    x1 = trk.x0 - dz *(TMath::Tan(t))*(TMath::Cos(p));
-    y1 = trk.y0 - dz *(TMath::Tan(t))*(TMath::Sin(p));
-    z1 = trk.z0 - dz;
-    Double_t x_line[3] = {x1, trk.x0, x2};
-    Double_t y_line[3] = {y1, trk.y0, y2};
-    Double_t z_line[3] = {z1, trk.z0, z2};
-    TPolyLine3D* line_track = new TPolyLine3D(3, x_line, y_line, z_line);
-    line_track->SetLineWidth(2);
-    line_track->SetLineColor(kRed);
-    line_track->Draw();
-
-    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 1,1,0,0,0);
-    g->Draw();
-    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, trk.err_x0, trk.err_y0, 0, 0, 0);
-    m->Draw();
-    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 1,1,0,0,0);
-    f->Draw();
-
-    //reco->Update();
-    
-    /*
-    cout << "L2 ------ x:" << x2 << ",   y: " << y2 << ",    z: " << z2 << endl; 
-    cout << "L1 ------ x:" << trk.x0 << ",   y: " << trk.y0 << ",    z: " << trk.z0 << endl; 
-    cout << "L0 ------ x:" << x1 << ",   y: " << y1 << ",    z: " << z1 << endl; 
-    cout << "(gradi) theta: " << trk.theta << "     phi: " << trk.phi << endl;
-    cout << "(rad)   theta: " << t         << "     phi: " <<     p   << endl;
-    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-    */
-
-  }
-
-  reco->Update();
 }
 

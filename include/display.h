@@ -35,7 +35,7 @@ public:
     static constexpr double PixelSizeCols = 0.02924; 
     static constexpr double PixelSizeRows = 0.02688;
     static constexpr double ChipSizeX = PixelSizeCols*PixelNCols;
-    static constexpr double ChipSizeY = PixelSizeRows*PixelNRows;
+    static constexpr double ChipSizeY = PixelSizeRows*PixelNRows;     //13.7626 mm
     static constexpr double ChipSizeZ = 0.050;     //50microm
     static constexpr double ChipDistanceX = 0.150;
     static constexpr double ChipDistanceY = 0.150;

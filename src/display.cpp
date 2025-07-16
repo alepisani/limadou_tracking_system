@@ -214,7 +214,7 @@ for (int i=0; i < events; i++){
 
     //fake hit rate (rate = 10^-6 per event)
     double rate = rnd->Uniform(0,1);
-    if (rate < 1./1000000.){
+    if (rate < 1./1000.){
         //x
         double fakehit_x = rnd->Uniform(-(2.5*display::ChipSizeX+2*display::ChipDistanceX),+(2.5*display::ChipSizeX+2*display::ChipDistanceX));
         //y
@@ -252,7 +252,7 @@ for (int i=0; i < events; i++){
     Double_t z_line[2] = {zTR2, zTR1};
     TPolyLine3D* line_track = new TPolyLine3D(2, x_line, y_line, z_line);
     line_track->SetLineColor(kBlue);
-    line_track->SetLineWidth(2);
+    line_track->SetLineWidth(4);
     geom->cd();
     line_track->Draw();
     

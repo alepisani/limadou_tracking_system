@@ -25,7 +25,7 @@ void run(){
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
 
-    int events = 3;
+    int events = 20;
     stats s;
     display generated_tracks;
     chips cc;
@@ -47,15 +47,16 @@ void run(){
     tracker.computeTracklets();
     //tracker.computeTrackCandidates(real_tracks);
     tracker.new_computing(real_tracks);
-
     t.Stop();
-    tracker.printRecoTracks(real_tracks, events);
+
+    //tracker.printRecoTracks_old_alg(real_tracks, events);
+    tracker.printRecoTracks_new_alg(real_tracks, events);
+
     cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
     cout << "Real time: " << t.RealTime() << " s\n";
     cout << "CPU time:  " << t.CpuTime()  << " s\n";
     cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
 
-    
 
     
 

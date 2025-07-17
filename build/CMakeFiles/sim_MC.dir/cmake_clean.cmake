@@ -11,6 +11,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/sim_MC.dir/src/eventdata.cpp.o.d"
   "CMakeFiles/sim_MC.dir/src/main.cpp.o"
   "CMakeFiles/sim_MC.dir/src/main.cpp.o.d"
+  "CMakeFiles/sim_MC.dir/src/simulations.cpp.o"
+  "CMakeFiles/sim_MC.dir/src/simulations.cpp.o.d"
   "CMakeFiles/sim_MC.dir/src/stats.cpp.o"
   "CMakeFiles/sim_MC.dir/src/stats.cpp.o.d"
   "sim_MC"

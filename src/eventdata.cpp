@@ -13,6 +13,7 @@
 #include "../include/display.h"
 #include "../include/stats.h"
 #include "../include/LTrackerCluster.h"
+#include "../include/LTrackerTrack.h"
 using namespace std;
 
 eventdata::eventdata(){}

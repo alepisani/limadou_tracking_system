@@ -29,11 +29,11 @@ void LTrackerTrack::Reset()
   tracklet_lay01.clear();
   tracklet_lay12.clear();
   tracklet_lay02.clear();
-  //track_candidates.clear();
+  track_candidates.clear();
   used_clusters_lay0.clear();
   used_clusters_lay1.clear();
   used_clusters_lay2.clear();
-  //tracks.clear();
+  tracks.clear();
 }
 
 void LCluster::fill_cluster(LCluster& cl, double x, double y, double z, double errx, double erry, double errz, int id){
@@ -82,12 +82,12 @@ void LTrackerTrack::computeTracklets()
       createTracklet(cl_l0, cl_l2, tracklet_lay02, tracklet_counter);
     }
   }
-  cout << "~~~~~~~~~~~~~~~~~~~~~" << endl;
+  /* cout << "~~~~~~~~~~~~~~~~~~~~~" << endl;
   cout << "tracklet_counter: " << tracklet_counter << endl;
   cout << "trackelt_lay01: " << tracklet_lay01.size() << endl;
   cout << "trackelt_lay12: " << tracklet_lay12.size() << endl;
   cout << "trackelt_lay02: " << tracklet_lay02.size() << endl;
-  cout << "~~~~~~~~~~~~~~~~~~~~~" << endl;
+  cout << "~~~~~~~~~~~~~~~~~~~~~" << endl; */
 }
 
 void LTrackerTrack::print_tracklet(const LCluster cl_0, const LCluster cl_2){
@@ -235,7 +235,7 @@ void LTrackerTrack::addSpuriousTracks(std::vector<int> &used_tracklets, std::vec
   }
 }
 
-void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
+void LTrackerTrack::computeTrackCandidates()
 {
   //inside () should have LTrackerCluster &clusterer
   int candidateCounter = 0;
@@ -329,12 +329,16 @@ void LTrackerTrack::computeTrackCandidates(TCanvas* reco)
 }
 
 
-void LTrackerTrack::new_computing(TCanvas* reco){
+void LTrackerTrack::new_computing(){
 
   int candidateCounter = 0;
 
-  for (auto &trkl02 : tracklet_lay02){
+  //vector per tenere traccia di quanti cluster entrano in un cerchio in funzione di r
+  std::vector <int> nclus_circle;
 
+  for (auto &trkl02 : tracklet_lay02){
+    int ncc;
+    ncc = 0;
     //calcola punto sul layer 1
     LCluster clus_0 = tidy_clusters_lay0[trkl02.firstClusterId];
     LCluster clus_2 = tidy_clusters_lay2[trkl02.secondClusterId];
@@ -345,14 +349,14 @@ void LTrackerTrack::new_computing(TCanvas* reco){
     y1 = (clus_2.y+ clus_0.y)/2;
     z1 = display::StaveZ[1];
     //nb il raggio massimo è dato dalla dimensione del chip, 256 pixel; display::chipsizey
-    //r = display::ChipSizeY/2;
-    r = 1;
+    //r = display::ChipSizeY/2;          //13.7625/2 = 6.88
+    r = 0.1;
+    
 
 
     //print della regione 
-    /* TMarker3DBox *p = new TMarker3DBox(x1, y1, z1, 8,8,0,0,0);
-    p->Draw(); */
-    int n = 100;                          // N° di punti per approssimare il cerchio
+    
+    /* int n = 100;                          // N° di punti per approssimare il cerchio
     double cx=x1, cy=y1, cz=z1;           // Centro e raggio
     TPolyLine3D *circ = new TPolyLine3D(n);
     for(int i=0; i<n; ++i) {
@@ -362,16 +366,15 @@ void LTrackerTrack::new_computing(TCanvas* reco){
       circ->SetPoint(i, x, y, cz);
     }
     circ->SetLineColor(kRed);
-    circ->Draw();
+    circ->Draw(); */
 
-    
     //definisci una regione di coordinate x+-dx, y+-dy
     for(int i=0; i < tidy_clusters_lay1.size(); i++){
       if(tidy_clusters_lay1[i].x < x1 + r && tidy_clusters_lay1[i].x > x1 - r &&
          tidy_clusters_lay1[i].y < y1 + r && tidy_clusters_lay1[i].y > y1 - r){
           LTrackerTrack t;
           LCluster clus_1 = tidy_clusters_lay1[i];
-
+          ncc++;
           std::vector<LCluster> clus_vec = {clus_0, clus_1, clus_2};
           LTrackCandidate trkCand;
           fitStraightLine(clus_vec, trkCand);
@@ -383,7 +386,15 @@ void LTrackerTrack::new_computing(TCanvas* reco){
 
          }
     }
+    nclus_circle.push_back(ncc);
   }
+
+  /* cout << "quanti cluster per circles" << endl;
+  cout << "(";
+  for(int i=0; i<nclus_circle.size(); i++){
+    cout << nclus_circle[i] << ",";
+  }
+  cout << ")" << endl; */
 
 
   //Sort track candidates by descending chi2
@@ -398,20 +409,18 @@ void LTrackerTrack::new_computing(TCanvas* reco){
   std::vector<int> used_tracklets;
   std::vector<int> used_clusters;
 
-  cout << "track_candidates" << track_candidates.size() << endl;
+  //cout << "track_candidates" << track_candidates.size() << endl;
 
-  cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+chi2 (<100) " << endl;
   for (auto &trk : track_candidates)
   {
     tracks.push_back(trk);
     used_tracklets.insert(used_tracklets.end(), trk.tracklet_id.begin(), trk.tracklet_id.end());
     used_clusters.insert(used_clusters.end(), trk.clus_id.begin(), trk.clus_id.end());
-    cout << trk.chi2 << endl;
+    //cout << trk.chi2 << endl;
   }
-  cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;    
+  
 
-  //addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay01, tidy_clusters_lay0, tidy_clusters_lay1);
-  //addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay12, tidy_clusters_lay1, tidy_clusters_lay2);
+  
   //addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay02, tidy_clusters_lay0, tidy_clusters_lay2);
 
 
@@ -422,10 +431,8 @@ void LTrackerTrack::new_computing(TCanvas* reco){
   }
 
   stats::hmrt = tracks.size();
-
-    //valuta se in quella regione è presente un cluster acceso
-    //nota bene, i cluster sono confinati in un chip
-    //crea distribuzioni per valutare raggio migliore 
+  //cout << "tracks size " << stats::hmrt << endl; 
+  
 
 }
 
@@ -481,6 +488,7 @@ void LTrackerTrack::printRecoTracks_old_alg(TCanvas* reco, int events) {
 void LTrackerTrack::printRecoTracks_new_alg(TCanvas* reco, int events){
 
   int i=0;
+  cout << "trakcs size" << tracks.size() << endl;
   for (auto &trk : tracks){
     if(i>=events){break;}
     ++i;

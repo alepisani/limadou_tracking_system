@@ -4,6 +4,7 @@
 #include "../include/LTrackerTrack.h"
 #include "../include/LTrackerCluster.h"
 #include "../include/eventdata.h"
+#include "../include/simulations.h"
 #include <string>
 #include <array> 
 #include <map>
@@ -18,14 +19,14 @@
 using namespace std;
 
 
-void run(){
+void run(int events){
 
     TCanvas* real_tracks = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
     TView* rt = TView::CreateView(1);
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
 
-    int events = 20;
+    
     stats s;
     display generated_tracks;
     chips cc;
@@ -45,8 +46,8 @@ void run(){
     TStopwatch t;
     t.Start();
     tracker.computeTracklets();
-    //tracker.computeTrackCandidates(real_tracks);
-    tracker.new_computing(real_tracks);
+    //tracker.computeTrackCandidates();
+    tracker.new_computing();
     t.Stop();
 
     //tracker.printRecoTracks_old_alg(real_tracks, events);
@@ -85,32 +86,54 @@ int main(int argc, char** argv) {
     
 
     //track simulation
-    run();
+    //int events = 10;
+    //run(events);
+
+    simulations sim;
+    sim.sim(10);
 
 
-
-    /* //prove varie
-    TFile *file = TFile::Open("../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
+     
+    //prove varie
+    //TFile *file = TFile::Open("../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
+    /* 
+    
     TTree *tree = (TTree*)file->Get("L2;1");
-    //Long64_t nentries = tree->GetEntries();
-    Long64_t nentries = 15000;
+    TTree *tree = (TTree*)file->Get("Tmd;1");
+    tree->Print();
 
-
+    Long64_t nentries = tree->GetEntries();
     Bool_t trig_conf_flag[6];
-    tree->SetBranchAddress("trig_conf_flag", trig_conf_flag);
-    for (Long64_t i=8000; i<nentries; ++i) {
+    tree->SetBranchAddress("trig_conf_flag[6]", &trig_conf_flag);
+    for (Long64_t i=0; i<nentries; ++i) {
+    //for (Long64_t i=10000; i<10500; ++i) {
         tree->GetEntry(i);
         cout << "Evento " << i << ": ";
+        //cout << trigger_mask;
+
         for (int j=0; j<6; ++j) {
             cout << "flag[" << j << "]=" << trig_conf_flag[j] << " ";
         }
+
+
         cout << endl;
     } 
 
     cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
- */
 
-
+      
+    UInt_t trigger_mask;
+    TTree *tr = (TTree*)file->Get("Tmd;1");
+    Long64_t nentr = tr->GetEntries();
+    tr->SetBranchAddress("trigger_mask", &trigger_mask);
+    for (Long64_t i=0; i<nentr; ++i) {
+        tr->GetEntry(i);
+        cout << "Evento " << i << ": ";
+        cout << trigger_mask;
+        cout << endl;
+    }
+     */
+    
 
 
 

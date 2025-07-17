@@ -57,6 +57,7 @@ public:
 
     void draw_TR12(TCanvas* geom);
     void tracks(int, LTrackerTrack&, TCanvas* geom);   //true p-q  //false p-theta-phi
+    void tracks_no_print_hist(int, LTrackerTrack&);
     void take_angle_distribution();
     
 

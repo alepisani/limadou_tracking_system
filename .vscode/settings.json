@@ -67,6 +67,7 @@
         "ratio": "cpp",
         "stop_token": "cpp",
         "thread": "cpp",
-        "mc_ifns.C": "cpp"
+        "mc_ifns.C": "cpp",
+        "numeric": "cpp"
     }
 }

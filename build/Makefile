@@ -273,6 +273,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/simulations.o: src/simulations.cpp.o
+.PHONY : src/simulations.o
+
+# target to build an object file
+src/simulations.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/simulations.cpp.o
+.PHONY : src/simulations.cpp.o
+
+src/simulations.i: src/simulations.cpp.i
+.PHONY : src/simulations.i
+
+# target to preprocess a source file
+src/simulations.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/simulations.cpp.i
+.PHONY : src/simulations.cpp.i
+
+src/simulations.s: src/simulations.cpp.s
+.PHONY : src/simulations.s
+
+# target to generate assembly for a file
+src/simulations.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/simulations.cpp.s
+.PHONY : src/simulations.cpp.s
+
 src/stats.o: src/stats.cpp.o
 .PHONY : src/stats.o
 
@@ -324,6 +348,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/simulations.o"
+	@echo "... src/simulations.i"
+	@echo "... src/simulations.s"
 	@echo "... src/stats.o"
 	@echo "... src/stats.i"
 	@echo "... src/stats.s"

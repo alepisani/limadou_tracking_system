@@ -33,6 +33,7 @@ public:
     
 
     stats(); // Default constructor
+    void reset();
 
     friend std::ostream &operator<<(std::ostream &output, const stats &s);
 };

@@ -17,6 +17,7 @@
 #include "../include/stats.h"
 #include "../include/chip.h"
 #include "../include/LTrackerTrack.h"
+#include "display.h"
 using namespace std;
 
 display::display() {}
@@ -405,3 +406,210 @@ f.Close();
 
 }
 
+
+
+void display::tracks_no_print_hist(int events, LTrackerTrack& tracker){
+
+stats::hmgt = events;
+
+//puoi settare il seed for reproducibility
+TRandom3 *rnd = new TRandom3(0); 
+
+//MC
+for (int i=0; i < events; i++){
+    double xTR2, yTR2, zTR2, xTR1, yTR1, zTR1;
+    float phi, theta; 
+    stats::hitL0=false;
+    stats::hitL1=false;
+    stats::hitL2=false;
+
+    //i layer acquisiscono il segnale quando arriva un segnale AND dagli scintillatori
+    //genero traccie misurabili come traccie che passano nei due scintillatori TR2, TR1
+    
+    do {
+        double xTR2_fake = rnd->Uniform(-TR2Size[0]*2,TR2Size[0]*2);     
+        if(xTR2_fake>0 && xTR2_fake<TR2Size[0]){xTR2 = xTR2_fake + 0.5*TR2GapX;}
+        if(xTR2_fake<0 && xTR2_fake>-TR2Size[0]){xTR2 = xTR2_fake - 0.5*TR2GapX;}
+        if(xTR2_fake<2*TR2Size[0] && xTR2_fake>TR2Size[0]){xTR2 = xTR2_fake + 1.5*TR2GapX;}
+        if(xTR2_fake>-2*TR2Size[0] && xTR2_fake<-TR2Size[0]){xTR2 = xTR2_fake - 1.5*TR2GapX;}
+        yTR2 = rnd->Uniform(-TR2Size[1]/2,TR2Size[1]/2);
+        zTR2 = rnd->Uniform(TR2CenterZ-TR2Thickness/2,TR2CenterZ+TR2Thickness/2);
+        zTR1 = rnd->Uniform(TR1CenterZ-TR1Thickness/2,TR1CenterZ+TR1Thickness/2);
+
+        //phi = rnd->Uniform(-pi,pi);
+        
+        /*
+        double THETA; double y;
+        do {
+            THETA = gRandom->Uniform(0, TMath::Pi()/2);
+            y = gRandom->Uniform(0, 1);
+        } while (y > TMath::Sin(THETA) * TMath::Cos(THETA) * TMath::Cos(THETA));
+        theta = THETA;
+        */
+        //theta = rnd->Uniform(0,pi/2);
+
+        //prendo gli angoli dalla distribuzione di muoni
+        int ind_theta = rnd->Uniform(0, allTheta.size()-1);
+        int ind_phi = rnd->Uniform(0, allPhi.size()-1);
+        theta = (allTheta[ind_theta]/180)*TMath::Pi();
+        phi = (allPhi[ind_phi]/180)*TMath::Pi();
+        //cout << theta << ", " << phi << "           ";
+
+
+
+
+        xTR1 = xTR2 + (zTR2-TR1CenterZ)*(TMath::Tan(theta))*(TMath::Cos(phi));
+        yTR1 = yTR2 + (zTR2-TR1CenterZ)*(TMath::Tan(theta))*(TMath::Sin(phi));
+    } while (!(xTR1 < TR1Size[0]/2 && xTR1 > -TR1Size[0]/2 &&
+        (
+            (yTR1 < (2.5*TR1Size[1]+2*TR1GapY) && yTR1 > (1.5*TR1Size[1]+2*TR1GapY)) ||
+            (yTR1 < (1.5*TR1Size[1]+1*TR1GapY) && yTR1 > (0.5*TR1Size[1]+1*TR1GapY)) ||
+            (yTR1 < (0.5*TR1Size[1]+0*TR1GapY) && yTR1 > -(0.5*TR1Size[1]+0*TR1GapY)) ||
+            (yTR1 < -(0.5*TR1Size[1]+1*TR1GapY) && yTR1 > -(1.5*TR1Size[1]+1*TR1GapY)) ||
+            (yTR1 < -(1.5*TR1Size[1]+2*TR1GapY) && yTR1 > -(2.5*TR1Size[1]+2*TR1GapY)) 
+        )
+    ));
+    
+    double xL2 = xTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Cos(phi));
+    double yL2 = yTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Sin(phi));
+    double xL1 = xTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Cos(phi));
+    double yL1 = yTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Sin(phi));
+    double xL0 = xTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Cos(phi));
+    double yL0 = yTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Sin(phi));
+
+
+    if(xTR1 < TR1Size[0]/2 && xTR1 > -TR1Size[0]/2 &&
+        (
+            (yTR1 < (2.5*TR1Size[1]+2*TR1GapY) && yTR1 > (1.5*TR1Size[1]+2*TR1GapY)) ||
+            (yTR1 < (1.5*TR1Size[1]+1*TR1GapY) && yTR1 > (0.5*TR1Size[1]+1*TR1GapY)) ||
+            (yTR1 < (0.5*TR1Size[1]+0*TR1GapY) && yTR1 > -(0.5*TR1Size[1]+0*TR1GapY)) ||
+            (yTR1 < -(0.5*TR1Size[1]+1*TR1GapY) && yTR1 > -(1.5*TR1Size[1]+1*TR1GapY)) ||
+            (yTR1 < -(1.5*TR1Size[1]+2*TR1GapY) && yTR1 > -(2.5*TR1Size[1]+2*TR1GapY)) 
+        )
+      ){
+        stats::hmgthTR1++;
+    }
+    
+    
+    //fake hit rate (rate = 10^-6 per event)
+    double rate = rnd->Uniform(0,1);
+    LCluster fakehit;
+    if (rate < 1./1000.){
+        //x
+        double fakehit_x = rnd->Uniform(-(2.5*display::ChipSizeX+2*display::ChipDistanceX),+(2.5*display::ChipSizeX+2*display::ChipDistanceX));
+        //y
+        double FAKEhit_y = rnd->Uniform(-(5*display::ChipSizeY+2.5*display::ChipDistanceY),+(5*display::ChipSizeY+2.5*display::ChipDistanceY));
+        double fakehit_y;
+        if(FAKEhit_y < (0.5*display::ChipDistanceY+1*display::ChipSizeY) && FAKEhit_y > -(0.5*display::ChipDistanceY+1*display::ChipSizeY)){
+            fakehit_y = FAKEhit_y;
+        }
+        if((FAKEhit_y < (1.5*display::ChipDistanceY+3*display::ChipSizeY) && FAKEhit_y > (0.5*display::ChipDistanceY+1*display::ChipSizeY)) ||
+          (FAKEhit_y > -(1.5*display::ChipDistanceY+3*display::ChipSizeY) && FAKEhit_y < -(0.5*display::ChipDistanceY+1*display::ChipSizeY))){
+            fakehit_y = FAKEhit_y + display::ChipStaveDistanceY;
+          }
+        if((FAKEhit_y < (2.5*display::ChipDistanceY+5*display::ChipSizeY) && FAKEhit_y > (1.5*display::ChipDistanceY+3*display::ChipSizeY)) ||
+          (FAKEhit_y > -(2.5*display::ChipDistanceY+5*display::ChipSizeY) && FAKEhit_y < -(1.5*display::ChipDistanceY+3*display::ChipSizeY))){
+            fakehit_y = FAKEhit_y + 2*display::ChipStaveDistanceY;
+          }
+        //z
+        int r = 1 + (int)(rnd->Uniform(0,3));
+        double fakehit_z;
+        if(r == 1){
+            fakehit_z = display::StaveZ[0];
+            fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, err_cl, err_cl, err_cl, -1);
+            tracker.tidy_clusters_lay0.try_emplace(-1, fakehit);
+        }
+        if(r == 2){
+            fakehit_z = display::StaveZ[1];
+            fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, err_cl, err_cl, err_cl, -1);
+            tracker.tidy_clusters_lay1.try_emplace(-1, fakehit);
+        }
+        if(r == 3){
+            fakehit_z = display::StaveZ[2];
+            fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, err_cl, err_cl, err_cl, -1);
+            tracker.tidy_clusters_lay2.try_emplace(-1, fakehit);
+        }
+
+        stats::fakehit++;
+    }
+
+
+    LCluster pL2; LCluster mL1; LCluster qL0;
+    //check if the track hitted the staves in layer 2
+    if((xL2 < ChipSizeX*2.5 + ChipDistanceX && xL2 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
+    ((yL2 < ChipSizeY*5 + ChipStaveDistanceY*2 + ChipDistanceY*2.5 && yL2 > ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*2.5) ||
+    (yL2 < ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*1.5 && yL2 > ChipSizeY*3 + ChipStaveDistanceY*2 + ChipDistanceY*1.5) ||
+    (yL2 < ChipSizeY*3 + ChipStaveDistanceY*1 + ChipDistanceY*1.5 && yL2 > ChipSizeY*2 + ChipStaveDistanceY*1 + ChipDistanceY*1.5) ||
+    (yL2 < ChipSizeY*2 + ChipStaveDistanceY*1 + ChipDistanceY*0.5 && yL2 > ChipSizeY*1 + ChipStaveDistanceY*1 + ChipDistanceY*0.5) ||
+    (yL2 < ChipSizeY*1 + ChipStaveDistanceY*0 + ChipDistanceY*0.5 && yL2 > ChipSizeY*0 + ChipStaveDistanceY*0 + ChipDistanceY*0.5) ||
+    (yL2 > -(ChipSizeY*1 + ChipStaveDistanceY*0 + ChipDistanceY*0.5) && yL2 < -(ChipSizeY*0 + ChipStaveDistanceY*0 + ChipDistanceY*0.5)) ||
+    (yL2 > -(ChipSizeY*2 + ChipStaveDistanceY*1 + ChipDistanceY*0.5) && yL2 < -(ChipSizeY*1 + ChipStaveDistanceY*1 + ChipDistanceY*0.5)) ||
+    (yL2 > -(ChipSizeY*3 + ChipStaveDistanceY*1 + ChipDistanceY*1.5) && yL2 < -(ChipSizeY*2 + ChipStaveDistanceY*1 + ChipDistanceY*1.5)) ||
+    (yL2 > -(ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*1.5) && yL2 < -(ChipSizeY*3 + ChipStaveDistanceY*2 + ChipDistanceY*1.5)) ||
+    (yL2 > -(ChipSizeY*5 + ChipStaveDistanceY*2 + ChipDistanceY*2.5) && yL2 < -(ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*2.5)))
+    ){
+    stats::hmgthL2++;
+    stats::hitL2 = true;
+    //only if hitted the chips goes to tidy_clusters
+    pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], err_cl, err_cl, err_cl, i);
+    tracker.tidy_clusters_lay2.try_emplace(i,pL2);
+    }
+    //check if the track hitted the staves in layer 1
+    if((xL1 < ChipSizeX*2.5 + ChipDistanceX && xL1 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
+    ((yL1 < ChipSizeY*5 + ChipStaveDistanceY*2 + ChipDistanceY*2.5 && yL1 > ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*2.5) ||
+    (yL1 < ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*1.5 && yL1 > ChipSizeY*3 + ChipStaveDistanceY*2 + ChipDistanceY*1.5) ||
+    (yL1 < ChipSizeY*3 + ChipStaveDistanceY*1 + ChipDistanceY*1.5 && yL1 > ChipSizeY*2 + ChipStaveDistanceY*1 + ChipDistanceY*1.5) ||
+    (yL1 < ChipSizeY*2 + ChipStaveDistanceY*1 + ChipDistanceY*0.5 && yL1 > ChipSizeY*1 + ChipStaveDistanceY*1 + ChipDistanceY*0.5) ||
+    (yL1 < ChipSizeY*1 + ChipStaveDistanceY*0 + ChipDistanceY*0.5 && yL1 > ChipSizeY*0 + ChipStaveDistanceY*0 + ChipDistanceY*0.5) ||
+    (yL1 > -(ChipSizeY*1 + ChipStaveDistanceY*0 + ChipDistanceY*0.5) && yL1 < -(ChipSizeY*0 + ChipStaveDistanceY*0 + ChipDistanceY*0.5)) ||
+    (yL1 > -(ChipSizeY*2 + ChipStaveDistanceY*1 + ChipDistanceY*0.5) && yL1 < -(ChipSizeY*1 + ChipStaveDistanceY*1 + ChipDistanceY*0.5)) ||
+    (yL1 > -(ChipSizeY*3 + ChipStaveDistanceY*1 + ChipDistanceY*1.5) && yL1 < -(ChipSizeY*2 + ChipStaveDistanceY*1 + ChipDistanceY*1.5)) ||
+    (yL1 > -(ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*1.5) && yL1 < -(ChipSizeY*3 + ChipStaveDistanceY*2 + ChipDistanceY*1.5)) ||
+    (yL1 > -(ChipSizeY*5 + ChipStaveDistanceY*2 + ChipDistanceY*2.5) && yL1 < -(ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*2.5)))
+    ){
+    stats::hmgthL1++;
+    stats::hitL1 = true;
+    mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], err_cl, err_cl, err_cl, i);
+    tracker.tidy_clusters_lay1.try_emplace(i,mL1);
+    }
+    //check if the track hitted the staves in layer 0
+    if((xL0 < ChipSizeX*2.5 + ChipDistanceX && xL0 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
+    ((yL0 < ChipSizeY*5 + ChipStaveDistanceY*2 + ChipDistanceY*2.5 && yL0 > ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*2.5) ||
+    (yL0 < ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*1.5 && yL0 > ChipSizeY*3 + ChipStaveDistanceY*2 + ChipDistanceY*1.5) ||
+    (yL0 < ChipSizeY*3 + ChipStaveDistanceY*1 + ChipDistanceY*1.5 && yL0 > ChipSizeY*2 + ChipStaveDistanceY*1 + ChipDistanceY*1.5) ||
+    (yL0 < ChipSizeY*2 + ChipStaveDistanceY*1 + ChipDistanceY*0.5 && yL0 > ChipSizeY*1 + ChipStaveDistanceY*1 + ChipDistanceY*0.5) ||
+    (yL0 < ChipSizeY*1 + ChipStaveDistanceY*0 + ChipDistanceY*0.5 && yL0 > ChipSizeY*0 + ChipStaveDistanceY*0 + ChipDistanceY*0.5) ||
+    (yL0 > -(ChipSizeY*1 + ChipStaveDistanceY*0 + ChipDistanceY*0.5) && yL0 < -(ChipSizeY*0 + ChipStaveDistanceY*0 + ChipDistanceY*0.5)) ||
+    (yL0 > -(ChipSizeY*2 + ChipStaveDistanceY*1 + ChipDistanceY*0.5) && yL0 < -(ChipSizeY*1 + ChipStaveDistanceY*1 + ChipDistanceY*0.5)) ||
+    (yL0 > -(ChipSizeY*3 + ChipStaveDistanceY*1 + ChipDistanceY*1.5) && yL0 < -(ChipSizeY*2 + ChipStaveDistanceY*1 + ChipDistanceY*1.5)) ||
+    (yL0 > -(ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*1.5) && yL0 < -(ChipSizeY*3 + ChipStaveDistanceY*2 + ChipDistanceY*1.5)) ||
+    (yL0 > -(ChipSizeY*5 + ChipStaveDistanceY*2 + ChipDistanceY*2.5) && yL0 < -(ChipSizeY*4 + ChipStaveDistanceY*2 + ChipDistanceY*2.5)))
+    ){
+    stats::hmgthL0++;
+    stats::hitL0 = true;
+    qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], err_cl, err_cl, err_cl, i);
+    tracker.tidy_clusters_lay0.try_emplace(i,qL0);
+    }
+
+    //chip c;
+    //c.is_dead_chip_tracking_smt(c, pL2, mL1, qL0);
+
+    
+    //contiamo quante traccie hanno colpito quanti layer ciascuna (3layer, 2layer, 1layer, 0layer)
+    if(stats::hitL2 && stats::hitL1 && stats::hitL0 && stats::hmgthTR1){
+        stats::hmgthL012++;
+    }
+    if((stats::hitL0 && stats::hitL1 && !stats::hitL2)||(stats::hitL1 && stats::hitL2 && !stats::hitL0)||(stats::hitL0 && stats::hitL2 && !stats::hitL1)){
+        stats::hmgth2L++;
+    }
+    if((stats::hitL0 && !stats::hitL1 && !stats::hitL2)||(stats::hitL1 && !stats::hitL2 && !stats::hitL0)||(!stats::hitL0 && stats::hitL2 && !stats::hitL1)){
+        stats::hmgth1L++;
+    }
+    if(!stats::hitL0 && !stats::hitL1 && !stats::hitL2){
+        stats::hmgth0L++;
+    }
+    
+}
+
+
+}

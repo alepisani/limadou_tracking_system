@@ -14,6 +14,7 @@ set(SOURCES
     src/main.cpp
     src/eventdata.cpp
     src/LTrackerCluster.cpp
+    src/simulations.cpp
 )
 
 # Aggiungi la directory include

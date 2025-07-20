@@ -50,15 +50,19 @@ public:
     static constexpr float z_origin_shift = 26.325; // [mm] distance between origin of the reference point for tracks and firts tracking layer
     std::vector<float> *theta = nullptr;
     std::vector<float> *phi = nullptr;
+    std::vector<float> *cls_size = nullptr;
     std::vector<float> allTheta;
     std::vector<float> allPhi;
-
+    std::vector<float> all_cls_size;
+    std::vector<std::vector <LCluster>> track_3layer;
+    std::vector<std::vector <LCluster>> track_2layer;
+    std::vector<std::vector <LCluster>> track_1layer;
 
 
     void draw_TR12(TCanvas* geom);
     void tracks(int, LTrackerTrack&, TCanvas* geom);   //true p-q  //false p-theta-phi
     void tracks_no_print_hist(int, LTrackerTrack&);
-    void take_angle_distribution();
+    void take_distributions();
     
 
     display();

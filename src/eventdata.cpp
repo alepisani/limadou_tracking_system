@@ -14,6 +14,7 @@
 #include "../include/stats.h"
 #include "../include/LTrackerCluster.h"
 #include "../include/LTrackerTrack.h"
+#include "eventdata.h"
 using namespace std;
 
 eventdata::eventdata(){}
@@ -22,15 +23,15 @@ std::unordered_map<int, eventdata> alldata;
 
 
 std::ostream &operator<<(std::ostream &output, const eventdata &ev) {
-    for (size_t i = 0; i < ev.DIR_xpos.size(); i++) {
+    for (size_t i = 0; i < ev.cls_mean_x.size(); i++) {
         // output << "turret_idx: " << (int)ev.DIR_turret_idx[i] << " ";
         // output << "stave_idx: " << (int)ev.DIR_stave_idx[i] << " ";
         // output << "chip_idx0: " << (int)ev.DIR_chip_idx0[i] << " ";
         // output << "chip_idx1: " << (int)ev.DIR_chip_idx1[i] << " ";
         // output << "chip_id:   " << ev.DIR_chip_id[i] << " ";
-        output << "xpos:      " << ev.DIR_xpos[i] << " || ";
-        output << "ypos:      " << ev.DIR_ypos[i] << " || ";
-        output << "zpos:      " << ev.DIR_zpos[i] << " || ";
+        //output << "xpos:      " << ev.DIR_xpos[i] << " || ";
+        //output << "ypos:      " << ev.DIR_ypos[i] << " || ";
+        //output << "zpos:      " << ev.DIR_zpos[i] << " || ";
         // output << "cls_idx:   " << ev.DIR_cls_idx[i];
         // output << "total events: " << alldata.size();
         //output << "hmthL2: " << ;
@@ -60,7 +61,7 @@ void eventdata::takedata(){
     }
 
     // Oggetti temporanei per collegare i branch
-    std::vector<unsigned char> *DIR_turret_idx = nullptr;
+    /* std::vector<unsigned char> *DIR_turret_idx = nullptr;
     std::vector<unsigned char> *DIR_stave_idx = nullptr;
     std::vector<unsigned char> *DIR_chip_idx0 = nullptr;
     std::vector<unsigned char> *DIR_chip_idx1 = nullptr;
@@ -68,9 +69,16 @@ void eventdata::takedata(){
     std::vector<float> *DIR_xpos = nullptr;
     std::vector<float> *DIR_ypos = nullptr;
     std::vector<float> *DIR_zpos = nullptr;
-    std::vector<int> *DIR_cls_idx = nullptr;
+    std::vector<int> *DIR_cls_idx = nullptr; */
+    std::vector<unsigned int> *cls_size = nullptr;
+    std::vector<float> *cls_mean_x = nullptr;
+    std::vector<float> *cls_mean_y = nullptr;
+    std::vector<float> *cls_mean_z = nullptr;
+    std::vector<float> *cls_mean_x_err = nullptr;
+    std::vector<float> *cls_mean_y_err = nullptr;
+    
 
-    tree->SetBranchAddress("DIR_turret_idx", &DIR_turret_idx);
+    /* tree->SetBranchAddress("DIR_turret_idx", &DIR_turret_idx);
     tree->SetBranchAddress("DIR_stave_idx",  &DIR_stave_idx);
     tree->SetBranchAddress("DIR_chip_idx0",  &DIR_chip_idx0);
     tree->SetBranchAddress("DIR_chip_idx1",  &DIR_chip_idx1);
@@ -78,14 +86,23 @@ void eventdata::takedata(){
     tree->SetBranchAddress("DIR_xpos",       &DIR_xpos);
     tree->SetBranchAddress("DIR_ypos",       &DIR_ypos);
     tree->SetBranchAddress("DIR_zpos",       &DIR_zpos);
-    tree->SetBranchAddress("DIR_cls_idx",    &DIR_cls_idx);
+    tree->SetBranchAddress("DIR_cls_idx",    &DIR_cls_idx); */
+    tree->SetBranchAddress("cls_size",  &cls_size);    //in pixel
+    tree->SetBranchAddress("cls_mean_x",  &cls_mean_x);
+    tree->SetBranchAddress("cls_mean_y",  &cls_mean_y);
+    tree->SetBranchAddress("cls_mean_z",  &cls_mean_z);
+    tree->SetBranchAddress("cls_mean_x_err",  &cls_mean_x_err);
+    tree->SetBranchAddress("cls_mean_y_err",  &cls_mean_y_err);
+
+    
+
 
     Long64_t nEntries = tree->GetEntries();
 
     for (Long64_t i = 0; i < nEntries; ++i) {
         tree->GetEntry(i);
         eventdata ev;
-        ev.DIR_turret_idx = *DIR_turret_idx;
+        /* ev.DIR_turret_idx = *DIR_turret_idx;
         ev.DIR_stave_idx  = *DIR_stave_idx;
         ev.DIR_chip_idx0  = *DIR_chip_idx0;
         ev.DIR_chip_idx1  = *DIR_chip_idx1;
@@ -93,7 +110,13 @@ void eventdata::takedata(){
         ev.DIR_xpos       = *DIR_xpos;
         ev.DIR_ypos       = *DIR_ypos;
         ev.DIR_zpos       = *DIR_zpos;
-        ev.DIR_cls_idx    = *DIR_cls_idx;
+        ev.DIR_cls_idx    = *DIR_cls_idx; */
+        ev.cls_size = *cls_size;
+        ev.cls_mean_x = *cls_mean_x;
+        ev.cls_mean_y = *cls_mean_y;
+        ev.cls_mean_z = *cls_mean_z;
+        ev.cls_mean_x_err = *cls_mean_x_err;
+        ev.cls_mean_y_err = *cls_mean_y_err;
         alldata[i] = ev;
 
         
@@ -105,6 +128,7 @@ void eventdata::takedata(){
 
 void eventdata::print_data_on_canvas(TCanvas* can){
 
+    int negative_clus;
     can->cd();
     display d;
     d.draw_TR12(can);
@@ -123,7 +147,8 @@ void eventdata::print_data_on_canvas(TCanvas* can){
     for (int i = 0; i < events; i++){
         LTrackerCluster cluster;
         ev = alldata[i];
-        cluster.CalculateClusterPosition(ev);
+        //cluster.CalculateClusterPosition(ev);
+        ev.from_ev_to_cluster(cluster, ev);
 
         clusters.push_back(cluster);
     }    
@@ -136,7 +161,7 @@ void eventdata::print_data_on_canvas(TCanvas* can){
         bool hit_L2 = false;
         bool hit_L1 = false;
         bool hit_L0 = false;
-        if(clusters[i].cls_mean_x.size() == 0){
+        if(clusters[i].cls_mean_x.empty()){
         stats::hmbh0L++;
         }
         for(int j=0; j<clusters[i].cls_mean_x.size(); j++){
@@ -163,6 +188,9 @@ void eventdata::print_data_on_canvas(TCanvas* can){
                 stats::hmthL0++;
                 hit_L0 = true;
             }
+            if(clusters[i].cls_mean_z[j] < 0.){
+                negative_clus++;
+            }
         }   
         if(hit_L2 && hit_L1 && hit_L0){
             stats::hmbh3L++;}
@@ -174,7 +202,7 @@ void eventdata::print_data_on_canvas(TCanvas* can){
     
 
 
-
+    cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++   negative_clus  " << negative_clus << endl;
     char file[200];
     sprintf(file,"../data_beam_test/data.root");
     TFile f(file,"RECREATE");
@@ -185,4 +213,16 @@ void eventdata::print_data_on_canvas(TCanvas* can){
     f.Close();
 }
 
+void eventdata::from_ev_to_cluster(LTrackerCluster& cluster, eventdata& ev){
+
+    cluster.cls_mean_x = ev.cls_mean_x;
+    cluster.cls_mean_y = ev.cls_mean_y;
+    cluster.cls_mean_z = ev.cls_mean_z;
+    cluster.cls_mean_err_x = ev.cls_mean_x_err;
+    cluster.cls_mean_err_y = ev.cls_mean_y_err;
+    cluster.cls_idx = {-1,-1,-1};
+
+    //values to be discuss and maybe change
+
+}
 

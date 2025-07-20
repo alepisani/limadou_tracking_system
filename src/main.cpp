@@ -38,7 +38,7 @@ void run(int events){
     generated_tracks.draw_TR12(real_tracks);
 
     //funzione MC
-    generated_tracks.take_angle_distribution();
+    generated_tracks.take_distributions();
     generated_tracks.tracks(events, tracker, real_tracks);
 
 
@@ -71,8 +71,8 @@ int main(int argc, char** argv) {
     TApplication app("ROOT Application", &argc, argv);
 
     //take data from beam test
-    /*
-    TCanvas* can = new TCanvas("can", "3D View", 800, 600);
+    
+    /* TCanvas* can = new TCanvas("can", "3D View", 800, 600);
     TView* rt = TView::CreateView(1);
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
@@ -80,8 +80,8 @@ int main(int argc, char** argv) {
     e.takedata();
     e.print_data_on_canvas(can);
     stats s;
-    cout << "stats \n" << s << endl;
-    */
+    cout << "stats \n" << s << endl; */
+    
 
     
 
@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
     //run(events);
 
     simulations sim;
-    sim.sim(10);
+    sim.sim_only_trk_3L(100);
 
 
      
@@ -102,6 +102,7 @@ int main(int argc, char** argv) {
     TTree *tree = (TTree*)file->Get("Tmd;1");
     tree->Print();
 
+    
     Long64_t nentries = tree->GetEntries();
     Bool_t trig_conf_flag[6];
     tree->SetBranchAddress("trig_conf_flag[6]", &trig_conf_flag);

@@ -13,7 +13,7 @@ public:
     void Reset();
     friend std::ostream &operator<<(std::ostream &output, const LTrackerCluster &cluster);
     std::vector<int> GetClusterIdx() {return cls_idx;}
-    void CalculateClusterPosition(eventdata ev);
+    //void CalculateClusterPosition(eventdata ev);
 
     // residuals for the second tracking methos
     std::vector<float> cls_res_x_m2;

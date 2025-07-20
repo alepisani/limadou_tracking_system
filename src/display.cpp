@@ -69,7 +69,7 @@ void display::draw_TR12(TCanvas* geom){
     
 }
 
-void display::take_angle_distribution(){
+void display::take_distributions(){
     
     TFile *file = TFile::Open("../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
     if (!file || file->IsZombie()) {
@@ -84,6 +84,7 @@ void display::take_angle_distribution(){
 
     tree->SetBranchAddress("theta", &theta);
     tree->SetBranchAddress("phi", &phi);
+    tree->SetBranchAddress("cls_size", &cls_size);
     Long64_t n = tree->GetEntries();
 
     for (Long64_t i = 0; i < n; ++i) {
@@ -93,6 +94,9 @@ void display::take_angle_distribution(){
         }
         if (phi) {
             allPhi.insert(allPhi.end(), phi->begin(), phi->end());
+        }
+        if (cls_size) {
+            all_cls_size.insert(all_cls_size.end(), cls_size->begin(), cls_size->end());
         }
     }
 
@@ -138,7 +142,9 @@ TRandom3 *rnd = new TRandom3(0);
 //MC
 for (int i=0; i < events; i++){
     double xTR2, yTR2, zTR2, xTR1, yTR1, zTR1;
-    float phi, theta; 
+    double xL2, xL1, xL0, yL2, yL1, yL0;
+    float phi, theta, cls_size, cls_size_x, cls_size_y; 
+    double smiring_xL2, smiring_xL1, smiring_xL0, smiring_yL2, smiring_yL1, smiring_yL0;
     stats::hitL0=false;
     stats::hitL1=false;
     stats::hitL2=false;
@@ -171,15 +177,39 @@ for (int i=0; i < events; i++){
         //prendo gli angoli dalla distribuzione di muoni
         int ind_theta = rnd->Uniform(0, allTheta.size()-1);
         int ind_phi = rnd->Uniform(0, allPhi.size()-1);
+        int ind_cls_size = rnd->Uniform(0, all_cls_size.size()-1);
         theta = (allTheta[ind_theta]/180)*TMath::Pi();
         phi = (allPhi[ind_phi]/180)*TMath::Pi();
-        //cout << theta << ", " << phi << "           ";
+        cls_size = (all_cls_size[ind_cls_size]);
+        cls_size_x = cls_size*PixelSizeRows;
+        cls_size_y = cls_size*PixelSizeCols;
 
+        xL2 = xTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Cos(phi));
+        yL2 = yTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Sin(phi));
+        xL1 = xTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Cos(phi));
+        yL1 = yTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Sin(phi));
+        xL0 = xTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Cos(phi));
+        yL0 = yTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Sin(phi));
 
-
+        //applica smiring
+        smiring_xL2 = rnd->Uniform(-cls_size_x, +cls_size_x);
+        smiring_xL1 = rnd->Uniform(-cls_size_x, +cls_size_x);
+        smiring_xL0 = rnd->Uniform(-cls_size_x, +cls_size_x);
+        smiring_yL2 = rnd->Uniform(-cls_size_y, +cls_size_y);
+        smiring_yL1 = rnd->Uniform(-cls_size_y, +cls_size_y);
+        smiring_yL0 = rnd->Uniform(-cls_size_y, +cls_size_y);
+        xL2 = xL2 + smiring_xL2;
+        xL1 = xL1 + smiring_xL1;
+        xL0 = xL0 + smiring_xL0;
+        yL2 = yL2 + smiring_yL2;
+        yL1 = yL1 + smiring_yL1;
+        yL0 = yL0 + smiring_yL0;
 
         xTR1 = xTR2 + (zTR2-TR1CenterZ)*(TMath::Tan(theta))*(TMath::Cos(phi));
         yTR1 = yTR2 + (zTR2-TR1CenterZ)*(TMath::Tan(theta))*(TMath::Sin(phi));
+
+        
+
     } while (!(xTR1 < TR1Size[0]/2 && xTR1 > -TR1Size[0]/2 &&
         (
             (yTR1 < (2.5*TR1Size[1]+2*TR1GapY) && yTR1 > (1.5*TR1Size[1]+2*TR1GapY)) ||
@@ -187,15 +217,10 @@ for (int i=0; i < events; i++){
             (yTR1 < (0.5*TR1Size[1]+0*TR1GapY) && yTR1 > -(0.5*TR1Size[1]+0*TR1GapY)) ||
             (yTR1 < -(0.5*TR1Size[1]+1*TR1GapY) && yTR1 > -(1.5*TR1Size[1]+1*TR1GapY)) ||
             (yTR1 < -(1.5*TR1Size[1]+2*TR1GapY) && yTR1 > -(2.5*TR1Size[1]+2*TR1GapY)) 
-        )
+        ) 
     ));
     
-    double xL2 = xTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Cos(phi));
-    double yL2 = yTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Sin(phi));
-    double xL1 = xTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Cos(phi));
-    double yL1 = yTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Sin(phi));
-    double xL0 = xTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Cos(phi));
-    double yL0 = yTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Sin(phi));
+    
 
 
     if(xTR1 < TR1Size[0]/2 && xTR1 > -TR1Size[0]/2 &&
@@ -239,7 +264,7 @@ for (int i=0; i < events; i++){
         if(r == 2){fakehit_z = display::StaveZ[1];}
         if(r == 3){fakehit_z = display::StaveZ[2];}
 
-        TMarker3DBox *fake_hit = new TMarker3DBox(fakehit_x, fakehit_y, fakehit_z, display::err_cl, display::err_cl, 0, 0, 0);
+        TMarker3DBox *fake_hit = new TMarker3DBox(fakehit_x, fakehit_y, fakehit_z, err_cl, err_cl, 0, 0, 0);
         fake_hit->Draw();
 
         stats::fakehit++;
@@ -285,9 +310,8 @@ for (int i=0; i < events; i++){
     stats::hmgthL2++;
     stats::hitL2 = true;
     //only if hitted the chips goes to tidy_clusters
-    pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], err_cl, err_cl, err_cl, i);
-    tracker.tidy_clusters_lay2.try_emplace(i,pL2);
-    TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], 2,2,0,0,0);
+    pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], cls_size_x, cls_size_y, 0, i);
+    TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], err_cl, err_cl,0,0,0);
     p->Draw();
     }
     //check if the track hitted the staves in layer 1
@@ -305,9 +329,8 @@ for (int i=0; i < events; i++){
     ){
     stats::hmgthL1++;
     stats::hitL1 = true;
-    mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], err_cl, err_cl, err_cl, i);
-    tracker.tidy_clusters_lay1.try_emplace(i,mL1);
-    TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], 2,2,0,0,0);
+    mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], cls_size_x, cls_size_y, 0, i);
+    TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], err_cl, err_cl,0,0,0);
     m->Draw();
     }
     //check if the track hitted the staves in layer 0
@@ -325,9 +348,8 @@ for (int i=0; i < events; i++){
     ){
     stats::hmgthL0++;
     stats::hitL0 = true;
-    qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], err_cl, err_cl, err_cl, i);
-    tracker.tidy_clusters_lay0.try_emplace(i,qL0);
-    TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], 2,2,0,0,0);
+    qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], cls_size_x, cls_size_y, 0, i);
+    TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], err_cl, err_cl, 0,0,0);
     q->Draw();
     }
 
@@ -355,6 +377,12 @@ for (int i=0; i < events; i++){
         stats::hmgth0L++;
         htheta0L->Fill(theta);
         hphi0L->Fill(phi);
+    }
+    //creo solo le tracklet di traccie con hit su L012
+    if(stats::hitL0 && stats::hitL1 && stats::hitL2){
+        tracker.tidy_clusters_lay2.try_emplace(i,pL2);
+        tracker.tidy_clusters_lay1.try_emplace(i,mL1);
+        tracker.tidy_clusters_lay0.try_emplace(i,qL0);
     }
     
 
@@ -418,7 +446,9 @@ TRandom3 *rnd = new TRandom3(0);
 //MC
 for (int i=0; i < events; i++){
     double xTR2, yTR2, zTR2, xTR1, yTR1, zTR1;
-    float phi, theta; 
+    double xL2, xL1, xL0, yL2, yL1, yL0;
+    float phi, theta, cls_size, cls_size_x, cls_size_y; 
+    double smiring_xL2, smiring_xL1, smiring_xL0, smiring_yL2, smiring_yL1, smiring_yL0;
     stats::hitL0=false;
     stats::hitL1=false;
     stats::hitL2=false;
@@ -436,26 +466,39 @@ for (int i=0; i < events; i++){
         zTR2 = rnd->Uniform(TR2CenterZ-TR2Thickness/2,TR2CenterZ+TR2Thickness/2);
         zTR1 = rnd->Uniform(TR1CenterZ-TR1Thickness/2,TR1CenterZ+TR1Thickness/2);
 
-        //phi = rnd->Uniform(-pi,pi);
-        
-        /*
-        double THETA; double y;
-        do {
-            THETA = gRandom->Uniform(0, TMath::Pi()/2);
-            y = gRandom->Uniform(0, 1);
-        } while (y > TMath::Sin(THETA) * TMath::Cos(THETA) * TMath::Cos(THETA));
-        theta = THETA;
-        */
-        //theta = rnd->Uniform(0,pi/2);
-
         //prendo gli angoli dalla distribuzione di muoni
         int ind_theta = rnd->Uniform(0, allTheta.size()-1);
         int ind_phi = rnd->Uniform(0, allPhi.size()-1);
+        int ind_cls_size = rnd->Uniform(0, all_cls_size.size()-1);
         theta = (allTheta[ind_theta]/180)*TMath::Pi();
         phi = (allPhi[ind_phi]/180)*TMath::Pi();
-        //cout << theta << ", " << phi << "           ";
+        cls_size = (all_cls_size[ind_cls_size]);
+        cls_size_x = cls_size*PixelSizeRows;
+        cls_size_y = cls_size*PixelSizeCols;
+
+        //cout << "cls size xy " << cls_size_x << "   " << cls_size_y << endl; 
 
 
+        xL2 = xTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Cos(phi));
+        yL2 = yTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Sin(phi));
+        xL1 = xTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Cos(phi));
+        yL1 = yTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Sin(phi));
+        xL0 = xTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Cos(phi));
+        yL0 = yTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Sin(phi));
+
+        //applica smiring
+        smiring_xL2 = rnd->Uniform(-cls_size_x, +cls_size_x);
+        smiring_xL1 = rnd->Uniform(-cls_size_x, +cls_size_x);
+        smiring_xL0 = rnd->Uniform(-cls_size_x, +cls_size_x);
+        smiring_yL2 = rnd->Uniform(-cls_size_y, +cls_size_y);
+        smiring_yL1 = rnd->Uniform(-cls_size_y, +cls_size_y);
+        smiring_yL0 = rnd->Uniform(-cls_size_y, +cls_size_y);
+        xL2 = xL2 + smiring_xL2;
+        xL1 = xL1 + smiring_xL1;
+        xL0 = xL0 + smiring_xL0;
+        yL2 = yL2 + smiring_yL2;
+        yL1 = yL1 + smiring_yL1;
+        yL0 = yL0 + smiring_yL0;
 
 
         xTR1 = xTR2 + (zTR2-TR1CenterZ)*(TMath::Tan(theta))*(TMath::Cos(phi));
@@ -470,13 +513,6 @@ for (int i=0; i < events; i++){
         )
     ));
     
-    double xL2 = xTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Cos(phi));
-    double yL2 = yTR2 + (zTR2-StaveZ[2])*(TMath::Tan(theta))*(TMath::Sin(phi));
-    double xL1 = xTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Cos(phi));
-    double yL1 = yTR2 + (zTR2-StaveZ[1])*(TMath::Tan(theta))*(TMath::Sin(phi));
-    double xL0 = xTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Cos(phi));
-    double yL0 = yTR2 + (zTR2-StaveZ[0])*(TMath::Tan(theta))*(TMath::Sin(phi));
-
 
     if(xTR1 < TR1Size[0]/2 && xTR1 > -TR1Size[0]/2 &&
         (
@@ -492,7 +528,7 @@ for (int i=0; i < events; i++){
     
     
     //fake hit rate (rate = 10^-6 per event)
-    double rate = rnd->Uniform(0,1);
+    /* double rate = rnd->Uniform(0,1);
     LCluster fakehit;
     if (rate < 1./1000.){
         //x
@@ -516,23 +552,23 @@ for (int i=0; i < events; i++){
         double fakehit_z;
         if(r == 1){
             fakehit_z = display::StaveZ[0];
-            fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, err_cl, err_cl, err_cl, -1);
+            fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, cls_size_x, cls_size_y, 0, -1);
             tracker.tidy_clusters_lay0.try_emplace(-1, fakehit);
         }
         if(r == 2){
             fakehit_z = display::StaveZ[1];
-            fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, err_cl, err_cl, err_cl, -1);
+            fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, cls_size_x, cls_size_y, 0, -1);
             tracker.tidy_clusters_lay1.try_emplace(-1, fakehit);
         }
         if(r == 3){
             fakehit_z = display::StaveZ[2];
-            fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, err_cl, err_cl, err_cl, -1);
+            fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, cls_size_x, cls_size_y, 0, -1);
             tracker.tidy_clusters_lay2.try_emplace(-1, fakehit);
         }
 
         stats::fakehit++;
     }
-
+ */
 
     LCluster pL2; LCluster mL1; LCluster qL0;
     //check if the track hitted the staves in layer 2
@@ -551,8 +587,7 @@ for (int i=0; i < events; i++){
     stats::hmgthL2++;
     stats::hitL2 = true;
     //only if hitted the chips goes to tidy_clusters
-    pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], err_cl, err_cl, err_cl, i);
-    tracker.tidy_clusters_lay2.try_emplace(i,pL2);
+    pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], cls_size_x, cls_size_y, 0, i);
     }
     //check if the track hitted the staves in layer 1
     if((xL1 < ChipSizeX*2.5 + ChipDistanceX && xL1 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
@@ -569,8 +604,7 @@ for (int i=0; i < events; i++){
     ){
     stats::hmgthL1++;
     stats::hitL1 = true;
-    mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], err_cl, err_cl, err_cl, i);
-    tracker.tidy_clusters_lay1.try_emplace(i,mL1);
+    mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], cls_size_x, cls_size_y, 0, i);
     }
     //check if the track hitted the staves in layer 0
     if((xL0 < ChipSizeX*2.5 + ChipDistanceX && xL0 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
@@ -587,8 +621,7 @@ for (int i=0; i < events; i++){
     ){
     stats::hmgthL0++;
     stats::hitL0 = true;
-    qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], err_cl, err_cl, err_cl, i);
-    tracker.tidy_clusters_lay0.try_emplace(i,qL0);
+    qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], cls_size_x, cls_size_y, 0, i);
     }
 
     //chip c;
@@ -608,6 +641,18 @@ for (int i=0; i < events; i++){
     if(!stats::hitL0 && !stats::hitL1 && !stats::hitL2){
         stats::hmgth0L++;
     }
+    //SOLO SE VUOI FARE TRACKING SULLE TRACCIE CHE HANNO COLPITO I 3 LAYER
+    //creo solo le tracklet di traccie con hit su L012
+    /* if(stats::hitL0 && stats::hitL1 && stats::hitL2){
+        tracker.tidy_clusters_lay2.try_emplace(i,pL2);
+        tracker.tidy_clusters_lay1.try_emplace(i,mL1);
+        tracker.tidy_clusters_lay0.try_emplace(i,qL0);
+    } */
+    
+    //CONSIDERA TUTTI I CLUSTER
+    tracker.tidy_clusters_lay2.try_emplace(i,pL2);
+    tracker.tidy_clusters_lay1.try_emplace(i,mL1);
+    tracker.tidy_clusters_lay0.try_emplace(i,qL0);
     
 }
 

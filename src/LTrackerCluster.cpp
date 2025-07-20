@@ -46,7 +46,7 @@ std::ostream &operator<<(std::ostream &output, const LTrackerCluster &cluster) {
 } 
 
 //sostituisci signal con i dati presi da eventdata
-void LTrackerCluster::CalculateClusterPosition(eventdata ev) {
+/* void LTrackerCluster::CalculateClusterPosition(eventdata ev) {
     //std::vector<int> cls_id = GetClusterIndex(signal);
     std::vector<float> x = ev.DIR_xpos;
     std::vector<float> y = ev.DIR_ypos;
@@ -92,44 +92,44 @@ void LTrackerCluster::CalculateClusterPosition(eventdata ev) {
                 cls_pix_chip_id = chip_id[j];
                 size++;
                 // evaluate min/max row and col
-                /*
-                if (row[j] < min_row)
-                    min_row = row[j];
-                if (col[j] < min_col)
-                    min_col = col[j];
-                if (row[j] > max_row)
-                    max_row = row[j];
-                if (col[j] > max_col)
-                    max_col = col[j];
+                
+                //if (row[j] < min_row)
+                //    min_row = row[j];
+                //if (col[j] < min_col)
+                //    min_col = col[j];
+                //if (row[j] > max_row)
+                //    max_row = row[j];
+                //if (col[j] > max_col)
+                //    max_col = col[j];
                 // store (row, col) in buffer
-                cls_rows_tmp.push_back(row[j]);
-                cls_cols_tmp.push_back(col[j]);
-                */
+                //cls_rows_tmp.push_back(row[j]);
+                //cls_cols_tmp.push_back(col[j]);
+                
             }
         }
         mean_x /= size;
         mean_y /= size;
         //mean_z /= size;
         // get cluster span
-        /*
-        row_span = max_row - min_row + 1;
-        col_span = max_col - min_col + 1;
-         build cluster pattern
-        int nbytes = ((int)row_span * (int)col_span) / 8;
-        if(((int)row_span * (int)col_span) % 8 != 0){
-            nbytes++;
-        }
-        std::vector<unsigned char> pattern(nbytes, 0);
-        for (int i = 0; i < size; i++)
-        {
-            auto row = cls_rows_tmp[i] - min_row;
-            auto col = cls_cols_tmp[i] - min_col;
-            int bit = row * col_span + col;
-            int element = bit / 8;
-            bit = bit % 8;
-            pattern[element] |= 128 >> bit;  // 128 = 0b10000000
-        }
-        */
+        
+        //row_span = max_row - min_row + 1;
+        //col_span = max_col - min_col + 1;
+        // build cluster pattern
+        //int nbytes = ((int)row_span * (int)col_span) / 8;
+        //if(((int)row_span * (int)col_span) % 8 != 0){
+        //    nbytes++;
+        //}
+        //std::vector<unsigned char> pattern(nbytes, 0);
+        //for (int i = 0; i < size; i++)
+        //{
+        //    auto row = cls_rows_tmp[i] - min_row;
+        //    auto col = cls_cols_tmp[i] - min_col;
+        //    int bit = row * col_span + col;
+        //    int element = bit / 8;
+        //    bit = bit % 8;
+        //    pattern[element] |= 128 >> bit;  // 128 = 0b10000000
+        //}
+        
         cls_mean_x.push_back(mean_x);
         cls_mean_y.push_back(mean_y);
         cls_mean_z.push_back(mean_z);
@@ -143,16 +143,11 @@ void LTrackerCluster::CalculateClusterPosition(eventdata ev) {
         //cls_pattern_position.push_back(position);
         //cls_pattern.insert(cls_pattern.end(), pattern.begin(), pattern.end());
         cls_idx.push_back(unique_cls_id[i]);
-        /*
-        if(i==0){stats::hmbh1L++;}
-        if(i==1){stats::hmbh2L++; stats::hmbh1L--;}
-        if(i==2){stats::hmbh3L++; stats::hmbh2L--;}
-        */
 
 
     }
 }
 
-
+ */
 
 

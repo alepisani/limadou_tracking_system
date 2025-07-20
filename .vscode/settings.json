@@ -68,6 +68,9 @@
         "stop_token": "cpp",
         "thread": "cpp",
         "mc_ifns.C": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "chrono": "cpp",
+        "forward_list": "cpp",
+        "sstream": "cpp"
     }
 }

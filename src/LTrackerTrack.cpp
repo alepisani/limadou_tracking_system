@@ -331,10 +331,13 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackerTrack::new_computing(){
 
+  double r;
   int candidateCounter = 0;
+  //cout << "tidy cls:  " << tidy_clusters_lay1.size() << endl;
 
   //vector per tenere traccia di quanti cluster entrano in un cerchio in funzione di r
   std::vector <int> nclus_circle;
+  //cout << "tracklet 02 size " << tracklet_lay02.size() << endl;
 
   for (auto &trkl02 : tracklet_lay02){
     int ncc;
@@ -345,18 +348,19 @@ void LTrackerTrack::new_computing(){
 
     //intorno del punto nel quale si cerca un cluster
     double x1, y1, z1, r;
-    x1 = (clus_2.x+ clus_0.x)/2;
-    y1 = (clus_2.y+ clus_0.y)/2;
+    x1 = (clus_2.x + clus_0.x)/2;
+    y1 = (clus_2.y + clus_0.y)/2;
     z1 = display::StaveZ[1];
     //nb il raggio massimo è dato dalla dimensione del chip, 256 pixel; display::chipsizey
     //r = display::ChipSizeY/2;          //13.7625/2 = 6.88
-    r = 0.1;
+    r = 1;
+    
     
 
 
     //print della regione 
     
-    /* int n = 100;                          // N° di punti per approssimare il cerchio
+/*     int n = 100;                          // N° di punti per approssimare il cerchio
     double cx=x1, cy=y1, cz=z1;           // Centro e raggio
     TPolyLine3D *circ = new TPolyLine3D(n);
     for(int i=0; i<n; ++i) {
@@ -370,8 +374,9 @@ void LTrackerTrack::new_computing(){
 
     //definisci una regione di coordinate x+-dx, y+-dy
     for(int i=0; i < tidy_clusters_lay1.size(); i++){
-      if(tidy_clusters_lay1[i].x < x1 + r && tidy_clusters_lay1[i].x > x1 - r &&
-         tidy_clusters_lay1[i].y < y1 + r && tidy_clusters_lay1[i].y > y1 - r){
+      //cout << "errx, erry " << tidy_clusters_lay1[i].errx << "  " << tidy_clusters_lay1[i].erry << endl;
+      if(tidy_clusters_lay1[i].x < x1 + r + tidy_clusters_lay1[i].errx && tidy_clusters_lay1[i].x > x1 - r - tidy_clusters_lay1[i].errx &&
+         tidy_clusters_lay1[i].y < y1 + r + tidy_clusters_lay1[i].erry && tidy_clusters_lay1[i].y > y1 - r - tidy_clusters_lay1[i].erry){
           LTrackerTrack t;
           LCluster clus_1 = tidy_clusters_lay1[i];
           ncc++;
@@ -463,12 +468,12 @@ void LTrackerTrack::printRecoTracks_old_alg(TCanvas* reco, int events) {
     line_track->SetLineColor(kRed);
     line_track->Draw();
 
-    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 1,1,0,0,0);
+    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 0,0,0,0,0);
     g->Draw();
     //TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, trk.err_x0, trk.err_y0, 0, 0, 0);
-    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 10, 10, 0, 0, 0);
+    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 0, 0, 0, 0, 0);
     m->Draw();
-    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 1,1,0,0,0);
+    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0,0,0,0,0);
     f->Draw();
         
     cout << "L2 ------ x:" << x2 << ",   y: " << y2 << ",    z: " << z2 << endl; 
@@ -511,12 +516,12 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas* reco, int events){
     line_track->SetLineColor(kRed);
     line_track->Draw();
 
-    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 1,1,0,0,0);
+    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 0,0,0,0,0);
     g->Draw();
     //TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, trk.err_x0, trk.err_y0, 0, 0, 0);
-    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 5, 5, 0, 0, 0);
+    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 0, 0, 0, 0, 0);
     m->Draw();
-    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 1,1,0,0,0);
+    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0,0,0,0,0);
     f->Draw();
 
     

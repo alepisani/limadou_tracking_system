@@ -24,19 +24,24 @@ public:
     //classe per stipare i dati dalle simulazioni
 
     std::vector<int> gen_tracks;
-    double radius;
+    //double radius;
     std::vector<double> real_time;
     std::vector<double> cpu_time;
     std::vector<double> reco_trk;
+    std::vector<double> reco_trk_real;
     std::vector<double> hmgth3l;
     std::vector<double> reco_hmgth3l;
     std::vector<double> tracklet;
+    std::vector<double> radius;
+    std::vector<double> delta_gentrk_recoreal;
+    std::vector<double> delta_gentrk_reco;
 
     simulations();
     static double mean(const vector<double>& v);
     void sim_only_trk_3L(int);
     void printProgressBarWithETA(int, int, std::chrono::steady_clock::time_point, int);
     friend std::ostream& operator<<(std::ostream& os, const simulations& sim);
+      
 
 };
 

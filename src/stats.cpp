@@ -22,6 +22,7 @@ double stats::hmgthL1 = 0;
 double stats::hmgthL0 = 0;
 double stats::hmgthL012 = 0;
 double stats::hmrt = 0;
+int stats::hmrtar = 0;
 bool stats::hitL0;
 bool stats::hitL1;
 bool stats::hitL2;
@@ -55,6 +56,7 @@ stats::stats(){
     stats::hmgthL0 = 0;
     stats::hmgthL012 = 0;
     stats::hmrt = 0;
+    stats::hmrtar = 0;
     stats::hitL0;
     stats::hitL1;
     stats::hitL2;
@@ -90,6 +92,7 @@ std::ostream &operator<<(std::ostream &output, const stats &s) {
     output << "how many generated tracks hitted dead chip on layer 0: " << stats::hmgthdcL0 << endl;
     output << "how many fake hit: " << stats::fakehit << endl;
     output << "how many reco tracks: " << stats::hmrt << endl;
+    output << "how many reco tracks are real: " << stats::hmrtar << endl;
     output << "how many cluster (beam test) on layer 2: " << stats::hmthL2 << endl;
     output << "how many cluster (beam test) on layer 1: " << stats::hmthL1 << endl;
     output << "how many cluster (beam test) on layer 0: " << stats::hmthL0 << endl;

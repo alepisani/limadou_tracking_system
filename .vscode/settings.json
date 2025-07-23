@@ -71,6 +71,7 @@
         "numeric": "cpp",
         "chrono": "cpp",
         "forward_list": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "fstream": "cpp"
     }
 }

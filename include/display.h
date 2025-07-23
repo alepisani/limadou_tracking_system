@@ -57,7 +57,8 @@ public:
     std::vector<std::vector <LCluster>> track_3layer;
     std::vector<std::vector <LCluster>> track_2layer;
     std::vector<std::vector <LCluster>> track_1layer;
-
+    std::vector<LTrackCandidate> generated_tracks;
+ 
 
     void draw_TR12(TCanvas* geom);
     void tracks(int, LTrackerTrack&, TCanvas* geom);   //true p-q  //false p-theta-phi

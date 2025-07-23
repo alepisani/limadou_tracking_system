@@ -329,8 +329,9 @@ void LTrackerTrack::computeTrackCandidates()
 }
 
 
-void LTrackerTrack::new_computing(){
+void LTrackerTrack::new_computing(double radius){
 
+  bool same_trk = false;
   double r;
   int candidateCounter = 0;
   //cout << "tidy cls:  " << tidy_clusters_lay1.size() << endl;
@@ -345,6 +346,12 @@ void LTrackerTrack::new_computing(){
     //calcola punto sul layer 1
     LCluster clus_0 = tidy_clusters_lay0[trkl02.firstClusterId];
     LCluster clus_2 = tidy_clusters_lay2[trkl02.secondClusterId];
+    /* cout << "clusters id" << endl;
+    cout << clus_0.id << endl;
+    cout << clus_2.id << endl;
+    cout << "~~~~~~~~~~~~~~~~~~~~" << endl; */
+
+    //cluster devono essere maggiore di 0 e uguali tra di loro
 
     //intorno del punto nel quale si cerca un cluster
     double x1, y1, z1, r;
@@ -353,7 +360,7 @@ void LTrackerTrack::new_computing(){
     z1 = display::StaveZ[1];
     //nb il raggio massimo è dato dalla dimensione del chip, 256 pixel; display::chipsizey
     //r = display::ChipSizeY/2;          //13.7625/2 = 6.88
-    r = 1;
+    r = radius;
     
     
 
@@ -372,11 +379,12 @@ void LTrackerTrack::new_computing(){
     circ->SetLineColor(kRed);
     circ->Draw(); */
 
+
     //definisci una regione di coordinate x+-dx, y+-dy
     for(int i=0; i < tidy_clusters_lay1.size(); i++){
-      //cout << "errx, erry " << tidy_clusters_lay1[i].errx << "  " << tidy_clusters_lay1[i].erry << endl;
       if(tidy_clusters_lay1[i].x < x1 + r + tidy_clusters_lay1[i].errx && tidy_clusters_lay1[i].x > x1 - r - tidy_clusters_lay1[i].errx &&
-         tidy_clusters_lay1[i].y < y1 + r + tidy_clusters_lay1[i].erry && tidy_clusters_lay1[i].y > y1 - r - tidy_clusters_lay1[i].erry){
+         tidy_clusters_lay1[i].y < y1 + r + tidy_clusters_lay1[i].erry && tidy_clusters_lay1[i].y > y1 - r - tidy_clusters_lay1[i].erry
+        ){
           LTrackerTrack t;
           LCluster clus_1 = tidy_clusters_lay1[i];
           ncc++;
@@ -386,10 +394,33 @@ void LTrackerTrack::new_computing(){
           trkCand.id = candidateCounter++;
           trkCand.n_clus = clus_vec.size();
           trkCand.tracklet_id = {trkl02.id};
-
-          track_candidates.push_back(trkCand);
-
+          double x2, y2, dz, x0, y0;
+          dz = display::StaveZ[2] - display::StaveZ[1];
+          x2 = x1 + dz*(TMath::Tan(trkCand.theta))*(TMath::Cos(trkCand.phi));
+          y2 = y1 + dz*(TMath::Tan(trkCand.theta))*(TMath::Sin(trkCand.phi));
+          x0 = x1 - dz*(TMath::Tan(trkCand.theta))*(TMath::Cos(trkCand.phi));
+          y0 = y1 - dz*(TMath::Tan(trkCand.theta))*(TMath::Sin(trkCand.phi));
+          
+          //check if recotrk passa dai trigger
+          if(x0 < display::TR1Size[0]/2 && x0 > -display::TR1Size[0]/2 &&(
+            (y0 < (2.5*display::TR1Size[1]+2*display::TR1GapY) && y0 > (1.5*display::TR1Size[1]+2*display::TR1GapY)) ||
+            (y0 < (1.5*display::TR1Size[1]+1*display::TR1GapY) && y0 > (0.5*display::TR1Size[1]+1*display::TR1GapY)) ||
+            (y0 < (0.5*display::TR1Size[1]+0*display::TR1GapY) && y0 > -(0.5*display::TR1Size[1]+0*display::TR1GapY)) ||
+            (y0 < -(0.5*display::TR1Size[1]+1*display::TR1GapY) && y0 > -(1.5*display::TR1Size[1]+1*display::TR1GapY)) ||
+            (y0 < -(1.5*display::TR1Size[1]+2*display::TR1GapY) && y0 > -(2.5*display::TR1Size[1]+2*display::display::TR1GapY)) ) &&
+            (y2 < display::TR2Size[1]/2 && y2 > -display::TR2Size[1]/2 &&  
+            (x2 < (2*display::TR2Size[0]+1.5*display::TR2GapX) && x2 > (1*display::TR2Size[0]+1.5*display::TR2GapX)) ||
+            (x2 < (1*display::TR2Size[0]+0.5*display::TR2GapX) && x2 > (0*display::TR2Size[0]+0.5*display::TR2GapX)) ||
+            (x2 < -(0*display::TR2Size[0]+0.5*display::TR2GapX) && x2 > -(1*display::TR2Size[0]+0.5*display::TR2GapX)) ||
+            (x2 < -(1*display::TR2Size[0]+1.5*display::TR2GapX) && x2 > -(2*display::TR2Size[0]+1.5*display::display::TR2GapX))
+          )){
+            if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id && trkCand.chi2 < 100){
+              stats::hmrtar++;
+              track_candidates.push_back(trkCand);
+            }
+          }
          }
+         
     }
     nclus_circle.push_back(ncc);
   }
@@ -422,6 +453,8 @@ void LTrackerTrack::new_computing(){
     used_tracklets.insert(used_tracklets.end(), trk.tracklet_id.begin(), trk.tracklet_id.end());
     used_clusters.insert(used_clusters.end(), trk.clus_id.begin(), trk.clus_id.end());
     //cout << trk.chi2 << endl;
+
+
   }
   
 
@@ -524,24 +557,14 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas* reco, int events){
     TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0,0,0,0,0);
     f->Draw();
 
-    
-    
-    
-    
-    
-    
     //cout << "x: " << trk.x0 << "+- " << trk.err_x0 << "| y: " << trk.y0 << "+- " << trk.err_y0 << "| z: " << trk.z0 << endl; 
-
-
-
-
+  
   }
-
-
-
 
   reco->Update();
 }
+
+
 
 
 std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker)

@@ -240,10 +240,10 @@ void LTrackerTrack::computeTrackCandidates()
   //inside () should have LTrackerCluster &clusterer
   int candidateCounter = 0;
 
-  //std::vector<int> clusterer_indices = clusterer.GetClusterIdx();           
-  //int n_cluster_clusterer = (int)clusterer_indices.size();
-  //clusterer.cls_res_x_m2.resize(n_cluster_clusterer);
-  //clusterer.cls_res_y_m2.resize(n_cluster_clusterer);
+/*   std::vector<int> clusterer_indices = clusterer.GetClusterIdx();           
+  int n_cluster_clusterer = (int)clusterer_indices.size();
+  clusterer.cls_res_x_m2.resize(n_cluster_clusterer);
+  clusterer.cls_res_y_m2.resize(n_cluster_clusterer); */
 
 
   for (auto &trkl01 : tracklet_lay01)
@@ -265,22 +265,22 @@ void LTrackerTrack::computeTrackCandidates()
         trkCand.id = candidateCounter++;
         trkCand.n_clus = 3;
         trkCand.clus_id = {trkl01.firstClusterId, trkl01.secondClusterId, trkl12.secondClusterId};
+
         // compute residuals
         for (auto &clus : clus_vec)
         {
           float l_res_x = clus.x - (trkCand.x0 + (clus.z - display::z_origin_shift) * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi));         //trkCand esce in gradi e qua viene usato in rad
           float l_res_y = clus.y - (trkCand.y0 + (clus.z - display::z_origin_shift) * TMath::Tan(trkCand.theta) * TMath::Sin(trkCand.phi));
 
-          //int position = std::distance(clusterer_indices.begin(), std::find(clusterer_indices.begin(), clusterer_indices.end(), clus.id));
-          //clusterer.cls_res_x_m2[position] = l_res_x;
-          //clusterer.cls_res_y_m2[position] = l_res_y;
+/*           int position = std::distance(clusterer_indices.begin(), std::find(clusterer_indices.begin(), clusterer_indices.end(), clus.id));
+          clusterer.cls_res_x_m2[position] = l_res_x;
+          clusterer.cls_res_y_m2[position] = l_res_y; */
         }
         trkCand.tracklet_id = {trkl01.id, trkl12.id};
         track_candidates.push_back(trkCand);
       }
     }
   }
-  cout << "track_candidates: " << track_candidates.size() << endl; 
 
   // Sort track candidates by descending chi2
   std::sort(track_candidates.begin(), track_candidates.end(), [](LTrackCandidate &a, LTrackCandidate &b)
@@ -304,7 +304,6 @@ void LTrackerTrack::computeTrackCandidates()
   std::vector<int> used_tracklets;
   std::vector<int> used_clusters;
 
-  cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+chi2 (<100) " << endl;
   for (auto &trk : track_candidates)
   {
     tracks.push_back(trk);
@@ -312,7 +311,6 @@ void LTrackerTrack::computeTrackCandidates()
     used_clusters.insert(used_clusters.end(), trk.clus_id.begin(), trk.clus_id.end());
     cout << trk.chi2 << endl;
   }
-  cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;    
 
   addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay01, tidy_clusters_lay0, tidy_clusters_lay1);
   addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay12, tidy_clusters_lay1, tidy_clusters_lay2);
@@ -331,18 +329,10 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackerTrack::new_computing(double radius){
 
-  bool same_trk = false;
   double r;
   int candidateCounter = 0;
-  //cout << "tidy cls:  " << tidy_clusters_lay1.size() << endl;
-
-  //vector per tenere traccia di quanti cluster entrano in un cerchio in funzione di r
-  std::vector <int> nclus_circle;
-  //cout << "tracklet 02 size " << tracklet_lay02.size() << endl;
 
   for (auto &trkl02 : tracklet_lay02){
-    int ncc;
-    ncc = 0;
     //calcola punto sul layer 1
     LCluster clus_0 = tidy_clusters_lay0[trkl02.firstClusterId];
     LCluster clus_2 = tidy_clusters_lay2[trkl02.secondClusterId];
@@ -387,7 +377,6 @@ void LTrackerTrack::new_computing(double radius){
         ){
           LTrackerTrack t;
           LCluster clus_1 = tidy_clusters_lay1[i];
-          ncc++;
           std::vector<LCluster> clus_vec = {clus_0, clus_1, clus_2};
           LTrackCandidate trkCand;
           fitStraightLine(clus_vec, trkCand);
@@ -416,22 +405,13 @@ void LTrackerTrack::new_computing(double radius){
           )){
             if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id && trkCand.chi2 < 100){
               stats::hmrtar++;
-              track_candidates.push_back(trkCand);
             }
+            track_candidates.push_back(trkCand);
           }
          }
          
     }
-    nclus_circle.push_back(ncc);
   }
-
-  /* cout << "quanti cluster per circles" << endl;
-  cout << "(";
-  for(int i=0; i<nclus_circle.size(); i++){
-    cout << nclus_circle[i] << ",";
-  }
-  cout << ")" << endl; */
-
 
   //Sort track candidates by descending chi2
   std::sort(track_candidates.begin(), track_candidates.end(), [](LTrackCandidate &a, LTrackCandidate &b)
@@ -454,12 +434,7 @@ void LTrackerTrack::new_computing(double radius){
     used_clusters.insert(used_clusters.end(), trk.clus_id.begin(), trk.clus_id.end());
     //cout << trk.chi2 << endl;
 
-
   }
-  
-
-  
-  //addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay02, tidy_clusters_lay0, tidy_clusters_lay2);
 
 
   // Reassigning track id
@@ -528,10 +503,10 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas* reco, int events){
   int i=0;
   cout << "trakcs size" << tracks.size() << endl;
   for (auto &trk : tracks){
-    if(i>=events){break;}
-    ++i;
+/*     if(i>=events){break;}
+    ++i; */
     float x1, y1, z1, dz, x2, y2, z2, t, p;
-    //dz = display::dist_z;         
+    
     dz = 100;
     t = trk.theta*TMath::DegToRad();
     p = trk.phi*TMath::DegToRad();

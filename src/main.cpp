@@ -46,8 +46,8 @@ void run(int events){
     TStopwatch t;
     t.Start();
     tracker.computeTracklets();
-    tracker.computeTrackCandidates();
-    //tracker.new_computing(1.0);
+    //tracker.computeTrackCandidates();
+    tracker.new_computing(2.0);
     t.Stop();
 
     //  tracker.printRecoTracks_old_alg(real_tracks, events);
@@ -84,11 +84,11 @@ int main(int argc, char** argv) {
     
 
     //track simulation
-    //int events = 5;
+    //int events = 15;
     //run(events);
 
     simulations sim;
-    sim.sim_only_trk_3L(1000);
+    sim.sim_only_trk_3L(100);
     //sim.sim_old_algo(1000);
 
 

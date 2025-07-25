@@ -25,9 +25,10 @@
 
 simulations::simulations(){
     //simulations::gen_tracks = {2,3,4,5,6,7,8,9,10,12,14,16,18,20,25,30};
-    simulations::gen_tracks = {2};
+    simulations::gen_tracks = {30};
     //radius = {6.88, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.8, 0.6, 0.4, 0.2, 0.1, 0.05, 0.025};
-    radius = {2.6,2.4,2.2,2,1.8,1.6,1.4,1.2,1.,0.8,0.6,0.4,0.2};
+    //radius = {6,5.5,5,4.5,4,3.5,3,2.8,2.6,2.4,2.2,2,1.8,1.6,1.4,1.2,1.,0.8,0.6,0.4,0.2};
+    radius = {2,1.8,1.6,1.4,1.2,1.,0.8,0.6,0.4,0.2};
      
     //limite massimo dimensione del chip ~13.7
     //limite minimo dimensione singolo pixel ~0.029
@@ -133,7 +134,7 @@ void simulations::sim_only_trk_3L(int iteration_per_event){
             // Scrivi una riga per ogni combinazione GenTrack-Raggio
             file << gen_tracks[i] << "," 
                 << radius[m] << ","
-                << std::fixed << std::setprecision(3) << mean(reco)/mean(gen_tr3L) << ","
+                << std::fixed << std::setprecision(3) << mean(reco_real)/mean(gen_tr3L) << ","
                 << std::fixed << std::setprecision(3) << mean(gen_tr3L) << ","
                 << std::fixed << std::setprecision(3) << mean(reco) << ","
                 << std::fixed << std::setprecision(3) << mean(reco_real) << ","

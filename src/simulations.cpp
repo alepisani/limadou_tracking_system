@@ -10,6 +10,7 @@
 #include "TMarker3DBox.h"
 #include "TH1F.h"
 #include <fstream>
+#include <filesystem>
 #include <numeric>
 #include <chrono>
 #include <TStopwatch.h>
@@ -25,10 +26,10 @@
 
 simulations::simulations(){
     //simulations::gen_tracks = {2,3,4,5,6,7,8,9,10,12,14,16,18,20,25,30};
-    simulations::gen_tracks = {30};
+    simulations::gen_tracks = {2,3,4,5,6,7,8,9,10,12,14,16,18,20,25,30};
     //radius = {6.88, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.8, 0.6, 0.4, 0.2, 0.1, 0.05, 0.025};
     //radius = {6,5.5,5,4.5,4,3.5,3,2.8,2.6,2.4,2.2,2,1.8,1.6,1.4,1.2,1.,0.8,0.6,0.4,0.2};
-    radius = {2,1.8,1.6,1.4,1.2,1.,0.8,0.6,0.4,0.2};
+    radius = {6,4,2,1.8,1.6,1.4,1.2,1.,0.8,0.6,0.4,0.2,0.1,0.05};
      
     //limite massimo dimensione del chip ~13.7
     //limite minimo dimensione singolo pixel ~0.029
@@ -82,20 +83,21 @@ void simulations::sim_only_trk_3L(int iteration_per_event){
     LTrackerTrack ltt;
     stats stats;
     chips cc;
-    /* std::vector<double> r_time;
-    std::vector<double> c_time;
-    std::vector<double> reco;
-    std::vector<double> reco_real;
-    std::vector<double> gen_tr3L;
-    std::vector<double> trkl;
-    std::vector<double> d_recoreal_gentrk;
-    std::vector<double> d_reco_gentrk; */
 
     simu.take_distributions();
 
+    //std::string path = "/mnt/c/Users/user/Desktop/limadou_sim.csv";
+    //std::ofstream file(path, std::ios::out);
+    //file << "GenTrk,Raggio,Efficiency,Gen3L,RecoTrk,RecoReal,Tracklet,RealTime,CPUTime\n"; 
+
     std::string path = "/mnt/c/Users/user/Desktop/limadou_sim.csv";
-    std::ofstream file(path, std::ios::out);
-    file << "GenTrk,Raggio,Efficiency,Gen3L,RecoTrk,RecoReal,Tracklet,RealTime,CPUTime\n"; 
+    bool file_exists = std::filesystem::exists(path);
+    std::ofstream file(path, std::ios::app);
+
+    // Scrivi intestazione solo se il file non esisteva prima
+    if (!file_exists) {
+        file << "GenTrk,Raggio,Efficiency,Gen3L,RecoTrk,RecoReal,Tracklet,RealTime,CPUTime\n";
+    }
 
     for (int i = 0; i < gen_tracks.size(); ++i) {
         std::cout << "==== GenTracks = " << gen_tracks[i] << " ====" << std::endl;
@@ -104,10 +106,9 @@ void simulations::sim_only_trk_3L(int iteration_per_event){
             cout << endl;
             std::cout << " raggio = " << radius[m] << " mm" << std::endl;
 
-            std::vector<double> r_time, c_time, reco, reco_real, gen_tr3L, trkl, d_gentrk_recoreal, d_gentrk_reco, eff;
+            std::vector<double> r_time, c_time, reco, reco_real, gen_tr3L, trkl;
             stats.reset();
             ltt.Reset();
-            //printProgressBarWithETA(m, radius.size(), start_time);
 
             for (int j = 0; j < iteration_per_event; ++j) {
                 stats.reset();
@@ -118,11 +119,9 @@ void simulations::sim_only_trk_3L(int iteration_per_event){
                 ltt.computeTracklets();
                 ltt.new_computing(radius[m]);
                 t.Stop();
-                //double e = (stats::hmgthL012 != 0) ? (stats::hmrt / stats::hmgthL012) : 0.0;
 
                 r_time.push_back(t.RealTime());
                 c_time.push_back(t.CpuTime());
-                //eff.push_back(e);
                 reco.push_back(stats::hmrt);
                 reco_real.push_back(stats::hmrtar);
                 gen_tr3L.push_back(stats::hmgthL012);
@@ -134,7 +133,7 @@ void simulations::sim_only_trk_3L(int iteration_per_event){
             // Scrivi una riga per ogni combinazione GenTrack-Raggio
             file << gen_tracks[i] << "," 
                 << radius[m] << ","
-                << std::fixed << std::setprecision(3) << mean(reco_real)/mean(gen_tr3L) << ","
+                << std::fixed << std::setprecision(3) << mean(reco)/mean(gen_tr3L) << ","
                 << std::fixed << std::setprecision(3) << mean(gen_tr3L) << ","
                 << std::fixed << std::setprecision(3) << mean(reco) << ","
                 << std::fixed << std::setprecision(3) << mean(reco_real) << ","
@@ -161,17 +160,17 @@ void simulations::sim_old_algo(int iteration_per_event){
     chips cc;
 
     simu.take_distributions();
+
     std::string path = "/mnt/c/Users/user/Desktop/limadou_sim.csv";
     std::ofstream file(path, std::ios::out);
-    file << "GenTrk,Gen Trk - reco,Gen3L,RecoTrk,Tracklet,RealTime,CPUTime\n";
+    file << "GenTrk,Efficiency,Gen3L,RecoTrk,RecoReal,Tracklet,RealTime,CPUTime\n"; 
 
     for (int i = 0; i < gen_tracks.size(); ++i) {
         std::cout << "==== GenTracks = " << gen_tracks[i] << " ====" << std::endl;
 
-        std::vector<double> r_time, c_time, reco, reco_real, gen_tr3L, trkl, d_gentrk_recoreal, d_gentrk_reco;
+        std::vector<double> r_time, c_time, reco, reco_real, gen_tr3L, trkl;
             stats.reset();
             ltt.Reset();
-            //printProgressBarWithETA(m, radius.size(), start_time);
 
             for (int j = 0; j < iteration_per_event; ++j) {
                 stats.reset();
@@ -188,20 +187,17 @@ void simulations::sim_old_algo(int iteration_per_event){
                 reco.push_back(stats::hmrt);
                 reco_real.push_back(stats::hmrtar);
                 gen_tr3L.push_back(stats::hmgthL012);
-                trkl.push_back(ltt.tracklet_lay02.size());
-                d_gentrk_reco.push_back(stats::hmgthL012-stats::hmrt);
-                //d_gentrk_recoreal.push_back(stats::hmgthL012-stats::hmrtar);
+                trkl.push_back(ltt.tracklet_lay02.size()+ltt.tracklet_lay01.size()+ltt.tracklet_lay12.size());
 
                 printProgressBarWithETA(j + 1, iteration_per_event, start_time);
             }
 
             // Scrivi una riga per ogni combinazione GenTrack-Raggio
             file << gen_tracks[i] << "," 
-                << std::fixed << std::setprecision(3) << mean(d_gentrk_reco) << ","
-                //<< std::fixed << std::setprecision(3) << mean(d_gentrk_recoreal) << ","
+                << std::fixed << std::setprecision(3) << mean(reco_real)/mean(gen_tr3L) << ","
                 << std::fixed << std::setprecision(3) << mean(gen_tr3L) << ","
                 << std::fixed << std::setprecision(3) << mean(reco) << ","
-                //<< std::fixed << std::setprecision(3) << mean(reco_real) << ","
+                << std::fixed << std::setprecision(3) << mean(reco_real) << ","
                 << std::fixed << std::setprecision(3) << mean(trkl) << ","
                 << std::fixed << std::setprecision(6) << mean(r_time) << ","
                 << std::fixed << std::setprecision(6) << mean(c_time) << "\n";

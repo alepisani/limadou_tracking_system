@@ -135,6 +135,7 @@ TH1F* hx = new TH1F("x", "x;x;counts", nbins, -TR2Size[0]*2.5, TR2Size[0]*2.5);
 TH1F* hy = new TH1F("y", "y;y;counts", nbins, -100, 100);
 
 //puoi settare il seed for reproducibility
+//TRandom3 *rnd = new TRandom3(45133); 
 TRandom3 *rnd = new TRandom3(0); 
 
 
@@ -311,6 +312,7 @@ for (int i=0; i < events; i++){
     stats::hitL2 = true;
     //only if hitted the chips goes to tidy_clusters
     pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], cls_size_x, cls_size_y, 0, i);
+    tracker.tidy_clusters_lay2.try_emplace(i,pL2);
     TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], err_cl, err_cl,0,0,0);
     p->Draw();
     }
@@ -330,6 +332,7 @@ for (int i=0; i < events; i++){
     stats::hmgthL1++;
     stats::hitL1 = true;
     mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], cls_size_x, cls_size_y, 0, i);
+    tracker.tidy_clusters_lay1.try_emplace(i,mL1);
     TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], err_cl, err_cl,0,0,0);
     m->Draw();
     }
@@ -349,6 +352,7 @@ for (int i=0; i < events; i++){
     stats::hmgthL0++;
     stats::hitL0 = true;
     qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], cls_size_x, cls_size_y, 0, i);
+    tracker.tidy_clusters_lay0.try_emplace(i,qL0);
     TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], err_cl, err_cl, 0,0,0);
     q->Draw();
     }
@@ -380,17 +384,14 @@ for (int i=0; i < events; i++){
     }
     //SOLO SE VUOI FARE TRACKING SULLE TRACCIE CHE HANNO COLPITO I 3 LAYER
     //creo solo le tracklet di traccie con hit su L012
-    /* if(stats::hitL0 && stats::hitL1 && stats::hitL2){
+/*     if(stats::hitL0 && stats::hitL1 && stats::hitL2){
         tracker.tidy_clusters_lay2.try_emplace(i,pL2);
         tracker.tidy_clusters_lay1.try_emplace(i,mL1);
         tracker.tidy_clusters_lay0.try_emplace(i,qL0);
-        cout << "STAI FACENDO RECO SOLO CON TRACCIE CHE HANNO COLPITO TUTTI E TRE I LAYER" << endl;
-    } */
+    }  */
     
-    //CONSIDERA TUTTI I CLUSTER
-    tracker.tidy_clusters_lay2.try_emplace(i,pL2);
-    tracker.tidy_clusters_lay1.try_emplace(i,mL1);
-    tracker.tidy_clusters_lay0.try_emplace(i,qL0);
+    
+    
     
     
     LTrackCandidate real_track;
@@ -605,6 +606,7 @@ for (int i=0; i < events; i++){
     stats::hitL2 = true;
     //only if hitted the chips goes to tidy_clusters
     pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], cls_size_x, cls_size_y, 0, i);
+    tracker.tidy_clusters_lay2.try_emplace(i,pL2);
     }
     //check if the track hitted the staves in layer 1
     if((xL1 < ChipSizeX*2.5 + ChipDistanceX && xL1 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
@@ -622,6 +624,7 @@ for (int i=0; i < events; i++){
     stats::hmgthL1++;
     stats::hitL1 = true;
     mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], cls_size_x, cls_size_y, 0, i);
+    tracker.tidy_clusters_lay1.try_emplace(i,mL1);
     }
     //check if the track hitted the staves in layer 0
     if((xL0 < ChipSizeX*2.5 + ChipDistanceX && xL0 > -(ChipSizeX*2.5 + ChipDistanceX)) &&
@@ -639,6 +642,7 @@ for (int i=0; i < events; i++){
     stats::hmgthL0++;
     stats::hitL0 = true;
     qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], cls_size_x, cls_size_y, 0, i);
+    tracker.tidy_clusters_lay0.try_emplace(i,qL0);
     }
 
     //chip c;
@@ -668,9 +672,9 @@ for (int i=0; i < events; i++){
     } */
     
     //CONSIDERA TUTTI I CLUSTER
-    tracker.tidy_clusters_lay2.try_emplace(i,pL2);
-    tracker.tidy_clusters_lay1.try_emplace(i,mL1);
-    tracker.tidy_clusters_lay0.try_emplace(i,qL0);
+    
+    
+    
     
 
 
@@ -685,6 +689,8 @@ for (int i=0; i < events; i++){
     generated_tracks.push_back(real_track);
     
 }
+
+
 
 
 }

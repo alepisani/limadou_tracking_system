@@ -50,7 +50,7 @@ void run(int events){
     tracker.new_computing(2.0);
     t.Stop();
 
-    //  tracker.printRecoTracks_old_alg(real_tracks, events);
+    //tracker.printRecoTracks_old_alg(real_tracks, events);
     tracker.printRecoTracks_new_alg(real_tracks, events);
 
     cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
@@ -84,12 +84,12 @@ int main(int argc, char** argv) {
     
 
     //track simulation
-    //int events = 15;
+    //int events = 10;
     //run(events);
 
     simulations sim;
-    sim.sim_only_trk_3L(100);
-    //sim.sim_old_algo(1000);
+    sim.sim_only_trk_3L(1000);
+    //sim.sim_old_algo(100);
 
 
 

@@ -104,6 +104,7 @@ public:
   static double fct(const std::vector<LCluster> &clusters, const double *par);
   void fitStraightLine(const std::vector<LCluster> &clusters, LTrackCandidate &trkCand);
   void addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer);
+  void New_addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer);
   void computeTrackCandidates();
   void new_computing(double);
   void printRecoTracks_old_alg(TCanvas* reco, int);

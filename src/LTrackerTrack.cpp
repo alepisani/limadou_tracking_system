@@ -295,6 +295,64 @@ void LTrackerTrack::addSpuriousTracks(std::vector<int> &used_tracklets, std::vec
   }
 }
 
+void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer)
+{
+  for (auto &trkl : tracklets)
+  {
+    // Reject tracklets already used in full tracks
+    if (std::find_if(used_tracklets.begin(), used_tracklets.end(), [&](int id)
+                     { return id == trkl.id; }) != used_tracklets.end())
+    {
+      continue;
+    }
+    // Reject tracklets with clusters already used in full tracks
+    if (std::find_if(used_clusters.begin(), used_clusters.end(), [&](int id)
+                     { return (id == trkl.firstClusterId || id == trkl.secondClusterId); }) != used_clusters.end())
+    {
+      continue;
+    }
+
+    // Consider remaining tracklets
+    auto first_cluster = cluster_map_first_layer[trkl.firstClusterId];
+    auto second_cluster = cluster_map_second_layer[trkl.secondClusterId];
+    double tan_theta = std::hypot((double)first_cluster.x - (double)second_cluster.x, (double)first_cluster.y - (double)second_cluster.y) / ((double)second_cluster.z - (double)first_cluster.z);
+    double delta_y = (double)second_cluster.y - (double)first_cluster.y;
+    double delta_x = (double)second_cluster.x - (double)first_cluster.x;
+    double delta_r = TMath::Sqrt(delta_y * delta_y + delta_x * delta_x);
+    double cos_phi = delta_x / delta_r;
+    double sin_phi = delta_y / delta_r;
+    double x0 = (double)first_cluster.x - ((double)first_cluster.z - display::z_origin_shift) * tan_theta * cos_phi;          //theta e phi in rad
+    double y0 = (double)first_cluster.y - ((double)first_cluster.z - display::z_origin_shift) * tan_theta * sin_phi;
+    double z0 = (double)first_cluster.z;
+
+    LTrackCandidate spurious;
+    spurious.n_clus = 2;
+    spurious.clus_id.push_back(first_cluster.id);
+    spurious.clus_id.push_back(second_cluster.id);
+    spurious.tracklet_id.push_back(trkl.id);
+    spurious.theta = TMath::ATan(tan_theta) * 180 / TMath::Pi();
+    spurious.phi = TMath::ACos(cos_phi) * 180 / TMath::Pi();
+    if (delta_y < 0)
+    {
+      spurious.phi *= -1.;
+    }
+    spurious.x0 = x0;
+    spurious.y0 = y0;
+    spurious.z0 = z0;
+    spurious.err_x0 = -1.;
+    spurious.err_y0 = -1.;
+    spurious.err_theta = -1.;
+    spurious.err_phi = -1.;
+    spurious.chi2 = -1.;
+
+    //aggiungi il controllo se passa sul layer
+    //da notare che devi distinguere dai casi in cui hai z0, z1, z2;
+
+    tracks.push_back(spurious);
+  }
+}
+
+
 void LTrackerTrack::computeTrackCandidates()
 {
   //inside () should have LTrackerCluster &clusterer
@@ -521,8 +579,28 @@ void LTrackerTrack::new_computing(double radius){
   //taglia su trigger
   //non ha senso fare un fit, considera solo le tracklet
 
+/*   tidy_clusters_lay0.clear();
+  tidy_clusters_lay1.clear();
+  tidy_clusters_lay2.clear();
+  computeTracklets();
 
-  
+  for(auto &trkl01 : tracklet_lay01){
+    LCluster clus_0 = tidy_clusters_lay0[trkl01.firstClusterId];
+    LCluster clus_1 = tidy_clusters_lay1[trkl01.secondClusterId];
+
+    double x2, y2, z2, theta, phi;
+    double r = TMath::Sqrt(pow(clus_0.x-clus_1.x,2)+pow(clus_0.y-clus_1.y,2)+pow(clus_0.z-clus_1.z,2));
+    theta = TMath::ACos((clus_1.z-clus_0.z)/r);
+    phi = TMath::ATan2((clus_0.y-clus_1.y),(clus_0.x-clus_1.x));
+    z2 = display::StaveZ[2];
+    double dz = display::dist_z;
+    x2 = clus_1.x + dz * TMath::Tan(theta) * TMath::Cos(phi);
+    y2 = clus_1.y + dz * TMath::Tan(theta) * TMath::Sin(phi);
+    if(display::is_inside_the_layers(x2,y2)){
+
+    } */
+
+  }
 
 
 }

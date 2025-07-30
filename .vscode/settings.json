@@ -72,6 +72,9 @@
         "chrono": "cpp",
         "forward_list": "cpp",
         "sstream": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "fitCosmics.C": "cpp",
+        "filesystem": "cpp",
+        "raggio.C": "cpp"
     }
 }

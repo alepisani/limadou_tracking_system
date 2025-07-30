@@ -107,8 +107,7 @@ public:
   void computeTrackCandidates();
   void new_computing(double);
   void printRecoTracks_old_alg(TCanvas* reco, int);
-  void printRecoTracks_new_alg(TCanvas* reco, int);
-  //bool is_this_a_real_track(LTrackCandidate &trk, const std::vector<LTrackCandidate>& generated_tracks);
+  void printRecoTracks_new_alg(TCanvas* reco);
   friend std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker);
 
 

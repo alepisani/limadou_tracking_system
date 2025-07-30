@@ -125,6 +125,70 @@ void eventdata::takedata(){
     file->Close();
 }
 
+void eventdata::analize_data(){
+
+    
+    TCanvas* canvas = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
+    TView* rt = TView::CreateView(1);
+    rt->SetRange(-100, -100, 0, 100, 100, 70);
+    rt->ShowAxis();
+
+    takedata();
+    display d;
+    LTrackerTrack ltt;
+    /* for(int i=0; i < alldata.size(); ++i){
+        eventdata ev;
+        LTrackerCluster cl;
+        LCluster c;
+        ev = alldata[i];
+        ev.from_ev_to_cluster(cl, ev, c);
+        if(cl.cls_mean_z < 36. && cl.cls_mean_z > 30.){
+            ltt.tidy_clusters_lay2.push_back(c);
+        }
+        if(cl.cls_mean_z < 29. && cl.cls_mean_z > 22.){
+            ltt.tidy_clusters_lay1.push_back(c);
+        }
+        if(cl.cls_mean_z < 20. && cl.cls_mean_z > 15.){
+            ltt.tidy_clusters_lay0.push_back(c);
+        }
+        
+        
+        ltt.computeTracklets();
+        ltt.new_computing(2.);
+    } */
+    eventdata ev;
+    LTrackerCluster cl;
+    LCluster c;
+    chips cc;
+    stats s;
+    ev = alldata[0];
+    cc.print_all_chips(cc,canvas);
+    d.draw_TR12(canvas);
+    ev.from_ev_to_cluster(cl, ev);
+    for (int j = 0; j < cl.cls_mean_z.size(); ++j) {
+        LCluster c;
+        c.x = cl.cls_mean_x[j];
+        c.y = cl.cls_mean_y[j];
+        c.z = cl.cls_mean_z[j];
+        c.errx = cl.cls_mean_err_x[j];
+        c.erry = cl.cls_mean_err_y[j];
+        c.id = j;
+        if (c.z < 36. && c.z > 30.) {
+            ltt.tidy_clusters_lay2.try_emplace(j, c);
+        }
+        if (c.z < 29. && c.z > 22.) {
+            ltt.tidy_clusters_lay1.try_emplace(j, c);
+        }
+        if (c.z < 20. && c.z > 15.) {
+            ltt.tidy_clusters_lay0.try_emplace(j, c);
+        }
+    }
+
+    ltt.computeTracklets();
+    ltt.new_computing(2.);
+    ltt.printRecoTracks_new_alg(canvas);
+
+}
 
 void eventdata::print_data_on_canvas(TCanvas* can){
 
@@ -135,8 +199,8 @@ void eventdata::print_data_on_canvas(TCanvas* can){
     chips c;
     c.print_all_chips(c, can);
 
-    int events = alldata.size();
-    //int events = 10;
+    //int events = alldata.size();
+    int events = 1;
     TH1F* hx = new TH1F("x", "x;x;counts", events, -display::TR2Size[0]*2.5, display::TR2Size[0]*2.5);
     TH1F* hy = new TH1F("y", "y;y;counts", events, -100, 100);
     TH1F* hz = new TH1F("z", "z;z;counts", events, 10, 40);
@@ -221,6 +285,7 @@ void eventdata::from_ev_to_cluster(LTrackerCluster& cluster, eventdata& ev){
     cluster.cls_mean_err_x = ev.cls_mean_x_err;
     cluster.cls_mean_err_y = ev.cls_mean_y_err;
     cluster.cls_idx = {-1,-1,-1};
+
 
     //values to be discuss and maybe change
 

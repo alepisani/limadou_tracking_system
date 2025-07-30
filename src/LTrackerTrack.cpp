@@ -217,20 +217,16 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
   double step_coarse[4] = {0.01, 0.01, 0.01, 0.01};
   double step_fine[4] = {0.001, 0.001, 0.001, 0.001};
 
-  // Prima minimizzazione (step grossi)
   const double *params, *errors;
   double chi2;
   std::tie(params, errors, chi2) = minimize(vars, step_coarse, "coarse");
 
-  // Se il chi2 è abbastanza buono, rifinisci
   if (chi2 <= 100.0)
   {
-    // Usa i parametri trovati come nuova partenza
     double refined_vars[4] = {params[0], params[1], params[2], params[3]};
     std::tie(params, errors, chi2) = minimize(refined_vars, step_fine, "fine");
   }
 
-  // Salva risultati
   trkCand.x0 = params[0];
   trkCand.y0 = params[1];
   trkCand.z0 = display::z_origin_shift;
@@ -410,33 +406,20 @@ void LTrackerTrack::new_computing(double radius){
     z1 = display::StaveZ[1];
     r = radius;
 
-    //definisci una regione di coordinate x+-dx, y+-dy
-    //ci sarebbe da considerare l'incertezza di tidy_clusters_lay1
-    for(int i=0; i < tidy_clusters_lay1.size(); ++i){
-      if(tidy_clusters_lay1[i].x < x1 + r + tidy_clusters_lay1[i].errx && tidy_clusters_lay1[i].x > x1 - r - tidy_clusters_lay1[i].errx  &&
-         tidy_clusters_lay1[i].y < y1 + r + tidy_clusters_lay1[i].erry && tidy_clusters_lay1[i].y > y1 - r - tidy_clusters_lay1[i].erry
-        ){
+    for(const auto& tcl1 : tidy_clusters_lay1){
+      const LCluster& clus_1 = tcl1.second;
+      int key_cls1 = tcl1.first;
+      if(clus_1.x < x1 + r + clus_1.errx && clus_1.x > x1 - r - clus_1.errx &&
+         clus_1.y < y1 + r + clus_1.erry && clus_1.y > y1 - r - clus_1.erry) {
 
-          /*double rad = 5;
-          int n = 100;                          // N° di punti per approssimare il cerchio
-          double cx=x1, cy=y1, cz=z1;           // Centro e raggio
-          TPolyLine3D *circ = new TPolyLine3D(n);
-          for(int i=0; i<n; ++i) {
-            double phi = 2*M_PI * i / (n-1);
-            double x = cx + rad * cos(phi);
-            double y = cy + rad * sin(phi);
-            circ->SetPoint(i, x, y, cz);
-          }
-          circ->SetLineColor(kRed);
-          circ->Draw();  */
+    
+
 
           LTrackerTrack t;
-          LCluster clus_1 = tidy_clusters_lay1[i];
           std::vector<LCluster> clus_vec = {clus_0, clus_1, clus_2};
           LTrackCandidate trkCand;
 
           fitStraightLine(clus_vec, trkCand);
-          //cout << "chi2 " << trkCand.chi2 << endl; 
 
           trkCand.id = candidateCounter++;
           trkCand.n_clus = clus_vec.size();
@@ -480,27 +463,22 @@ void LTrackerTrack::new_computing(double radius){
           (x3 < -(0*display::TR2Size[0]+0.5*display::TR2GapX) && x3 > -(1*display::TR2Size[0]+0.5*display::TR2GapX)) ||
           (x3 < -(1*display::TR2Size[0]+1.5*display::TR2GapX) && x3 > -(2*display::TR2Size[0]+1.5*display::display::TR2GapX))
           ))
-        )){
+        ) && trkCand.chi2 < chi2_cut
+      ){
             track_candidates.push_back(trkCand);
+
+            tidy_clusters_lay0.erase(trkl02.firstClusterId);
+            tidy_clusters_lay2.erase(trkl02.secondClusterId);
+            tidy_clusters_lay1.erase(key_cls1);
+
             if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id && trkCand.chi2 < chi2_cut){
               stats::hmrtar++;
             }
           } 
-          /*
-          if(
-            x0 < display::TR1Size[0]/2 && x0 > -display::TR1Size[0]/2 && 
-            y0 < display::TR1Size[1]*2.5 + display::TR1GapY*2 && y0 > -display::TR1Size[1]*2.5 - display::TR1GapY*2 &&
-            x2 < display::TR2Size[0]*2 + display::TR2GapX*2 && x2 > -display::TR2Size[0]*2 - display::TR2GapX*2 &&
-            y2 < display::TR2Size[1]/2 && y2 > -display::TR2Size[1]/2 
-            ){
-            track_candidates.push_back(trkCand);
-            if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id && trkCand.chi2 < chi2_cut){
-            stats::hmrtar++;
-          }
-         }*/
+
          
         }
-    }
+      }
   }
 
   //Sort track candidates by descending chi2
@@ -508,20 +486,14 @@ void LTrackerTrack::new_computing(double radius){
             { return a.chi2 < b.chi2; });
   //Remove candidates with large chi2
   double init_size_trkCand = track_candidates.size();
-  //cout << "trkCand  " << track_candidates.size() << endl;
   chi2_cut = 50;
   auto new_end = std::remove_if(track_candidates.begin(), track_candidates.end(), [&](LTrackCandidate &trk)
                                 { return trk.chi2 > chi2_cut; });
   track_candidates.erase(new_end, track_candidates.end()); 
-  //double end_size_trkCand = track_candidates.size();
-  //double delta = init_size_trkCand - end_size_trkCand;
-  //stats::hmrtar = stats::hmrtar - delta;
 
   // Record used tracklets and clusters
   std::vector<int> used_tracklets;
   std::vector<int> used_clusters;
-
-  //cout << "track_candidates" << track_candidates.size() << endl;
 
   for (auto &trk : track_candidates)
   {
@@ -538,6 +510,20 @@ void LTrackerTrack::new_computing(double radius){
   }
 
   stats::hmrt = tracks.size();  
+
+  //compute the track with only 2 cl on layers
+  //tracklet01
+  //tracklet02
+  //tracklet12
+  //prolunga su layer che non ha colpito 
+  //fai una funzione che verifica se ha colpito i layer
+  //if so aggiungi a track_candidates
+  //taglia su trigger
+  //non ha senso fare un fit, considera solo le tracklet
+
+
+  
+
 
 }
 
@@ -591,7 +577,7 @@ void LTrackerTrack::printRecoTracks_old_alg(TCanvas* reco, int events) {
 }
 
 
-void LTrackerTrack::printRecoTracks_new_alg(TCanvas* reco, int events){
+void LTrackerTrack::printRecoTracks_new_alg(TCanvas* reco){
 
   int i=0;
   cout << "trakcs size" << tracks.size() << endl;

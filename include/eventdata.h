@@ -13,6 +13,7 @@
 using namespace std;
 
 class LTrackerCluster;
+class LCluster;
 
 //funz che prende i dati e me li disegna sul plot
 //estrapola metriche delle stats
@@ -40,6 +41,7 @@ struct eventdata{
     eventdata();       //default constructor
     friend std::ostream &operator<<(std::ostream &output, const eventdata &ev);
     void takedata();    
+    void analize_data();
     void print_data_on_canvas(TCanvas* can);
     void from_ev_to_cluster(LTrackerCluster&, eventdata&);
 

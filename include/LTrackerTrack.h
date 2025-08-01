@@ -55,7 +55,7 @@ struct LTrackCandidate
 struct LCluster
 {
   LCluster();
-  void fill_cluster(LCluster&, double, double, double, double, double, double, int);
+  void fill_cluster(LCluster &, double, double, double, double, double, double, int);
 
   int id = -1;
   float x = -999.;
@@ -67,17 +67,17 @@ struct LCluster
 
   friend std::ostream &operator<<(std::ostream &output, const LCluster &cl)
   {
-      output << "cluster id : " << cl.id << std::endl;
-      output << "x : " << cl.x << " +- " << cl.errx << std::endl;
-      output << "y : " << cl.y << " +- " << cl.erry << std::endl;
-      output << "z : " << cl.z << " +- " << cl.errz << std::endl;
-      return output;
+    output << "cluster id : " << cl.id << std::endl;
+    output << "x : " << cl.x << " +- " << cl.errx << std::endl;
+    output << "y : " << cl.y << " +- " << cl.erry << std::endl;
+    output << "z : " << cl.z << " +- " << cl.errz << std::endl;
+    return output;
   }
 };
 
 struct LTracklet
 {
-  
+
   LTracklet();
   int id = -1;
   int firstClusterId = -1;
@@ -92,7 +92,7 @@ struct LTracklet
   }
 };
 
-class LTrackerTrack 
+class LTrackerTrack
 {
 
 public:
@@ -104,13 +104,13 @@ public:
   static double fct(const std::vector<LCluster> &clusters, const double *par);
   void fitStraightLine(const std::vector<LCluster> &clusters, LTrackCandidate &trkCand);
   void addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer);
-  void New_addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer);
+  void New_addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters);
   void computeTrackCandidates();
   void new_computing(double);
-  void printRecoTracks_old_alg(TCanvas* reco, int);
-  void printRecoTracks_new_alg(TCanvas* reco);
+  bool track_hit_TR(double, double, double, double, double, double, double, double);
+  void printRecoTracks_old_alg(TCanvas *reco, int);
+  void printRecoTracks_new_alg(TCanvas *reco);
   friend std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker);
-
 
   // clusters separated by layer
   std::unordered_map<int, LCluster> tidy_clusters_lay0;
@@ -128,14 +128,8 @@ public:
   std::vector<int> used_clusters_lay2;
   // final tracks
   std::vector<LTrackCandidate> tracks;
-  
-  float chi2_cut = 100;
 
+  float chi2_cut = 100;
 };
 
-
-
-
-
-
-#endif  
+#endif

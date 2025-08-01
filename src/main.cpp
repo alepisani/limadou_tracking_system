@@ -58,9 +58,6 @@ void run(int events){
     cout << "CPU time:  " << t.CpuTime()  << " s\n";
     cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
 
-
-    
-
     cout << "stats \n" << s << endl;
 
 
@@ -72,7 +69,7 @@ int main(int argc, char** argv) {
 
     //take data from beam test
     
-    TCanvas* can = new TCanvas("can", "3D View", 800, 600);
+/*     TCanvas* can = new TCanvas("can", "3D View", 800, 600);
     TView* rt = TView::CreateView(1);
     rt->SetRange(-100, -100, 0, 100, 100, 70);
     rt->ShowAxis();
@@ -80,20 +77,20 @@ int main(int argc, char** argv) {
     e.takedata();
     //e.print_data_on_canvas(can);
     stats s;
-    cout << "stats \n" << s << endl;
+    cout << "stats \n" << s << endl; */
     
 
     //track simulation
-    //int events = 10;
+    //int events = 7;
     //run(events);
 
-    //simulations sim;
-    //sim.sim_only_trk_3L(1000);
+    simulations sim;
+    sim.sim_only_trk_3L(1000);
     //sim.sim_old_algo(100);
 
     //reco from MUONS
-    e.analize_data();
-    e.print_data_on_canvas(can);
+    //e.analize_data();
+    //e.print_data_on_canvas(can);
 
 
 

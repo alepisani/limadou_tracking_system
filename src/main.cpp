@@ -47,7 +47,7 @@ void run(int events){
     t.Start();
     tracker.computeTracklets();
     //tracker.computeTrackCandidates();
-    tracker.new_computing(1.5);
+    tracker.new_algo(0.3);
     t.Stop();
 
     //tracker.printRecoTracks_old_alg(real_tracks, events);
@@ -81,11 +81,11 @@ int main(int argc, char** argv) {
     
 
     //track simulation
-    //int events = 7;
-    //run(events);
+    int events = 20;
+    run(events);
 
-    simulations sim;
-    sim.sim_only_trk_3L(1000);
+    //simulations sim;
+    //sim.sim_only_trk_3L(1000);
     //sim.sim_old_algo(100);
 
     //reco from MUONS

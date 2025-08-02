@@ -25,10 +25,7 @@
 
 
 simulations::simulations(){
-    //simulations::gen_tracks = {2,3,4,5,6,7,8,9,10,12,14,16,18,20,25,30};
-    simulations::gen_tracks = {2,3,4,5,6,7,8,9,10,11,12,13};
-    //radius = {6.88, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.8, 0.6, 0.4, 0.2, 0.1, 0.05, 0.025};
-    //radius = {6,5.5,5,4.5,4,3.5,3,2.8,2.6,2.4,2.2,2,1.8,1.6,1.4,1.2,1.,0.8,0.6,0.4,0.2};
+    simulations::gen_tracks = {2,3,4,5,6,7,8,9,10,12,14,16,18,20,25,30};
     radius = {6,4,2,1.8,1.6,1.4,1.2,1.,0.8,0.6,0.4,0.2,0.1,0.05};
      
     //limite massimo dimensione del chip ~13.7
@@ -117,7 +114,7 @@ void simulations::sim_only_trk_3L(int iteration_per_event){
                 TStopwatch t;
                 t.Start();
                 ltt.computeTracklets();
-                ltt.new_computing(radius[m]);
+                ltt.new_algo(radius[m]);
                 t.Stop();
 
                 r_time.push_back(t.RealTime());

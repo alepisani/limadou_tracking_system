@@ -49,7 +49,7 @@ void eventdata::takedata(){
     //cambia nome file in base a cosa vuoi
     //TFile *file = TFile::Open("../data_beam_test/");
     
-    TFile *file = TFile::Open("../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
+    TFile *file = TFile::Open("../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
     if (!file || file->IsZombie()) {
         std::cerr << "Errore nell'aprire il file ROOT\n";
         return;
@@ -185,7 +185,7 @@ void eventdata::analize_data(){
     }
 
     ltt.computeTracklets();
-    ltt.new_computing(2.);
+    ltt.new_algo(2.);
     ltt.printRecoTracks_new_alg(canvas);
 
 }

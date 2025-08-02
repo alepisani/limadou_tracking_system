@@ -106,8 +106,8 @@ public:
   void addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer);
   void New_addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters);
   void computeTrackCandidates();
-  void new_computing(double);
-  bool track_hit_TR(double, double, double, double, double, double, double, double);
+  void new_algo(double);
+  bool track_hit_TR(double, double, double, double);
   void printRecoTracks_old_alg(TCanvas *reco, int);
   void printRecoTracks_new_alg(TCanvas *reco);
   friend std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker);

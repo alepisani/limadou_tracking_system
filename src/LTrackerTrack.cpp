@@ -339,17 +339,10 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.err_phi = -1.;
     spurious.chi2 = -1.;
 
-    double xb, yb, xbb, ybb, xt, yt, xtt, ytt;
-    xb = (double)cls_lay0.x - (display::StaveZ[0] - display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
-    yb = (double)cls_lay0.y - (display::StaveZ[0] - display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
-    xbb = (double)cls_lay0.x - (display::StaveZ[0] + display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
-    ybb = (double)cls_lay0.x - (display::StaveZ[0] + display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
-    xt = (double)cls_lay0.x + (display::TR2CenterZ - display::StaveZ[0] - display::TR2Thickness - 2) * TMath::Tan(theta) * TMath::Cos(phi);
-    yt = (double)cls_lay0.x + (display::TR2CenterZ - display::StaveZ[0] - display::TR2Thickness - 2) * TMath::Tan(theta) * TMath::Sin(phi);
-    xtt = (double)cls_lay0.x + (display::TR2CenterZ - display::StaveZ[0] + display::TR2Thickness - 2) * TMath::Tan(theta) * TMath::Cos(phi);
-    ytt = (double)cls_lay0.x + (display::TR2CenterZ - display::StaveZ[0] + display::TR2Thickness - 2) * TMath::Tan(theta) * TMath::Sin(phi);
+    double x1 = (double)cls_lay0.x + display::dist_z * TMath::Tan(theta) * TMath::Cos(phi);
+    double y1 = (double)cls_lay0.y + display::dist_z * TMath::Tan(theta) * TMath::Sin(phi);
 
-    if (!display::is_inside_the_layers(x2, y2) && t.track_hit_TR(xb, yb, xt, yt, xtt, ytt, xbb, ybb))
+    if (!display::is_inside_the_layers(x2, y2) && t.track_hit_TR(x1, y1, theta, phi))
     {
       spurious.x0 = cls_lay1.x;
       spurious.y0 = cls_lay1.y;
@@ -359,8 +352,11 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
         stats::hmrtar++;
       }
       stats::hmrt++;
-      cout << "010101010100101" << endl;
+      //cout << "010101010100101" << endl;
       tracks.push_back(spurious);
+      used_tracklets.push_back(trkl01.id);
+      used_clusters.push_back(cls_lay0.id);
+      used_clusters.push_back(cls_lay1.id);
     }
   }
 
@@ -405,28 +401,21 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.err_phi = -1.;
     spurious.chi2 = -1.;
 
-    double xb, yb, xbb, ybb, xt, yt, xtt, ytt;
-    xb = (double)cls_lay1.x - (display::StaveZ[1] - display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
-    yb = (double)cls_lay1.y - (display::StaveZ[1] - display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
-    xbb = (double)cls_lay1.x - (display::StaveZ[1] + display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
-    ybb = (double)cls_lay1.y - (display::StaveZ[1] + display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
-    xt = (double)cls_lay1.x + (display::TR2CenterZ - display::StaveZ[1] - display::TR2Thickness - 2) * TMath::Tan(theta) * TMath::Cos(phi);
-    yt = (double)cls_lay1.y + (display::TR2CenterZ - display::StaveZ[1] - display::TR2Thickness - 2) * TMath::Tan(theta) * TMath::Sin(phi);
-    xtt = (double)cls_lay1.x + (display::TR2CenterZ - display::StaveZ[1] + display::TR2Thickness - 2) * TMath::Tan(theta) * TMath::Cos(phi);
-    ytt = (double)cls_lay1.y + (display::TR2CenterZ - display::StaveZ[1] + display::TR2Thickness - 2) * TMath::Tan(theta) * TMath::Sin(phi);
-
-    if (!display::is_inside_the_layers(x0, y0) && t.track_hit_TR(xb, yb, xt, yt, xtt, ytt, xbb, ybb))
+    if (!display::is_inside_the_layers(x0, y0) && t.track_hit_TR(cls_lay1.x, cls_lay1.y, theta, phi))
     {
-      spurious.x0 = x0;
-      spurious.y0 = y0;
-      spurious.z0 = z0;
+      spurious.x0 = cls_lay1.x;
+      spurious.y0 = cls_lay1.y;
+      spurious.z0 = cls_lay1.z;
       if (cls_lay1.id == cls_lay2.id)
       {
         stats::hmrtar++;
       }
       stats::hmrt++;
-      cout << "212121212121221122121" << endl;
+      //cout << "212121212121221122121" << endl;
       tracks.push_back(spurious);
+      used_tracklets.push_back(trkl12.id);
+      used_clusters.push_back(cls_lay1.id);
+      used_clusters.push_back(cls_lay2.id);
     }
   }
 
@@ -471,18 +460,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.err_phi = -1.;
     spurious.chi2 = -1.;
 
-    double xb, yb, xbb, ybb, xt, yt, xtt, ytt;
-    xb = (double)cls_lay0.x - (display::StaveZ[0] - display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
-    yb = (double)cls_lay0.y - (display::StaveZ[0] - display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
-    xbb = (double)cls_lay0.x - (display::StaveZ[0] + display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
-    ybb = (double)cls_lay0.y - (display::StaveZ[0] + display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
-    xt = (double)cls_lay0.x + (display::TR2CenterZ - display::StaveZ[0] - display::TR2Thickness - 2) * TMath::Tan(theta) * TMath::Cos(phi);
-    yt = (double)cls_lay0.y + (display::TR2CenterZ - display::StaveZ[0] - display::TR2Thickness - 2) * TMath::Tan(theta) * TMath::Sin(phi);
-    xtt = (double)cls_lay0.x + (display::TR2CenterZ - display::StaveZ[0] + display::TR2Thickness - 2) * TMath::Tan(theta) * TMath::Cos(phi);
-    ytt = (double)cls_lay0.y + (display::TR2CenterZ - display::StaveZ[0] + display::TR2Thickness - 2) * TMath::Tan(theta) * TMath::Sin(phi);
-
-    //if (!display::is_inside_the_layers(x1, y1) && t.track_hit_TR(xb, yb, xt, yt, xtt, ytt, xbb, ybb))
-    if (!display::is_inside_the_layers(x1, y1) && spurious.theta < 30)
+    if (!display::is_inside_the_layers(x1, y1) && t.track_hit_TR(x1, y1, theta, phi))
     {
       spurious.x0 = x1;
       spurious.y0 = y1;
@@ -492,8 +470,11 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
         stats::hmrtar++;
       }
       stats::hmrt++;
-      cout << "020202020200202" << endl;
+      //cout << "020202020200202" << endl;
       tracks.push_back(spurious);
+      used_tracklets.push_back(trkl02.id);
+      used_clusters.push_back(cls_lay0.id);
+      used_clusters.push_back(cls_lay2.id);
     }
   }
 }
@@ -590,11 +571,12 @@ void LTrackerTrack::computeTrackCandidates()
   stats::hmrt = tracks.size();
 }
 
-void LTrackerTrack::new_computing(double radius)
+void LTrackerTrack::new_algo(double radius)
 {
 
   double r;
   int candidateCounter = 0;
+  cout << "trkl size " << tracklet_lay02.size() << endl;
 
   for (auto &trkl02 : tracklet_lay02)
   {
@@ -616,7 +598,6 @@ void LTrackerTrack::new_computing(double radius)
       if (clus_1.x < x1 + r + clus_1.errx && clus_1.x > x1 - r - clus_1.errx &&
           clus_1.y < y1 + r + clus_1.erry && clus_1.y > y1 - r - clus_1.erry)
       {
-
         LTrackerTrack t;
         std::vector<LCluster> clus_vec = {clus_0, clus_1, clus_2};
         LTrackCandidate trkCand;
@@ -627,21 +608,12 @@ void LTrackerTrack::new_computing(double radius)
         trkCand.n_clus = clus_vec.size();
         trkCand.tracklet_id = {trkl02.id};
         trkCand.clus_id = {trkl02.firstClusterId, clus_1.id, trkl02.secondClusterId};
-        double x2, y2, dz, x0, y0, theta, phi, x3, y3, x4, y4;
-        dz = display::StaveZ[2] - display::StaveZ[1];
+        double theta, phi;
         theta = trkCand.theta * TMath::DegToRad();
         phi = trkCand.phi * TMath::DegToRad();
-        x2 = x1 + dz * (TMath::Tan(theta)) * (TMath::Cos(phi));
-        y2 = y1 + dz * (TMath::Tan(theta)) * (TMath::Sin(phi));
-        x0 = x1 - dz * (TMath::Tan(theta)) * (TMath::Cos(phi));
-        y0 = y1 - dz * (TMath::Tan(theta)) * (TMath::Sin(phi));
-        x3 = x1 + (dz + display::TR2Thickness) * (TMath::Tan(theta)) * (TMath::Cos(phi));
-        y3 = y1 + (dz + display::TR2Thickness) * (TMath::Tan(theta)) * (TMath::Sin(phi));
-        x4 = x1 - (dz + display::TR1Thickness) * (TMath::Tan(theta)) * (TMath::Cos(phi));
-        y4 = y1 - (dz + display::TR1Thickness) * (TMath::Tan(theta)) * (TMath::Sin(phi));
 
         // check if recotrk passa dai trigger
-        if (t.track_hit_TR(x0, y0, x2, y2, x3, y3, x4, y4) && trkCand.chi2 < chi2_cut)
+        if (t.track_hit_TR((double)trkCand.x0, (double)trkCand.y0, theta, phi) && trkCand.chi2 < chi2_cut)
         {
           track_candidates.push_back(trkCand);
           if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id && trkCand.chi2 < chi2_cut)
@@ -680,46 +652,54 @@ void LTrackerTrack::new_computing(double radius)
     tracks[i].id = i;
   }
 
-  //cout << "used trkl size " << used_tracklets.size() << endl;
-  //cout << "used cls size " << used_clusters.size() << endl;
-
   stats::hmrt = tracks.size();
-  //New_addSpuriousTracks(used_tracklets, used_clusters);
+  
+  New_addSpuriousTracks(used_tracklets, used_clusters);
+
 
 }
 
-bool LTrackerTrack::track_hit_TR(double x0, double y0, double x2, double y2, double x3, double y3, double x4, double y4)
+bool LTrackerTrack::track_hit_TR(double x1, double y1, double theta, double phi)
 {
-  //  +----------+   x3,y3
+  //  +----------+   xTR2t, yTR2t
   //  |   TR2    |
-  //  +----------+   x2,y2
+  //  +----------+   xTR2b, yTR2b
   //
-  //  +----------+   x0,y0
+  //  +----------+   xTR1t, yTR1t
   //  |   TR1    |
-  //  +----------+   x4,y4
+  //  +----------+   xTR1b, yTR1b
 
-  if ((x0 < display::TR1Size[0] / 2 && x0 > -display::TR1Size[0] / 2 &&
-       ((y0 < (2.5 * display::TR1Size[1] + 2 * display::TR1GapY) && y0 > (1.5 * display::TR1Size[1] + 2 * display::TR1GapY)) ||
-        (y0 < (1.5 * display::TR1Size[1] + 1 * display::TR1GapY) && y0 > (0.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
-        (y0 < (0.5 * display::TR1Size[1] + 0 * display::TR1GapY) && y0 > -(0.5 * display::TR1Size[1] + 0 * display::TR1GapY)) ||
-        (y0 < -(0.5 * display::TR1Size[1] + 1 * display::TR1GapY) && y0 > -(1.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
-        (y0 < -(1.5 * display::TR1Size[1] + 2 * display::TR1GapY) && y0 > -(2.5 * display::TR1Size[1] + 2 * display::display::TR1GapY))) &&
-       (y2 < display::TR2Size[1] / 2 && y2 > -display::TR2Size[1] / 2 &&
-            (x2 < (2 * display::TR2Size[0] + 1.5 * display::TR2GapX) && x2 > (1 * display::TR2Size[0] + 1.5 * display::TR2GapX)) ||
-        (x2 < (1 * display::TR2Size[0] + 0.5 * display::TR2GapX) && x2 > (0 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
-        (x2 < -(0 * display::TR2Size[0] + 0.5 * display::TR2GapX) && x2 > -(1 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
-        (x2 < -(1 * display::TR2Size[0] + 1.5 * display::TR2GapX) && x2 > -(2 * display::TR2Size[0] + 1.5 * display::display::TR2GapX)))) ||
-      ((x4 < display::TR1Size[0] / 2 && x4 > -display::TR1Size[0] / 2 &&
-        ((y4 < (2.5 * display::TR1Size[1] + 2 * display::TR1GapY) && y4 > (1.5 * display::TR1Size[1] + 2 * display::TR1GapY)) ||
-         (y4 < (1.5 * display::TR1Size[1] + 1 * display::TR1GapY) && y4 > (0.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
-         (y4 < (0.5 * display::TR1Size[1] + 0 * display::TR1GapY) && y4 > -(0.5 * display::TR1Size[1] + 0 * display::TR1GapY)) ||
-         (y4 < -(0.5 * display::TR1Size[1] + 1 * display::TR1GapY) && y4 > -(1.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
-         (y4 < -(1.5 * display::TR1Size[1] + 2 * display::TR1GapY) && y4 > -(2.5 * display::TR1Size[1] + 2 * display::display::TR1GapY))) &&
-        (y3 < display::TR2Size[1] / 2 && y3 > -display::TR2Size[1] / 2 &&
-             (x3 < (2 * display::TR2Size[0] + 1.5 * display::TR2GapX) && x3 > (1 * display::TR2Size[0] + 1.5 * display::TR2GapX)) ||
-         (x3 < (1 * display::TR2Size[0] + 0.5 * display::TR2GapX) && x3 > (0 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
-         (x3 < -(0 * display::TR2Size[0] + 0.5 * display::TR2GapX) && x3 > -(1 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
-         (x3 < -(1 * display::TR2Size[0] + 1.5 * display::TR2GapX) && x3 > -(2 * display::TR2Size[0] + 1.5 * display::display::TR2GapX))))))
+  double xTR1b = x1 - (display::StaveZ[1] + display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
+  double yTR1b = y1 - (display::StaveZ[1] + display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
+  double xTR1t = x1 - (display::StaveZ[1] - display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
+  double yTR1t = y1 - (display::StaveZ[1] - display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
+  double xTR2b = x1 + (-display::StaveZ[1] + display::TR2CenterZ - display::TR2Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
+  double yTR2b = y1 + (-display::StaveZ[1] + display::TR2CenterZ - display::TR2Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
+  double xTR2t = x1 + (-display::StaveZ[1] + display::TR2CenterZ + display::TR2Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
+  double yTR2t = y1 + (-display::StaveZ[1] + display::TR2CenterZ + display::TR2Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
+
+  if ((xTR1b < display::TR1Size[0] / 2 && xTR1b > -display::TR1Size[0] / 2 &&
+       ((yTR1b < (2.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1b > (1.5 * display::TR1Size[1] + 2 * display::TR1GapY)) ||
+        (yTR1b < (1.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1b > (0.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
+        (yTR1b < (0.5 * display::TR1Size[1] + 0 * display::TR1GapY) && yTR1b > -(0.5 * display::TR1Size[1] + 0 * display::TR1GapY)) ||
+        (yTR1b < -(0.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1b > -(1.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
+        (yTR1b < -(1.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1b > -(2.5 * display::TR1Size[1] + 2 * display::display::TR1GapY))) &&
+       (yTR2b < display::TR2Size[1] / 2 && yTR2b > -display::TR2Size[1] / 2 &&
+            (xTR2b < (2 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2b > (1 * display::TR2Size[0] + 1.5 * display::TR2GapX)) ||
+        (xTR2b < (1 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2b > (0 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
+        (xTR2b < -(0 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2b > -(1 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
+        (xTR2b < -(1 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2b > -(2 * display::TR2Size[0] + 1.5 * display::display::TR2GapX)))) ||
+      ((xTR1t < display::TR1Size[0] / 2 && xTR1t > -display::TR1Size[0] / 2 &&
+        ((yTR1t < (2.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1t > (1.5 * display::TR1Size[1] + 2 * display::TR1GapY)) ||
+         (yTR1t < (1.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1t > (0.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
+         (yTR1t < (0.5 * display::TR1Size[1] + 0 * display::TR1GapY) && yTR1t > -(0.5 * display::TR1Size[1] + 0 * display::TR1GapY)) ||
+         (yTR1t < -(0.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1t > -(1.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
+         (yTR1t < -(1.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1t > -(2.5 * display::TR1Size[1] + 2 * display::display::TR1GapY))) &&
+        (yTR2t < display::TR2Size[1] / 2 && yTR2t > -display::TR2Size[1] / 2 &&
+             (xTR2t < (2 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2t > (1 * display::TR2Size[0] + 1.5 * display::TR2GapX)) ||
+         (xTR2t < (1 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2t > (0 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
+         (xTR2t < -(0 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2t > -(1 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
+         (xTR2t < -(1 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2t > -(2 * display::TR2Size[0] + 1.5 * display::display::TR2GapX))))))
   {
     return true;
   }

@@ -81,11 +81,12 @@ int main(int argc, char** argv) {
     
 
     //track simulation
-    int events = 20;
-    run(events);
+    //int events = 10;
+    //run(events);
 
-    //simulations sim;
+    simulations sim;
     //sim.sim_only_trk_3L(1000);
+    sim.sim_trk_32L(2);
     //sim.sim_old_algo(100);
 
     //reco from MUONS

@@ -137,6 +137,12 @@ void display::take_distributions()
 
 void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
 {
+    // puoi settare il seed for reproducibility
+    TRandom3 *rnd = new TRandom3(0);
+    //TRandom3 *rnd = new TRandom3(547133);       //impazzisce su 
+
+
+
     if (allTheta.empty() || allPhi.empty() || all_cls_size.empty())
     {
         std::cerr << "Errore: allTheta, allPhi o all_cls_size sono vuoti!" << std::endl;
@@ -164,9 +170,6 @@ void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
     TH1F *hphi0L = new TH1F("hphi0L", "phi;#phi;counts", nbins, -pi, pi);
     TH1F *hx = new TH1F("x", "x;x;counts", nbins, -TR2Size[0] * 2.5, TR2Size[0] * 2.5);
     TH1F *hy = new TH1F("y", "y;y;counts", nbins, -100, 100);
-
-    // puoi settare il seed for reproducibility
-    TRandom3 *rnd = new TRandom3(0);
     
  
     // MC

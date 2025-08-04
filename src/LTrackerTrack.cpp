@@ -558,9 +558,9 @@ void LTrackerTrack::computeTrackCandidates()
     // cout << trk.chi2 << endl;
   }
 
-  // addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay01, tidy_clusters_lay0, tidy_clusters_lay1);
-  // addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay12, tidy_clusters_lay1, tidy_clusters_lay2);
-  // addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay02, tidy_clusters_lay0, tidy_clusters_lay2);
+  //addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay01, tidy_clusters_lay0, tidy_clusters_lay1);
+  //addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay12, tidy_clusters_lay1, tidy_clusters_lay2);
+  addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay02, tidy_clusters_lay0, tidy_clusters_lay2);
 
   // Reassigning track id
   for (int i = 0; i < tracks.size(); i++)
@@ -573,10 +573,9 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackerTrack::new_algo(double radius)
 {
-
+  chi2_cut = 50;
   double r;
   int candidateCounter = 0;
-  cout << "trkl size " << tracklet_lay02.size() << endl;
 
   for (auto &trkl02 : tracklet_lay02)
   {
@@ -612,11 +611,12 @@ void LTrackerTrack::new_algo(double radius)
         theta = trkCand.theta * TMath::DegToRad();
         phi = trkCand.phi * TMath::DegToRad();
 
+
         // check if recotrk passa dai trigger
         if (t.track_hit_TR((double)trkCand.x0, (double)trkCand.y0, theta, phi) && trkCand.chi2 < chi2_cut)
         {
           track_candidates.push_back(trkCand);
-          if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id && trkCand.chi2 < chi2_cut)
+          if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id)
           {
             stats::hmrtar++;
           }
@@ -624,16 +624,6 @@ void LTrackerTrack::new_algo(double radius)
       }
     }
   }
-
-  // Sort track candidates by descending chi2
-  std::sort(track_candidates.begin(), track_candidates.end(), [](LTrackCandidate &a, LTrackCandidate &b)
-            { return a.chi2 < b.chi2; });
-  // Remove candidates with large chi2
-  double init_size_trkCand = track_candidates.size();
-  chi2_cut = 50;
-  auto new_end = std::remove_if(track_candidates.begin(), track_candidates.end(), [&](LTrackCandidate &trk)
-                                { return trk.chi2 > chi2_cut; });
-  track_candidates.erase(new_end, track_candidates.end());
 
   // Record used tracklets and clusters
   std::vector<int> used_tracklets;
@@ -783,7 +773,7 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 
     TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 0, 0, 0, 0, 0);
     g->Draw();
-    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 0, 0, 0, 0, 0);
+    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 5, 5, 0, 0, 0);
     m->Draw();
     TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
     f->Draw();

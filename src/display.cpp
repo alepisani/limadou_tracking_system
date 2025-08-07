@@ -139,7 +139,7 @@ void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
 {
     // puoi settare il seed for reproducibility
     TRandom3 *rnd = new TRandom3(0);
-    //TRandom3 *rnd = new TRandom3(547133);       //impazzisce su 
+    //TRandom3 *rnd = new TRandom3(3456);       //con 50ev non taglia su TR1 TR2
 
 
 
@@ -227,7 +227,7 @@ void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
             int ind_cls_size = rnd->Uniform(0, all_cls_size.size() - 1);
             theta = (allTheta[ind_theta] / 180) * TMath::Pi();
             phi = (allPhi[ind_phi] / 180) * TMath::Pi();
-            cls_size = (all_cls_size[ind_cls_size]);
+            cls_size = (all_cls_size[ind_cls_size]) * TMath::Cos(theta);
             cls_size_x = cls_size * PixelSizeRows;
             cls_size_y = cls_size * PixelSizeCols;
 

@@ -43,7 +43,6 @@ public:
     void sim_old_algo(int);
     void sim_trk_32L(int);
     void printProgressBarWithETA(int, int, std::chrono::steady_clock::time_point, int);
-    friend std::ostream& operator<<(std::ostream& os, const simulations& sim);
       
 
 };

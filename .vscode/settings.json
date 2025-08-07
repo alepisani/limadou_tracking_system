@@ -75,6 +75,7 @@
         "fstream": "cpp",
         "fitCosmics.C": "cpp",
         "filesystem": "cpp",
-        "raggio.C": "cpp"
+        "raggio.C": "cpp",
+        "computeAcceptanceCosmics.C": "cpp"
     }
 }

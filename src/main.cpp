@@ -19,7 +19,7 @@
 using namespace std;
 
 
-void run(int events){
+void run(int *events){
 
     TCanvas* real_tracks = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
     TView* rt = TView::CreateView(1);
@@ -47,10 +47,9 @@ void run(int events){
     t.Start();
     tracker.computeTracklets();
     //tracker.computeTrackCandidates();
-    tracker.new_algo(0.03);
+    tracker.new_algo(0.3);
     t.Stop();
 
-    //tracker.printRecoTracks_old_alg(real_tracks, events);
     tracker.printRecoTracks_new_alg(real_tracks);
 
     cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
@@ -81,13 +80,15 @@ int main(int argc, char** argv) {
     
 
     //track simulation
-    //int events = 50;
-    //run(events);
+    int *events;
+    int ev = 20;
+    events = &ev; 
+    run(events);
 
 
-    simulations sim;
+    //simulations sim;
     //sim.sim_only_trk_3L(1000);
-    sim.sim_trk_32L(1000);
+    //sim.sim_trk_32L(1000);
     //sim.sim_old_algo(100);
 
     //reco from MUONS

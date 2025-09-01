@@ -42,6 +42,7 @@ public:
     void sim_only_trk_3L(int);
     void sim_old_algo(int);
     void sim_trk_32L(int);
+    void sim_trk_32L_minimal_memory(int);
     void printProgressBarWithETA(int, int, std::chrono::steady_clock::time_point, int);
       
 

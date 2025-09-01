@@ -22,6 +22,36 @@ using namespace std;
 
 display::display() {}
 
+void display::reset()
+{
+    if (theta)
+    {
+        delete theta;
+        theta = nullptr;
+    }
+    theta = new std::vector<float>();
+    if (phi)
+    {
+        delete phi;
+        phi = nullptr;
+    }
+    phi = new std::vector<float>();
+
+    if (cls_size)
+    {
+        delete cls_size;
+        cls_size = nullptr;
+    }
+    cls_size = new std::vector<float>();
+    std::vector<float>().swap(allTheta);
+    std::vector<float>().swap(allPhi);
+    std::vector<float>().swap(all_cls_size);
+    std::vector<std::vector<LCluster>>().swap(track_3layer);
+    std::vector<std::vector<LCluster>>().swap(track_2layer);
+    std::vector<std::vector<LCluster>>().swap(track_1layer);
+    std::vector<LTrackCandidate>().swap(generated_tracks);
+}
+
 void display::draw_TR12(TCanvas *geom)
 {
 
@@ -68,24 +98,23 @@ void display::draw_TR12(TCanvas *geom)
     geom->Update();
 }
 
-bool display::is_inside_the_layers(double x, double y)
+bool display::is_inside_the_layers(double *x, double *y)
 {
-    if ((x < ChipSizeX * 2.5 + ChipDistanceX && x > -(ChipSizeX * 2.5 + ChipDistanceX)) &&
-        ((y < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && y > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
-         (y < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && y > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
-         (y < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && y > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
-         (y < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && y > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
-         (y < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && y > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
-         (y > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && y < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
-         (y > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && y < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
-         (y > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && y < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
-         (y > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && y < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
-         (y > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && y < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))))
+    if ((*x < ChipSizeX * 2.5 + ChipDistanceX && *x > -(ChipSizeX * 2.5 + ChipDistanceX)) &&
+        ((*y < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && *y > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
+         (*y < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && *y > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
+         (*y < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && *y > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
+         (*y < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && *y > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
+         (*y < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && *y > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
+         (*y > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && *y < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
+         (*y > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && *y < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
+         (*y > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && *y < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
+         (*y > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && *y < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
+         (*y > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && *y < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))))
     {
         return true;
     }
     return false;
-    
 }
 
 void display::take_distributions()
@@ -97,7 +126,7 @@ void display::take_distributions()
         std::cerr << "Errore nell'aprire il file ROOT\n";
     }
 
-    // Carica il TTree (sostituisci con il nome corretto se diverso)
+    // Carica il TTree
     TTree *tree = (TTree *)file->Get("L2;1");
     if (!tree)
     {
@@ -125,55 +154,57 @@ void display::take_distributions()
             all_cls_size.insert(all_cls_size.end(), cls_size->begin(), cls_size->end());
         }
     }
-
-    /*
-    cout << "size theta: " << allTheta.size() << "size phi: " << allPhi.size();
-    for (int i = 0; i < allTheta.size(); i++){
-        cout << allTheta[i] << ", " << allPhi[i] << "           ";
-
-    }
-    */
 }
 
-void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
+void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
 {
-    // puoi settare il seed for reproducibility
+    /**
+     * you can set the seed for reproducibility
+     */
+
     TRandom3 *rnd = new TRandom3(0);
-    //TRandom3 *rnd = new TRandom3(3456);       //con 50ev non taglia su TR1 TR2
-
-
+    // TRandom3 *rnd = new TRandom3(3456);       //con 50ev non taglia su TR1 TR2
 
     if (allTheta.empty() || allPhi.empty() || all_cls_size.empty())
     {
         std::cerr << "Errore: allTheta, allPhi o all_cls_size sono vuoti!" << std::endl;
         return;
     }
-    stats::hmgt = events;
-    int nbins = events;
-
-    // TH1F(name, title, nbins, xlow, xup)
-    TH1F *hxTR2 = new TH1F("hxTR2", "x_trigger2;x_trigger1;counts", nbins, -TR2Size[0] * 2.5, TR2Size[0] * 2.5);
-    TH1F *hyTR2 = new TH1F("hyTR2", "y_trigger2;y_trigger1;counts", nbins, -TR2Size[1] / 2, TR2Size[1] / 2);
-    TH1F *hzTR2 = new TH1F("hzTR2", "z_trigger2;z_trigger2;counts", nbins, -TR2Size[2] / 2 + TR2CenterZ, TR2Size[2] / 2 + TR2CenterZ);
-    TH1F *hxTR1 = new TH1F("hxTR1", "x_trigger1;x_trigger1;counts", nbins, -TR1Size[0] / 2, TR1Size[0] / 2);
-    TH1F *hyTR1 = new TH1F("hyTR1", "y_trigger1;y_trigger1;counts", nbins, -TR1Size[1] * 3, TR1Size[1] * 3);
-    TH1F *hzTR1 = new TH1F("hzTR1", "z_trigger1;z_trigger1;counts", nbins, -TR1Size[2] / 2 + TR1CenterZ, TR1Size[2] / 2 + TR1CenterZ);
-    TH1F *hphi = new TH1F("hphi", "phi;#phi;counts", nbins, -pi, pi);
-    TH1F *htheta = new TH1F("htheta", "theta;#theta;counts", nbins, 0, pi / 2);
-    TH1F *htheta3L = new TH1F("htheta3L", "theta;#theta;counts", nbins, 0, pi / 2);
-    TH1F *hphi3L = new TH1F("hphi3L", "phi;#phi;counts", nbins, -pi, pi);
-    TH1F *htheta2L = new TH1F("htheta2L", "theta;#theta;counts", nbins, 0, pi / 2);
-    TH1F *hphi2L = new TH1F("hphi2L", "phi;#phi;counts", nbins, -pi, pi);
-    TH1F *htheta1L = new TH1F("htheta1L", "theta;#theta;counts", nbins, 0, pi / 2);
-    TH1F *hphi1L = new TH1F("hphi1L", "phi;#phi;counts", nbins, -pi, pi);
-    TH1F *htheta0L = new TH1F("htheta0L", "theta;#theta;counts", nbins, 0, pi / 2);
-    TH1F *hphi0L = new TH1F("hphi0L", "phi;#phi;counts", nbins, -pi, pi);
-    TH1F *hx = new TH1F("x", "x;x;counts", nbins, -TR2Size[0] * 2.5, TR2Size[0] * 2.5);
-    TH1F *hy = new TH1F("y", "y;y;counts", nbins, -100, 100);
     
- 
+    int *nbins;
+    nbins = events;
+    stats::hmgt = *events;
+
+    //printf("adress events: %p\n", events);
+    //printf("adress nbins: %p\n", nbins);
+
+
+    /**
+     * TH1F(name, title, nbins, xlow, xup)
+     * create histograms for stored all data collected from the simulations
+     */
+
+    TH1F *hxTR2 = new TH1F("hxTR2", "x_trigger2;x_trigger1;counts", *nbins, -TR2Size[0] * 2.5, TR2Size[0] * 2.5);
+    TH1F *hyTR2 = new TH1F("hyTR2", "y_trigger2;y_trigger1;counts", *nbins, -TR2Size[1] / 2, TR2Size[1] / 2);
+    TH1F *hzTR2 = new TH1F("hzTR2", "z_trigger2;z_trigger2;counts", *nbins, -TR2Size[2] / 2 + TR2CenterZ, TR2Size[2] / 2 + TR2CenterZ);
+    TH1F *hxTR1 = new TH1F("hxTR1", "x_trigger1;x_trigger1;counts", *nbins, -TR1Size[0] / 2, TR1Size[0] / 2);
+    TH1F *hyTR1 = new TH1F("hyTR1", "y_trigger1;y_trigger1;counts", *nbins, -TR1Size[1] * 3, TR1Size[1] * 3);
+    TH1F *hzTR1 = new TH1F("hzTR1", "z_trigger1;z_trigger1;counts", *nbins, -TR1Size[2] / 2 + TR1CenterZ, TR1Size[2] / 2 + TR1CenterZ);
+    TH1F *hphi = new TH1F("hphi", "phi;#phi;counts", *nbins, -pi, pi);
+    TH1F *htheta = new TH1F("htheta", "theta;#theta;counts", *nbins, 0, pi / 2);
+    TH1F *htheta3L = new TH1F("htheta3L", "theta;#theta;counts", *nbins, 0, pi / 2);
+    TH1F *hphi3L = new TH1F("hphi3L", "phi;#phi;counts", *nbins, -pi, pi);
+    TH1F *htheta2L = new TH1F("htheta2L", "theta;#theta;counts", *nbins, 0, pi / 2);
+    TH1F *hphi2L = new TH1F("hphi2L", "phi;#phi;counts", *nbins, -pi, pi);
+    TH1F *htheta1L = new TH1F("htheta1L", "theta;#theta;counts", *nbins, 0, pi / 2);
+    TH1F *hphi1L = new TH1F("hphi1L", "phi;#phi;counts", *nbins, -pi, pi);
+    TH1F *htheta0L = new TH1F("htheta0L", "theta;#theta;counts", *nbins, 0, pi / 2);
+    TH1F *hphi0L = new TH1F("hphi0L", "phi;#phi;counts", *nbins, -pi, pi);
+    TH1F *hx = new TH1F("x", "x;x;counts", *nbins, -TR2Size[0] * 2.5, TR2Size[0] * 2.5);
+    TH1F *hy = new TH1F("y", "y;y;counts", *nbins, -100, 100);
+
     // MC
-    for (int i = 0; i < events; i++)
+    for (int i = 0; i < *events; i++)
     {
         double xTR2, yTR2, zTR2, xTR1, yTR1, zTR1;
         double xL2, xL1, xL0, yL2, yL1, yL0;
@@ -183,8 +214,12 @@ void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
         stats::hitL1 = false;
         stats::hitL2 = false;
 
-        // i layer acquisiscono il segnale quando arriva un segnale AND dagli scintillatori
-        // genero traccie misurabili come traccie che passano nei due scintillatori TR2, TR1
+        /**
+         *  a signal on the layers is created only when there is an AND from the pmt.
+         *  thus i create "real" tracks only when the track hitted TR2 && TR1
+         *  i create the first point on the TR2, then using theta, phi distribution it's generated the second point on the zTR1.
+         *  only when the second point is inside TR1 the track is accepted and used for the MC simulation
+         */
 
         do
         {
@@ -209,19 +244,11 @@ void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
             zTR2 = rnd->Uniform(TR2CenterZ - TR2Thickness / 2, TR2CenterZ + TR2Thickness / 2);
             zTR1 = rnd->Uniform(TR1CenterZ - TR1Thickness / 2, TR1CenterZ + TR1Thickness / 2);
 
-            // phi = rnd->Uniform(-pi,pi);
+            /**
+             *  taking the theta/phi values from experimental distributions (MUONS)
+             *  the distribution should be something like sin(x)cos(x)
+             */
 
-            /*
-            double THETA; double y;
-            do {
-                THETA = gRandom->Uniform(0, TMath::Pi()/2);
-                y = gRandom->Uniform(0, 1);
-            } while (y > TMath::Sin(THETA) * TMath::Cos(THETA) * TMath::Cos(THETA));
-            theta = THETA;
-            */
-            // theta = rnd->Uniform(0,pi/2);
-
-            // prendo gli angoli dalla distribuzione di muoni
             int ind_theta = rnd->Uniform(0, allTheta.size() - 1);
             int ind_phi = rnd->Uniform(0, allPhi.size() - 1);
             int ind_cls_size = rnd->Uniform(0, all_cls_size.size() - 1);
@@ -238,7 +265,7 @@ void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
             xL0 = xTR2 + (zTR2 - StaveZ[0]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
             yL0 = yTR2 + (zTR2 - StaveZ[0]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
 
-            // applica smiring
+            // apply smiring to the signal left on the layers
             smiring_xL2 = rnd->Uniform(-cls_size_x, +cls_size_x);
             smiring_xL1 = rnd->Uniform(-cls_size_x, +cls_size_x);
             smiring_xL0 = rnd->Uniform(-cls_size_x, +cls_size_x);
@@ -342,17 +369,7 @@ void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
         LCluster mL1;
         LCluster qL0;
         // check if the track hitted the staves in layer 2
-        if ((xL2 < ChipSizeX * 2.5 + ChipDistanceX && xL2 > -(ChipSizeX * 2.5 + ChipDistanceX)) &&
-            ((yL2 < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && yL2 > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
-             (yL2 < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && yL2 > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
-             (yL2 < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && yL2 > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
-             (yL2 < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && yL2 > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
-             (yL2 < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && yL2 > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
-             (yL2 > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && yL2 < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
-             (yL2 > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && yL2 < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
-             (yL2 > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && yL2 < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
-             (yL2 > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && yL2 < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
-             (yL2 > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && yL2 < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))))
+        if (is_inside_the_layers(&xL2, &yL2))
         {
             stats::hmgthL2++;
             stats::hitL2 = true;
@@ -363,17 +380,7 @@ void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
             p->Draw();
         }
         // check if the track hitted the staves in layer 1
-        if ((xL1 < ChipSizeX * 2.5 + ChipDistanceX && xL1 > -(ChipSizeX * 2.5 + ChipDistanceX)) &&
-            ((yL1 < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && yL1 > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
-             (yL1 < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && yL1 > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
-             (yL1 < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && yL1 > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
-             (yL1 < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && yL1 > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
-             (yL1 < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && yL1 > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
-             (yL1 > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && yL1 < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
-             (yL1 > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && yL1 < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
-             (yL1 > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && yL1 < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
-             (yL1 > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && yL1 < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
-             (yL1 > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && yL1 < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))))
+        if (is_inside_the_layers(&xL1, &yL1))
         {
             stats::hmgthL1++;
             stats::hitL1 = true;
@@ -383,17 +390,7 @@ void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
             m->Draw();
         }
         // check if the track hitted the staves in layer 0
-        if ((xL0 < ChipSizeX * 2.5 + ChipDistanceX && xL0 > -(ChipSizeX * 2.5 + ChipDistanceX)) &&
-            ((yL0 < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && yL0 > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
-             (yL0 < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && yL0 > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
-             (yL0 < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && yL0 > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
-             (yL0 < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && yL0 > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
-             (yL0 < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && yL0 > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
-             (yL0 > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && yL0 < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
-             (yL0 > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && yL0 < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
-             (yL0 > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && yL0 < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
-             (yL0 > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && yL0 < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
-             (yL0 > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && yL0 < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))))
+        if (is_inside_the_layers(&xL0, &yL0))
         {
             stats::hmgthL0++;
             stats::hitL0 = true;
@@ -406,7 +403,10 @@ void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
         chip c;
         c.is_dead_chip_tracking_smt(c, pL2, mL1, qL0);
 
-        // contiamo quante traccie hanno colpito quanti layer ciascuna (3layer, 2layer, 1layer, 0layer)
+        /**
+         * make some statistics, counting how many layers hitted each real tracks
+         */
+
         if (stats::hitL2 && stats::hitL1 && stats::hitL0 && stats::hmgthTR1)
         {
             stats::hmgthL012++;
@@ -431,6 +431,7 @@ void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
             htheta0L->Fill(theta);
             hphi0L->Fill(phi);
         }
+
         // SOLO SE VUOI FARE TRACKING SULLE TRACCIE CHE HANNO COLPITO I 3 LAYER
         // creo solo le tracklet di traccie con hit su L012
         /*     if(stats::hitL0 && stats::hitL1 && stats::hitL2){
@@ -470,8 +471,6 @@ void display::tracks(int events, LTrackerTrack &tracker, TCanvas *geom)
     }
 
     char file[200];
-    // output mc distributions
-    // geom->SaveAs("../data/plot.png");
     sprintf(file, "../data/statsHisttracks.root");
     TFile f(file, "RECREATE");
     hxTR2->Write();
@@ -500,7 +499,10 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
 
     stats::hmgt = events;
 
-    // puoi settare il seed for reproducibility
+    /**
+     * in this case don't need to seed because this version of the tracks function
+     * is only use during simulations
+     */
     TRandom3 *rnd = new TRandom3(0);
 
     // MC
@@ -514,8 +516,12 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         stats::hitL1 = false;
         stats::hitL2 = false;
 
-        // i layer acquisiscono il segnale quando arriva un segnale AND dagli scintillatori
-        // genero traccie misurabili come traccie che passano nei due scintillatori TR2, TR1
+        /**
+         *  a signal on the layers is created only when there is an AND from the pmt.
+         *  thus i create "real" tracks only when the track hitted TR2 && TR1
+         *  i create the first point on the TR2, then using theta, phi distribution it's generated the second point on the zTR1.
+         *  only when the second point is inside TR1 the track is accepted and used for the MC simulation
+         */
 
         do
         {
@@ -540,7 +546,11 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             zTR2 = rnd->Uniform(TR2CenterZ - TR2Thickness / 2, TR2CenterZ + TR2Thickness / 2);
             zTR1 = rnd->Uniform(TR1CenterZ - TR1Thickness / 2, TR1CenterZ + TR1Thickness / 2);
 
-            // prendo gli angoli dalla distribuzione di muoni
+            /**
+             *  taking the theta/phi values from experimental distributions (MUONS)
+             *  the distribution should be something like sin(x)cos(x)
+             */
+
             int ind_theta = rnd->Uniform(0, allTheta.size() - 1);
             int ind_phi = rnd->Uniform(0, allPhi.size() - 1);
             int ind_cls_size = rnd->Uniform(0, all_cls_size.size() - 1);
@@ -550,8 +560,6 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             cls_size_x = cls_size * PixelSizeRows;
             cls_size_y = cls_size * PixelSizeCols;
 
-            // cout << "cls size xy " << cls_size_x << "   " << cls_size_y << endl;
-
             xL2 = xTR2 + (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
             yL2 = yTR2 + (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
             xL1 = xTR2 + (zTR2 - StaveZ[1]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
@@ -559,7 +567,7 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             xL0 = xTR2 + (zTR2 - StaveZ[0]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
             yL0 = yTR2 + (zTR2 - StaveZ[0]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
 
-            // applica smiring
+            // apply smiring to the signal left on the layers
             smiring_xL2 = rnd->Uniform(-cls_size_x, +cls_size_x);
             smiring_xL1 = rnd->Uniform(-cls_size_x, +cls_size_x);
             smiring_xL0 = rnd->Uniform(-cls_size_x, +cls_size_x);
@@ -593,39 +601,46 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         }
 
         // fake hit rate (rate = 10^-6 per event)
-        /* double rate = rnd->Uniform(0,1);
+        double rate = rnd->Uniform(0, 1);
         LCluster fakehit;
-        if (rate < 1./1000.){
-            //x
-            double fakehit_x = rnd->Uniform(-(2.5*display::ChipSizeX+2*display::ChipDistanceX),+(2.5*display::ChipSizeX+2*display::ChipDistanceX));
-            //y
-            double FAKEhit_y = rnd->Uniform(-(5*display::ChipSizeY+2.5*display::ChipDistanceY),+(5*display::ChipSizeY+2.5*display::ChipDistanceY));
+        if (rate < 1. / 1000.)
+        {
+            // x
+            double fakehit_x = rnd->Uniform(-(2.5 * display::ChipSizeX + 2 * display::ChipDistanceX), +(2.5 * display::ChipSizeX + 2 * display::ChipDistanceX));
+            // y
+            double FAKEhit_y = rnd->Uniform(-(5 * display::ChipSizeY + 2.5 * display::ChipDistanceY), +(5 * display::ChipSizeY + 2.5 * display::ChipDistanceY));
             double fakehit_y;
-            if(FAKEhit_y < (0.5*display::ChipDistanceY+1*display::ChipSizeY) && FAKEhit_y > -(0.5*display::ChipDistanceY+1*display::ChipSizeY)){
+            if (FAKEhit_y < (0.5 * display::ChipDistanceY + 1 * display::ChipSizeY) && FAKEhit_y > -(0.5 * display::ChipDistanceY + 1 * display::ChipSizeY))
+            {
                 fakehit_y = FAKEhit_y;
             }
-            if((FAKEhit_y < (1.5*display::ChipDistanceY+3*display::ChipSizeY) && FAKEhit_y > (0.5*display::ChipDistanceY+1*display::ChipSizeY)) ||
-              (FAKEhit_y > -(1.5*display::ChipDistanceY+3*display::ChipSizeY) && FAKEhit_y < -(0.5*display::ChipDistanceY+1*display::ChipSizeY))){
+            if ((FAKEhit_y < (1.5 * display::ChipDistanceY + 3 * display::ChipSizeY) && FAKEhit_y > (0.5 * display::ChipDistanceY + 1 * display::ChipSizeY)) ||
+                (FAKEhit_y > -(1.5 * display::ChipDistanceY + 3 * display::ChipSizeY) && FAKEhit_y < -(0.5 * display::ChipDistanceY + 1 * display::ChipSizeY)))
+            {
                 fakehit_y = FAKEhit_y + display::ChipStaveDistanceY;
-              }
-            if((FAKEhit_y < (2.5*display::ChipDistanceY+5*display::ChipSizeY) && FAKEhit_y > (1.5*display::ChipDistanceY+3*display::ChipSizeY)) ||
-              (FAKEhit_y > -(2.5*display::ChipDistanceY+5*display::ChipSizeY) && FAKEhit_y < -(1.5*display::ChipDistanceY+3*display::ChipSizeY))){
-                fakehit_y = FAKEhit_y + 2*display::ChipStaveDistanceY;
-              }
-            //z
-            int r = 1 + (int)(rnd->Uniform(0,3));
+            }
+            if ((FAKEhit_y < (2.5 * display::ChipDistanceY + 5 * display::ChipSizeY) && FAKEhit_y > (1.5 * display::ChipDistanceY + 3 * display::ChipSizeY)) ||
+                (FAKEhit_y > -(2.5 * display::ChipDistanceY + 5 * display::ChipSizeY) && FAKEhit_y < -(1.5 * display::ChipDistanceY + 3 * display::ChipSizeY)))
+            {
+                fakehit_y = FAKEhit_y + 2 * display::ChipStaveDistanceY;
+            }
+            // z
+            int r = 1 + (int)(rnd->Uniform(0, 3));
             double fakehit_z;
-            if(r == 1){
+            if (r == 1)
+            {
                 fakehit_z = display::StaveZ[0];
                 fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, cls_size_x, cls_size_y, 0, -1);
                 tracker.tidy_clusters_lay0.try_emplace(-1, fakehit);
             }
-            if(r == 2){
+            if (r == 2)
+            {
                 fakehit_z = display::StaveZ[1];
                 fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, cls_size_x, cls_size_y, 0, -1);
                 tracker.tidy_clusters_lay1.try_emplace(-1, fakehit);
             }
-            if(r == 3){
+            if (r == 3)
+            {
                 fakehit_z = display::StaveZ[2];
                 fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, cls_size_x, cls_size_y, 0, -1);
                 tracker.tidy_clusters_lay2.try_emplace(-1, fakehit);
@@ -633,23 +648,12 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
 
             stats::fakehit++;
         }
-     */
 
         LCluster pL2;
         LCluster mL1;
         LCluster qL0;
         // check if the track hitted the staves in layer 2
-        if ((xL2 < ChipSizeX * 2.5 + ChipDistanceX && xL2 > -(ChipSizeX * 2.5 + ChipDistanceX)) &&
-            ((yL2 < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && yL2 > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
-             (yL2 < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && yL2 > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
-             (yL2 < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && yL2 > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
-             (yL2 < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && yL2 > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
-             (yL2 < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && yL2 > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
-             (yL2 > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && yL2 < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
-             (yL2 > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && yL2 < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
-             (yL2 > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && yL2 < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
-             (yL2 > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && yL2 < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
-             (yL2 > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && yL2 < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))))
+        if (is_inside_the_layers(&xL2, &yL2))
         {
             stats::hmgthL2++;
             stats::hitL2 = true;
@@ -658,17 +662,7 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             tracker.tidy_clusters_lay2.try_emplace(i, pL2);
         }
         // check if the track hitted the staves in layer 1
-        if ((xL1 < ChipSizeX * 2.5 + ChipDistanceX && xL1 > -(ChipSizeX * 2.5 + ChipDistanceX)) &&
-            ((yL1 < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && yL1 > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
-             (yL1 < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && yL1 > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
-             (yL1 < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && yL1 > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
-             (yL1 < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && yL1 > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
-             (yL1 < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && yL1 > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
-             (yL1 > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && yL1 < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
-             (yL1 > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && yL1 < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
-             (yL1 > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && yL1 < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
-             (yL1 > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && yL1 < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
-             (yL1 > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && yL1 < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))))
+        if (is_inside_the_layers(&xL1, &yL1))
         {
             stats::hmgthL1++;
             stats::hitL1 = true;
@@ -676,17 +670,7 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             tracker.tidy_clusters_lay1.try_emplace(i, mL1);
         }
         // check if the track hitted the staves in layer 0
-        if ((xL0 < ChipSizeX * 2.5 + ChipDistanceX && xL0 > -(ChipSizeX * 2.5 + ChipDistanceX)) &&
-            ((yL0 < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && yL0 > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
-             (yL0 < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && yL0 > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
-             (yL0 < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && yL0 > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
-             (yL0 < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && yL0 > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
-             (yL0 < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && yL0 > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
-             (yL0 > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && yL0 < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
-             (yL0 > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && yL0 < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
-             (yL0 > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && yL0 < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
-             (yL0 > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && yL0 < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
-             (yL0 > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && yL0 < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))))
+        if (is_inside_the_layers(&xL0, &yL0))
         {
             stats::hmgthL0++;
             stats::hitL0 = true;
@@ -697,7 +681,10 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         // chip c;
         // c.is_dead_chip_tracking_smt(c, pL2, mL1, qL0);
 
-        // contiamo quante traccie hanno colpito quanti layer ciascuna (3layer, 2layer, 1layer, 0layer)
+        /**
+         * make some statistics, counting how many layers hitted each real tracks
+         */
+
         if (stats::hitL2 && stats::hitL1 && stats::hitL0 && stats::hmgthTR1)
         {
             stats::hmgthL012++;
@@ -714,16 +701,6 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         {
             stats::hmgth0L++;
         }
-        // SOLO SE VUOI FARE TRACKING SULLE TRACCIE CHE HANNO COLPITO I 3 LAYER
-        // creo solo le tracklet di traccie con hit su L012
-        /* if(stats::hitL0 && stats::hitL1 && stats::hitL2){
-            tracker.tidy_clusters_lay2.try_emplace(i,pL2);
-            tracker.tidy_clusters_lay1.try_emplace(i,mL1);
-            tracker.tidy_clusters_lay0.try_emplace(i,qL0);
-            //cout << "STAI FACENDO RECO SOLO CON TRACCIE CHE HANNO COLPITO TUTTI E TRE I LAYER" << endl;
-        } */
-
-        // CONSIDERA TUTTI I CLUSTER
 
         LTrackCandidate real_track;
         real_track.x0 = xL1;
@@ -734,5 +711,6 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         real_track.theta = theta;
         real_track.phi = phi;
         generated_tracks.push_back(real_track);
+
     }
 }

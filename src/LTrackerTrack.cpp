@@ -23,17 +23,17 @@ LTrackerTrack::LTrackerTrack() {}
 
 void LTrackerTrack::Reset()
 {
-  tidy_clusters_lay0.clear();
-  tidy_clusters_lay1.clear();
-  tidy_clusters_lay2.clear();
-  tracklet_lay01.clear();
-  tracklet_lay12.clear();
-  tracklet_lay02.clear();
-  track_candidates.clear();
-  used_clusters_lay0.clear();
-  used_clusters_lay1.clear();
-  used_clusters_lay2.clear();
-  tracks.clear();
+    std::unordered_map<int, LCluster>().swap(tidy_clusters_lay0);
+    std::unordered_map<int, LCluster>().swap(tidy_clusters_lay1);
+    std::unordered_map<int, LCluster>().swap(tidy_clusters_lay2);
+    std::vector<LTracklet>().swap(tracklet_lay01);
+    std::vector<LTracklet>().swap(tracklet_lay12);
+    std::vector<LTracklet>().swap(tracklet_lay02);
+    std::vector<LTrackCandidate>().swap(track_candidates);
+    std::vector<LTrackCandidate>().swap(tracks);
+    std::vector<int>().swap(used_clusters_lay0);
+    std::vector<int>().swap(used_clusters_lay1);
+    std::vector<int>().swap(used_clusters_lay2);
 }
 
 void LCluster::fill_cluster(LCluster &cl, double x, double y, double z, double errx, double erry, double errz, int id)
@@ -153,11 +153,12 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
     min->SetVariable(1, "y0", initialVars[1], steps[1]);
     // we're using a wider range because we are trying to optimise a circular function. maybe the function goes to one end but the optimal fit value could be just on the edge of the other end
 
-    min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -TMath::Pi(), 4 * TMath::Pi());
-    // min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0, TMath::Pi()/2);
-    min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -2 * TMath::Pi(), 2 * TMath::Pi());
-    // min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -1.5 * TMath::Pi(), 1.5 * TMath::Pi());
+    //min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0, TMath::Pi()/2);
+    //min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], TMath::Pi(), TMath::Pi());
 
+    min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -TMath::Pi(), 4 * TMath::Pi());
+    min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -2 * TMath::Pi(), 2 * TMath::Pi());
+  
     min->Minimize();
 
     return {min->X(), min->Errors(), min->MinValue()};
@@ -185,9 +186,9 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
   trkCand.err_theta = errors[2] * 180 / TMath::Pi();
   trkCand.err_phi = errors[3] * 180 / TMath::Pi();
   trkCand.chi2 = chi2;
+
   trkCand.theta = params[2] * 180 / TMath::Pi();
   trkCand.phi = params[3] * 180 / TMath::Pi();
-  // remap theta/phi in the right range
 }
 
 // Add unused tracklets to without used clusters to final tracks (chi2 = 1 by definition)
@@ -248,7 +249,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
 {
   computeTracklets();
   LTrackerTrack t;
-  tracks.reserve(tracklet_lay01.size()+tracklet_lay02.size()+tracklet_lay12.size());
+  tracks.reserve(tracklet_lay01.size() + tracklet_lay02.size() + tracklet_lay12.size());
 
   for (auto &trkl01 : tracklet_lay01)
   {
@@ -270,7 +271,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     double delta_y = (double)cls_lay1.y - (double)cls_lay0.y;
     double delta_x = (double)cls_lay1.x - (double)cls_lay0.x;
     double delta_z = (double)cls_lay1.z - (double)cls_lay0.z;
-    double r = TMath::Sqrt(delta_x*delta_x + delta_y*delta_y + delta_z*delta_z);
+    double r = TMath::Sqrt(delta_x * delta_x + delta_y * delta_y + delta_z * delta_z);
     double phi = TMath::ATan2(delta_y, delta_x);
     double theta = TMath::ACos(delta_z / r);
     double x2 = (double)cls_lay0.x + 2 * display::dist_z * TMath::Tan(theta) * TMath::Cos(phi);
@@ -293,7 +294,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     double x1 = (double)cls_lay0.x + display::dist_z * TMath::Tan(theta) * TMath::Cos(phi);
     double y1 = (double)cls_lay0.y + display::dist_z * TMath::Tan(theta) * TMath::Sin(phi);
 
-    if (!display::is_inside_the_layers(x2, y2) && t.track_hit_TR(x1, y1, theta, phi))
+    if (!display::is_inside_the_layers(&x2, &y2) && t.track_hit_TR(x1, y1, theta, phi))
     {
       spurious.x0 = cls_lay1.x;
       spurious.y0 = cls_lay1.y;
@@ -332,7 +333,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     double delta_x = (double)cls_lay2.x - (double)cls_lay1.x;
     double delta_z = (double)cls_lay2.z - (double)cls_lay1.z;
     double delta_r = TMath::Sqrt(delta_y * delta_y + delta_x * delta_x);
-    double r = TMath::Sqrt(delta_x*delta_x + delta_y*delta_y + delta_z*delta_z);
+    double r = TMath::Sqrt(delta_x * delta_x + delta_y * delta_y + delta_z * delta_z);
     double phi = TMath::ATan2(delta_y, delta_x);
     double theta = TMath::ACos(delta_z / r);
     double x0 = (double)cls_lay1.x - display::dist_z * TMath::Tan(theta) * TMath::Cos(phi);
@@ -352,7 +353,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.err_phi = -1.;
     spurious.chi2 = -1.;
 
-    if (!display::is_inside_the_layers(x0, y0) && t.track_hit_TR(cls_lay1.x, cls_lay1.y, theta, phi))
+    if (!display::is_inside_the_layers(&x0, &y0) && t.track_hit_TR(cls_lay1.x, cls_lay1.y, theta, phi))
     {
       spurious.x0 = cls_lay1.x;
       spurious.y0 = cls_lay1.y;
@@ -391,7 +392,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     double delta_x = (double)cls_lay0.x - (double)cls_lay2.x;
     double delta_z = (double)cls_lay0.z - (double)cls_lay2.z;
     double delta_r = TMath::Sqrt(delta_y * delta_y + delta_x * delta_x);
-    double r = TMath::Sqrt(delta_x*delta_x + delta_y*delta_y + delta_z*delta_z);
+    double r = TMath::Sqrt(delta_x * delta_x + delta_y * delta_y + delta_z * delta_z);
     double phi = TMath::ATan2(delta_y, delta_x);
     double theta = TMath::ACos(delta_z / r);
     double x1 = (double)cls_lay0.x + display::dist_z * TMath::Tan(theta) * TMath::Cos(phi);
@@ -411,7 +412,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.err_phi = -1.;
     spurious.chi2 = -1.;
 
-    if (!display::is_inside_the_layers(x1, y1) && t.track_hit_TR(x1, y1, theta, phi))
+    if (!display::is_inside_the_layers(&x1, &y1) && t.track_hit_TR(x1, y1, theta, phi))
     {
       spurious.x0 = x1;
       spurious.y0 = y1;
@@ -524,7 +525,7 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackerTrack::new_algo(double radius)
 {
-  chi2_cut = 5;
+  chi2_cut = 50;
   double degtorad = TMath::DegToRad();
   int candidateCounter = 0;
   std::vector<LCluster> clus_vec;

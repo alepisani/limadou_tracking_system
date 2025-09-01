@@ -48,33 +48,33 @@ stats::stats(){
 }
 
 
- void stats::reset(){
-    stats::hmgt = 0;
-    stats::hmgthTR1 = 0;
-    stats::hmgthL2 = 0;
-    stats::hmgthL1 = 0;
-    stats::hmgthL0 = 0;
-    stats::hmgthL012 = 0;
-    stats::hmrt = 0;
-    stats::hmrtar = 0;
-    stats::hitL0;
-    stats::hitL1;
-    stats::hitL2;
-    stats::hmgth1L = 0;
-    stats::hmgth2L = 0;
-    stats::hmgth0L = 0;
-    stats::hmgthdcL2 = 0;
-    stats::hmgthdcL1 = 0;
-    stats::hmgthdcL0 = 0;
-    stats::fakehit = 0;
-    stats::hmthL2 = 0;
-    stats::hmthL1 = 0;
-    stats::hmthL0 = 0;
-    stats::hmbh3L = 0;
-    stats::hmbh2L = 0;
-    stats::hmbh1L = 0;
-    stats::hmbh0L = 0;
-}
+    void stats::reset(){
+        stats::hmgt = 0;
+        stats::hmgthTR1 = 0;
+        stats::hmgthL2 = 0;
+        stats::hmgthL1 = 0;
+        stats::hmgthL0 = 0;
+        stats::hmgthL012 = 0;
+        stats::hmrt = 0;
+        stats::hmrtar = 0;
+        stats::hitL0;
+        stats::hitL1;
+        stats::hitL2;
+        stats::hmgth1L = 0;
+        stats::hmgth2L = 0;
+        stats::hmgth0L = 0;
+        stats::hmgthdcL2 = 0;
+        stats::hmgthdcL1 = 0;
+        stats::hmgthdcL0 = 0;
+        stats::fakehit = 0;
+        stats::hmthL2 = 0;
+        stats::hmthL1 = 0;
+        stats::hmthL0 = 0;
+        stats::hmbh3L = 0;
+        stats::hmbh2L = 0;
+        stats::hmbh1L = 0;
+        stats::hmbh0L = 0;
+    }
 
 // Overload operator<<
 std::ostream &operator<<(std::ostream &output, const stats &s) {

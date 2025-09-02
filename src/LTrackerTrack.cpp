@@ -83,12 +83,6 @@ void LTrackerTrack::computeTracklets()
       createTracklet(cl_l0, cl_l2, tracklet_lay02, tracklet_counter);
     }
   }
-  /* cout << "~~~~~~~~~~~~~~~~~~~~~" << endl;
-  cout << "tracklet_counter: " << tracklet_counter << endl;
-  cout << "trackelt_lay01: " << tracklet_lay01.size() << endl;
-  cout << "trackelt_lay12: " << tracklet_lay12.size() << endl;
-  cout << "trackelt_lay02: " << tracklet_lay02.size() << endl;
-  cout << "~~~~~~~~~~~~~~~~~~~~~" << endl; */
 }
 
 void LTrackerTrack::print_tracklet(const LCluster cl_0, const LCluster cl_2)
@@ -151,10 +145,16 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
 
     min->SetVariable(0, "x0", initialVars[0], steps[0]);
     min->SetVariable(1, "y0", initialVars[1], steps[1]);
-    // we're using a wider range because we are trying to optimise a circular function. maybe the function goes to one end but the optimal fit value could be just on the edge of the other end
 
     //min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0, TMath::Pi()/2);
     //min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], TMath::Pi(), TMath::Pi());
+
+    /**
+     * we're using a wider range because we are trying to optimise a circular function. 
+     * maybe the function goes to one end but the optimal fit value could be just on the edge of the other end.
+     * the real theta distribution is between (0,pi/2);
+     * the real  phi distribution is between (-pi,+pi);
+    */
 
     min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -TMath::Pi(), 4 * TMath::Pi());
     min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -2 * TMath::Pi(), 2 * TMath::Pi());
@@ -302,6 +302,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
       if (cls_lay0.id == cls_lay1.id)
       {
         stats::hmrtar++;
+        stats::hmrtar2++;
       }
       stats::hmrt++;
       // cout << "010101010100101" << endl;
@@ -361,6 +362,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
       if (cls_lay1.id == cls_lay2.id)
       {
         stats::hmrtar++;
+        stats::hmrtar2++;
       }
       stats::hmrt++;
       // cout << "212121212121221122121" << endl;
@@ -420,6 +422,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
       if (cls_lay0.id == cls_lay2.id)
       {
         stats::hmrtar++;
+        stats::hmrtar2++;
       }
       stats::hmrt++;
       // cout << "020202020200202" << endl;
@@ -435,11 +438,6 @@ void LTrackerTrack::computeTrackCandidates()
 {
   // inside () should have LTrackerCluster &clusterer
   int candidateCounter = 0;
-
-  /*   std::vector<int> clusterer_indices = clusterer.GetClusterIdx();
-    int n_cluster_clusterer = (int)clusterer_indices.size();
-    clusterer.cls_res_x_m2.resize(n_cluster_clusterer);
-    clusterer.cls_res_y_m2.resize(n_cluster_clusterer); */
 
   for (auto &trkl01 : tracklet_lay01)
   {
@@ -539,7 +537,7 @@ void LTrackerTrack::new_algo(double radius)
     const LCluster &clus_2 = tidy_clusters_lay2[trkl02.secondClusterId];
 
     // intorno del punto nel quale si cerca un cluster
-    double x1 = (clus_2.x + clus_0.x) * 0.5; // moltiplicatios is faster than division
+    double x1 = (clus_2.x + clus_0.x) * 0.5; // moltiplications are faster than divisions
     double y1 = (clus_2.y + clus_0.y) * 0.5;
     double r = radius;
 
@@ -572,6 +570,7 @@ void LTrackerTrack::new_algo(double radius)
           if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id)
           {
             stats::hmrtar++;
+            stats::hmrtar3++;
           }
         }
       }

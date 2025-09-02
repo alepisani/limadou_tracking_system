@@ -126,7 +126,7 @@ void display::take_distributions()
         std::cerr << "Errore nell'aprire il file ROOT\n";
     }
 
-    // Carica il TTree
+    // load the TTree
     TTree *tree = (TTree *)file->Get("L2;1");
     if (!tree)
     {
@@ -175,8 +175,9 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
     nbins = events;
     stats::hmgt = *events;
 
-    //printf("adress events: %p\n", events);
-    //printf("adress nbins: %p\n", nbins);
+    printf("adress events: %p\n", events);
+    printf("adress nbins: %p\n", nbins);
+    printf("adress hmgt: %p\n", &stats::hmgt);
 
 
     /**
@@ -375,6 +376,11 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             stats::hitL2 = true;
             // only if hitted the chips goes to tidy_clusters
             pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], cls_size_x, cls_size_y, 0, i);
+
+            printf("iteration: %d\n", i);
+            printf("addres of clsx: %p\n", &pL2.x);
+            printf("addres of    x: %p\n", &xL2);
+
             tracker.tidy_clusters_lay2.try_emplace(i, pL2);
             TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], err_cl, err_cl, 0, 0, 0);
             p->Draw();

@@ -80,15 +80,15 @@ int main(int argc, char** argv) {
     
 
     //track simulation
-    int *events;
-    int ev = 20;
-    events = &ev; 
-    run(events);
+    //int *events;
+    //int ev = 20;
+    //events = &ev; 
+    //run(events);
 
 
-    //simulations sim;
+    simulations sim;
     //sim.sim_only_trk_3L(1000);
-    //sim.sim_trk_32L(1000);
+    sim.sim_trk_32L(1000);
     //sim.sim_old_algo(100);
 
     //reco from MUONS

@@ -343,4 +343,6 @@ CMakeFiles/sim_MC.dir/src/simulations.cpp.o: \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/../include/display.h \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/../include/stats.h \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/../include/LTrackerCluster.h \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/include/simulations.h
+ /mnt/c/Users/user/Desktop/stageINFN/sim_mc/include/simulations.h \
+ /usr/include/malloc.h /usr/local/root/include/TH1.h \
+ /usr/local/root/include/TROOT.h /usr/local/root/include/TDirectory.h

@@ -16,6 +16,8 @@
 #include "TApplication.h"
 #include <thread>
 #include <TStopwatch.h>
+#include "TH1.h"   
+#include "TROOT.h" 
 using namespace std;
 
 
@@ -47,7 +49,7 @@ void run(int *events){
     t.Start();
     tracker.computeTracklets();
     //tracker.computeTrackCandidates();
-    tracker.new_algo(0.3);
+    tracker.new_algo(0.2);
     t.Stop();
 
     tracker.printRecoTracks_new_alg(real_tracks);
@@ -65,6 +67,7 @@ void run(int *events){
 
 int main(int argc, char** argv) {
     TApplication app("ROOT Application", &argc, argv);
+    TH1::AddDirectory(false);
 
     //take data from beam test
     
@@ -80,16 +83,16 @@ int main(int argc, char** argv) {
     
 
     //track simulation
-    //int *events;
-    //int ev = 20;
-    //events = &ev; 
-    //run(events);
+    int *events;
+    int ev = 50;
+    events = &ev; 
+    run(events);
 
 
-    simulations sim;
+    //simulations sim;
     //sim.sim_only_trk_3L(1000);
-    sim.sim_trk_32L(1000);
     //sim.sim_old_algo(100);
+    //sim.sim_trk_32L(1000);
 
     //reco from MUONS
     //e.analize_data();

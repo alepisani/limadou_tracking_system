@@ -175,11 +175,6 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
     nbins = events;
     stats::hmgt = *events;
 
-    printf("adress events: %p\n", events);
-    printf("adress nbins: %p\n", nbins);
-    printf("adress hmgt: %p\n", &stats::hmgt);
-
-
     /**
      * TH1F(name, title, nbins, xlow, xup)
      * create histograms for stored all data collected from the simulations
@@ -376,10 +371,6 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             stats::hitL2 = true;
             // only if hitted the chips goes to tidy_clusters
             pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], cls_size_x, cls_size_y, 0, i);
-
-            printf("iteration: %d\n", i);
-            printf("addres of clsx: %p\n", &pL2.x);
-            printf("addres of    x: %p\n", &xL2);
 
             tracker.tidy_clusters_lay2.try_emplace(i, pL2);
             TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], err_cl, err_cl, 0, 0, 0);
@@ -658,6 +649,7 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         LCluster pL2;
         LCluster mL1;
         LCluster qL0;
+
         // check if the track hitted the staves in layer 2
         if (is_inside_the_layers(&xL2, &yL2))
         {
@@ -717,6 +709,8 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         real_track.theta = theta;
         real_track.phi = phi;
         generated_tracks.push_back(real_track);
+        
 
     }
+
 }

@@ -125,8 +125,11 @@ double LTrackerTrack::fct(const std::vector<LCluster> &clusters, const double *p
   return chi2;
 };
 
+
 void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrackCandidate &trkCand)
 {
+  float pi = TMath::Pi();
+
   if (clusters.size() < 3)
     return;
 
@@ -146,21 +149,28 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
     min->SetVariable(0, "x0", initialVars[0], steps[0]);
     min->SetVariable(1, "y0", initialVars[1], steps[1]);
 
-    //min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0, TMath::Pi()/2);
-    //min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], TMath::Pi(), TMath::Pi());
-
     /**
      * we're using a wider range because we are trying to optimise a circular function. 
      * maybe the function goes to one end but the optimal fit value could be just on the edge of the other end.
-     * the real theta distribution is between (0,pi/2);
-     * the real  phi distribution is between (-pi,+pi);
+     * the real theta distribution is between (0,pi/2), now is (-pi/2, pi);
+     * the real  phi distribution is between (-pi,+pi), now is (-2pi, 2pi);
     */
 
-    min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -TMath::Pi(), 4 * TMath::Pi());
-    min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -2 * TMath::Pi(), 2 * TMath::Pi());
+    //what real intervals should look like
+    //min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0, pi/2);
+    //min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -pi, pi);
+    //what intervals are --> make efficiency raise
+    //min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -pi, 4 * pi);
+    //min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -2 * pi, 2 * pi);
+    //test
+    min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -pi/2, pi);
+    min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -2*pi, 2*pi);
+    
+    
   
     min->Minimize();
 
+    
     return {min->X(), min->Errors(), min->MinValue()};
   };
 
@@ -183,13 +193,49 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
   trkCand.z0 = display::z_origin_shift;
   trkCand.err_x0 = errors[0];
   trkCand.err_y0 = errors[1];
-  trkCand.err_theta = errors[2] * 180 / TMath::Pi();
-  trkCand.err_phi = errors[3] * 180 / TMath::Pi();
+  trkCand.err_theta = errors[2];
+  trkCand.err_phi = errors[3];
   trkCand.chi2 = chi2;
+  //trkCand.err_theta = errors[2] * 180 / TMath::Pi();
+  //trkCand.err_phi = errors[3] * 180 / TMath::Pi();
 
-  trkCand.theta = params[2] * 180 / TMath::Pi();
-  trkCand.phi = params[3] * 180 / TMath::Pi();
+  trkCand.theta = params[2];
+  trkCand.phi = params[3];
+  //trkCand.theta = params[2] * 180 / TMath::Pi();
+  //trkCand.phi = params[3] * 180 / TMath::Pi();
 }
+
+
+/** 
+ * the fit function uses a wider range for the definition intervals for the angles paramenter.
+ * that is because we're trying to minimaze a periodical variable and don't want to end up at the edge.
+ * that's why we need to remap the right angles valus to take the physical values we're intrested in.
+ * in fit function the angles variable are defined:
+ *      theta: (-pi/2, pi) while should be (0,pi/2)
+ *        phi: (-2pi, 2pi) while should be (-pi,+pi)
+ */
+
+void LTrackerTrack::remap_angles(std::vector<LTrackCandidate> &tracks){
+
+  float pi = TMath::Pi();
+  float degtorad = TMath::DegToRad();
+
+  for(int j = 0; j < tracks.size(); ++j){
+    //angles comes out in degrees --> change it to rad
+
+    //remap theta
+    if(tracks[j].theta <= 0.) tracks[j].theta *= -1;
+    if(tracks[j].theta > pi/2) tracks[j].theta -= pi/2;
+
+    //remap phi
+    if(tracks[j].phi < -pi) tracks[j].phi += 2*pi;
+    if(tracks[j].phi > pi) tracks[j].phi -= 2*pi;
+
+
+  }
+
+}
+
 
 // Add unused tracklets to without used clusters to final tracks (chi2 = 1 by definition)
 void LTrackerTrack::addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer)
@@ -227,8 +273,10 @@ void LTrackerTrack::addSpuriousTracks(std::vector<int> &used_tracklets, std::vec
     spurious.clus_id.push_back(first_cluster.id);
     spurious.clus_id.push_back(second_cluster.id);
     spurious.tracklet_id.push_back(trkl.id);
-    spurious.theta = TMath::ATan(tan_theta) * 180 / TMath::Pi();
-    spurious.phi = TMath::ACos(cos_phi) * 180 / TMath::Pi();
+    //spurious.theta = TMath::ATan(tan_theta) * 180 / TMath::Pi();
+    //spurious.phi = TMath::ACos(cos_phi) * 180 / TMath::Pi();
+    spurious.theta = TMath::ATan(tan_theta);
+    spurious.phi = TMath::ACos(cos_phi);
     if (delta_y < 0)
     {
       spurious.phi *= -1.;
@@ -283,8 +331,10 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.clus_id.push_back(cls_lay0.id);
     spurious.clus_id.push_back(cls_lay1.id);
     spurious.tracklet_id.push_back(trkl01.id);
-    spurious.theta = theta * 180 / TMath::Pi();
-    spurious.phi = phi * 180 / TMath::Pi();
+    //spurious.theta = theta * 180 / TMath::Pi();
+    //spurious.phi = phi * 180 / TMath::Pi();
+    spurious.theta = theta;
+    spurious.phi = phi;
     spurious.err_x0 = -1.;
     spurious.err_y0 = -1.;
     spurious.err_theta = -1.;
@@ -346,8 +396,10 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.clus_id.push_back(cls_lay1.id);
     spurious.clus_id.push_back(cls_lay2.id);
     spurious.tracklet_id.push_back(trkl12.id);
-    spurious.theta = theta * 180 / TMath::Pi();
-    spurious.phi = phi * 180 / TMath::Pi();
+    //spurious.theta = theta * 180 / TMath::Pi();
+    //spurious.phi = phi * 180 / TMath::Pi();
+    spurious.theta = theta;
+    spurious.phi = phi;
     spurious.err_x0 = -1.;
     spurious.err_y0 = -1.;
     spurious.err_theta = -1.;
@@ -406,8 +458,10 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.clus_id.push_back(cls_lay0.id);
     spurious.clus_id.push_back(cls_lay2.id);
     spurious.tracklet_id.push_back(trkl02.id);
-    spurious.theta = theta * 180 / TMath::Pi();
-    spurious.phi = phi * 180 / TMath::Pi();
+    //spurious.theta = theta * 180 / TMath::Pi();
+    //spurious.phi = phi * 180 / TMath::Pi();
+    spurious.theta = theta;
+    spurious.phi = phi;
     spurious.err_x0 = -1.;
     spurious.err_y0 = -1.;
     spurious.err_theta = -1.;
@@ -523,11 +577,13 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackerTrack::new_algo(double radius)
 {
-  chi2_cut = 50;
+  chi2_cut = 5;
   double degtorad = TMath::DegToRad();
   int candidateCounter = 0;
   std::vector<LCluster> clus_vec;
   clus_vec.reserve(3);
+  track_candidates.clear();
+  tracks.clear();
 
   for (const auto &trkl02 : tracklet_lay02)
   {
@@ -560,8 +616,10 @@ void LTrackerTrack::new_algo(double radius)
         trkCand.n_clus = clus_vec.size();
         trkCand.tracklet_id = {trkl02.id};
         trkCand.clus_id = {trkl02.firstClusterId, clus_1.id, trkl02.secondClusterId};
-        double theta = trkCand.theta * degtorad;
-        double phi = trkCand.phi * degtorad;
+        //double theta = trkCand.theta * degtorad;
+        //double phi = trkCand.phi * degtorad;
+        double theta = trkCand.theta;
+        double phi = trkCand.phi;
 
         // check if recotrk passa dai trigger
         if (t.track_hit_TR((double)trkCand.x0, (double)trkCand.y0, theta, phi) && trkCand.chi2 < chi2_cut)
@@ -590,16 +648,17 @@ void LTrackerTrack::new_algo(double radius)
     used_clusters.insert(used_clusters.end(), trk.clus_id.begin(), trk.clus_id.end());
   }
 
+  New_addSpuriousTracks(used_tracklets, used_clusters);
+
   // Reassigning track id
   for (int i = 0; i < tracks.size(); i++)
   {
     tracks[i].id = i;
-    // cout << tracks[i].chi2 << endl;
+    cout << tracks[i].chi2 << endl;
   }
 
   stats::hmrt = tracks.size();
 
-  New_addSpuriousTracks(used_tracklets, used_clusters);
 }
 
 bool LTrackerTrack::track_hit_TR(double x1, double y1, double theta, double phi)
@@ -708,8 +767,10 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 
     dz = 100;
 
-    t = trk.theta * TMath::DegToRad();
-    p = trk.phi * TMath::DegToRad();
+    t = trk.theta;
+    p = trk.phi;
+    //t = trk.theta * TMath::DegToRad();
+    //p = trk.phi * TMath::DegToRad();
     x2 = trk.x0 + dz * (TMath::Tan(t)) * (TMath::Cos(p));
     y2 = trk.y0 + dz * (TMath::Tan(t)) * (TMath::Sin(p));
     z2 = trk.z0 + dz;
@@ -721,12 +782,13 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
     Double_t z_line[3] = {z1, trk.z0, z2};
     TPolyLine3D *line_track = new TPolyLine3D(3, x_line, y_line, z_line);
     line_track->SetLineWidth(2);
-    line_track->SetLineColor(kRed);
+    if(trk.chi2 > 3) line_track->SetLineColor(kGreen);
+    else line_track->SetLineColor(kRed);
     line_track->Draw();
 
     TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 0, 0, 0, 0, 0);
     g->Draw();
-    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 5, 5, 0, 0, 0);
+    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 0, 0, 0, 0, 0);
     m->Draw();
     TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
     f->Draw();
@@ -740,6 +802,7 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 
   reco->Update();
 }
+
 
 std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker)
 {

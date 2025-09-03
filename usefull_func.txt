@@ -1,0 +1,292 @@
+template <typename T>
+size_t vector_bytes(const std::vector<T> &v)
+{
+    return sizeof(v) + v.capacity() * sizeof(T);
+}
+
+static std::string human_bytes(size_t bytes)
+{
+    const double KB = 1024.0;
+    const double MB = KB * 1024.0;
+    std::ostringstream os;
+    os.setf(std::ios::fixed);
+    os << std::setprecision(2);
+    if (bytes >= MB)
+        os << (bytes / MB) << " MB";
+    else if (bytes >= KB)
+        os << (bytes / KB) << " kB";
+    else
+        os << bytes << " B";
+    return os.str();
+}
+
+size_t get_process_rss_bytes()
+{
+    std::ifstream f("/proc/self/status");
+    std::string line;
+    while (std::getline(f, line))
+    {
+        if (line.rfind("VmRSS:", 0) == 0)
+        {
+            std::istringstream iss(line);
+            std::string key;
+            size_t kb;
+            iss >> key >> kb; // VmRSS:   123456 kB
+            return kb * 1024;
+        }
+    }
+    return 0;
+}
+
+void print_bar(size_t bytes)
+{
+    const size_t scale = 1024 * 1024; // 1 block ~ 1MB
+    size_t blocks = bytes / scale;
+    const size_t max_blocks = 50;
+    if (blocks > max_blocks)
+        blocks = max_blocks;
+    for (size_t i = 0; i < blocks; ++i)
+        std::cout << '#';
+    for (size_t i = blocks; i < max_blocks; ++i)
+        std::cout << ' ';
+    std::cout << "  " << human_bytes(bytes) << '\n';
+}
+
+void print_mem_report(const std::string &tag,
+                      const std::vector<double> &r_time,
+                      const std::vector<double> &c_time,
+                      const std::vector<double> &reco,
+                      const std::vector<double> &reco_real,
+                      const std::vector<double> &reco_real3,
+                      const std::vector<double> &reco_real2,
+                      const std::vector<double> &gen_trk)
+{
+    size_t A = vector_bytes(r_time);
+    size_t B = vector_bytes(c_time);
+    size_t C = vector_bytes(reco);
+    size_t D = vector_bytes(reco_real);
+    size_t E = vector_bytes(reco_real3);
+    size_t F = vector_bytes(reco_real2);
+    size_t G = vector_bytes(gen_trk);
+    size_t sum = A + B + C + D + E + F + G;
+    size_t rss = get_process_rss_bytes();
+
+    std::cout << "\n=== MEM REPORT: " << tag << " ===\n";
+    std::cout << "r_time     : size=" << r_time.size() << " cap=" << r_time.capacity() << " | ";
+    print_bar(A);
+    std::cout << "c_time     : size=" << c_time.size() << " cap=" << c_time.capacity() << " | ";
+    print_bar(B);
+    std::cout << "reco       : size=" << reco.size() << " cap=" << reco.capacity() << " | ";
+    print_bar(C);
+    std::cout << "reco_real  : size=" << reco_real.size() << " cap=" << reco_real.capacity() << " | ";
+    print_bar(D);
+    std::cout << "reco_real3 : size=" << reco_real3.size() << " cap=" << reco_real3.capacity() << " | ";
+    print_bar(E);
+    std::cout << "reco_real2 : size=" << reco_real2.size() << " cap=" << reco_real2.capacity() << " | ";
+    print_bar(F);
+    std::cout << "gen_trk    : size=" << gen_trk.size() << " cap=" << gen_trk.capacity() << " | ";
+    print_bar(G);
+
+    std::cout << "SUM vectors (approx) : " << human_bytes(sum) << '\n';
+    std::cout << "Process RSS (VmRSS)  : " << human_bytes(rss) << '\n';
+    if (rss > sum)
+    {
+        std::cout << "Note: RSS > sum. Other allocators/ROOT/objects or allocator rounding are using memory.\n";
+    }
+    else if (sum > rss)
+    {
+        std::cout << "Note: sum > RSS (unlikely) - rounding/metrics mismatch.\n";
+    }
+    std::cout << "========================================\n\n";
+}
+
+
+void simulations::sim_trk_32L(int iteration_per_event)
+{
+    using std::cout;
+    using std::endl;
+
+    auto start_time = std::chrono::steady_clock::now();
+
+    // Objects that live across radius loops but not across j iterations
+    display simu;
+    // stats object reused (you already used it that way)
+    stats stats;
+
+    simu.take_distributions();
+
+    // Prepare CSV file
+    std::string path = "../data/limadou_sim32L.csv";
+    bool file_exists = std::filesystem::exists(path);
+    std::ofstream file(path, std::ios::app);
+    if (!file_exists)
+    {
+        file << "GenTrk, Raggio, Eff, err_e, Eff_real, err_er, fake_reco_trk, err_frt, GenTrk, RecoTrk, RecoReal, RealTime, CPUTime, eff3hit, eff2hit\n";
+    }
+
+    // parameters for diagnostics
+    const int RSS_PRINT_INTERVAL = std::max(1, iteration_per_event / 10); // prints ~10 times per j-loop
+
+    for (size_t i = 0; i < gen_tracks.size(); ++i)
+    {
+        cout << "==== GenTracks = " << gen_tracks[i] << " ====" << endl;
+
+        for (size_t m = 0; m < radius.size(); ++m)
+        {
+            cout << endl;
+            cout << " raggio = " << radius[m] << " mm" << endl;
+
+            // create vectors inside radius loop so they destruct after this radius iteration
+            std::vector<double> r_time;
+            r_time.reserve(iteration_per_event);
+            std::vector<double> c_time;
+            c_time.reserve(iteration_per_event);
+            std::vector<double> reco;
+            reco.reserve(iteration_per_event);
+            std::vector<double> reco_real;
+            reco_real.reserve(iteration_per_event);
+            std::vector<double> reco_real3;
+            reco_real3.reserve(iteration_per_event);
+            std::vector<double> reco_real2;
+            reco_real2.reserve(iteration_per_event);
+            std::vector<double> gen_trk;
+            gen_trk.reserve(iteration_per_event);
+
+            // reset per-radius stats if needed
+            stats.reset();
+
+            // Rapid diagnostics: RSS before starting inner loop
+            size_t rss_before = get_process_rss_bytes();
+            cout << "RSS before j-loop: " << human_bytes(rss_before) << endl;
+
+            const int RSS_PRINT_INTERVAL = std::max(1, iteration_per_event / 20);
+
+            if (gDirectory)
+            {
+                std::cout << "gDirectory list size before j-loop: " << gDirectory->GetList()->GetSize() << "\n";
+            }
+            if (gROOT)
+            {
+                std::cout << "gROOT global objects (TList) size: " << gROOT->GetListOfCleanups()->GetSize() << "\n";
+            }
+
+            for (int j = 0; j < iteration_per_event; ++j)
+            {
+                stats.reset();
+
+                // RSS before constructing tracker
+                if ((j % RSS_PRINT_INTERVAL) == 0 || j == 0 || j == iteration_per_event - 1)
+                {
+                    std::cout << "[iter " << j + 1 << "] RSS (before construct) = " << human_bytes(get_process_rss_bytes()) << '\n';
+                }
+
+                { // scope for ltt_local so destructor runs at scope end
+                    size_t rss1 = get_process_rss_bytes();
+                    LTrackerTrack ltt_local; // construct
+                    size_t rss2 = get_process_rss_bytes();
+                    if ((j % RSS_PRINT_INTERVAL) == 0 || j == 0 || j == iteration_per_event - 1)
+                    {
+                        std::cout << "  after LTrackerTrack ctor: " << human_bytes(rss2) << " (delta: "
+                                  << human_bytes(rss2 - rss1) << ")\n";
+                    }
+
+                    // call simulator fill
+                    simu.tracks_no_print_hist(gen_tracks[i], ltt_local);
+                    size_t rss3 = get_process_rss_bytes();
+                    if ((j % RSS_PRINT_INTERVAL) == 0 || j == 0 || j == iteration_per_event - 1)
+                    {
+                        std::cout << "  after tracks_no_print_hist: " << human_bytes(rss3)
+                                  << " (delta: " << human_bytes(rss3 - rss2) << ")\n";
+                    }
+
+                    // compute + new_algo
+                    TStopwatch t;
+                    t.Start();
+                    ltt_local.computeTracklets();
+                    ltt_local.new_algo(radius[m]);
+                    t.Stop();
+                    size_t rss4 = get_process_rss_bytes();
+                    if ((j % RSS_PRINT_INTERVAL) == 0 || j == 0 || j == iteration_per_event - 1)
+                    {
+                        std::cout << "  after compute/new_algo: " << human_bytes(rss4)
+                                  << " (delta: " << human_bytes(rss4 - rss3) << ")\n";
+                    }
+
+                    // record stats (unchanged)
+                    r_time.push_back(t.RealTime());
+                    c_time.push_back(t.CpuTime());
+                    reco.push_back(stats::hmrt);
+                    reco_real.push_back(stats::hmrtar);
+                    reco_real3.push_back(stats::hmrtar3);
+                    reco_real2.push_back(stats::hmrtar2);
+                    gen_trk.push_back(stats::hmgthL012 + stats::hmgth2L);
+
+                    // end scope -> ltt_local destructor runs here
+                } // destructor runs now
+                size_t rss_after_destruct = get_process_rss_bytes();
+                if ((j % RSS_PRINT_INTERVAL) == 0 || j == 0 || j == iteration_per_event - 1)
+                {
+                    std::cout << "  after ltt_local destruct: " << human_bytes(rss_after_destruct) << '\n';
+                    int trimmed = malloc_trim(0);
+                    if (trimmed)
+                        std::cout << "    malloc_trim returned 1\n";
+                }
+            }
+
+            if (gDirectory)
+            {
+                std::cout << "gDirectory list size after j-loop:  " << gDirectory->GetList()->GetSize() << "\n";
+            }
+
+            // compute statistics (unchanged behavior from your original function)
+            double eff = mean(reco) / mean(gen_trk);
+            double eff_real = mean(reco_real) / mean(gen_trk);
+            double ineff_fake = eff - eff_real;
+            double eff3hit = mean(reco_real3) / mean(gen_trk);
+            double eff2hit = mean(reco_real2) / mean(gen_trk);
+            double err_reco = TMath::RMS(reco.begin(), reco.end()) / TMath::Sqrt(iteration_per_event);
+            double err_reco_real = TMath::RMS(reco_real.begin(), reco_real.end()) / TMath::Sqrt(iteration_per_event);
+            double err_gen_trk = TMath::RMS(gen_trk.begin(), gen_trk.end()) / TMath::Sqrt(iteration_per_event);
+            double err_eff = TMath::Sqrt(std::pow(err_reco / mean(gen_trk), 2) + std::pow((mean(reco) * err_gen_trk) / (std::pow(mean(gen_trk), 2)), 2));
+            double err_effreal = TMath::Sqrt(std::pow(err_reco_real / mean(gen_trk), 2) + std::pow((mean(reco_real) * err_gen_trk) / (std::pow(mean(gen_trk), 2)), 2));
+            double err_ineffake = TMath::Sqrt(std::pow(err_eff, 2) + std::pow(err_effreal, 2));
+
+            // write CSV
+            file << gen_tracks[i] << ","
+                 << radius[m] << ","
+                 << std::fixed << std::setprecision(3) << eff << ","
+                 << std::fixed << std::setprecision(3) << err_eff << ","
+                 << std::fixed << std::setprecision(3) << eff_real << ","
+                 << std::fixed << std::setprecision(3) << err_effreal << ","
+                 << std::fixed << std::setprecision(3) << ineff_fake << ","
+                 << std::fixed << std::setprecision(3) << err_ineffake << ","
+                 << std::fixed << std::setprecision(3) << mean(gen_trk) << ","
+                 << std::fixed << std::setprecision(3) << mean(reco) << ","
+                 << std::fixed << std::setprecision(3) << mean(reco_real) << ","
+                 << std::fixed << std::setprecision(6) << mean(r_time) << ","
+                 << std::fixed << std::setprecision(6) << mean(c_time) << ","
+                 << std::fixed << std::setprecision(3) << eff3hit << ","
+                 << std::fixed << std::setprecision(3) << eff2hit << "\n";
+
+            // after this radius iteration, vectors will destruct (free their heap) when going out of scope
+            // print RSS after finishing this radius to observe peak / drop
+            size_t rss_after_radius = get_process_rss_bytes();
+            cout << "RSS after finishing radius " << radius[m] << " : " << human_bytes(rss_after_radius) << endl;
+
+            // attempt a final malloc_trim
+            int final_trim = malloc_trim(0);
+            if (final_trim)
+                cout << " malloc_trim returned 1 after radius (freed pages)\n";
+
+        } // end radius loop
+
+        cout << endl;
+    }
+
+    file.close();
+    cout << "File CSV scritto correttamente in: " << path << "\n";
+
+    auto end_time = std::chrono::steady_clock::now();
+    double elapsed_s = std::chrono::duration<double>(end_time - start_time).count();
+    cout << "Total wall time: " << elapsed_s << " s\n";
+}

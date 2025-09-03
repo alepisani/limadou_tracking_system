@@ -2349,7 +2349,18 @@ CMakeFiles/sim_MC.dir/src/main.cpp.o: ../src/main.cpp \
   /usr/include/c++/11/thread \
   /usr/include/c++/11/bits/std_thread.h \
   /usr/include/c++/11/bits/this_thread_sleep.h \
-  /usr/local/root/include/TStopwatch.h
+  /usr/local/root/include/TStopwatch.h \
+  /usr/local/root/include/TH1.h \
+  /usr/local/root/include/TAxis.h \
+  /usr/local/root/include/TAttAxis.h \
+  /usr/local/root/include/TArrayC.h \
+  /usr/local/root/include/TArrayS.h \
+  /usr/local/root/include/TArrayF.h \
+  /usr/local/root/include/Foption.h \
+  /usr/local/root/include/ROOT/EExecutionPolicy.hxx \
+  /usr/local/root/include/TFitResultPtr.h \
+  /usr/include/c++/11/cfloat \
+  /usr/local/root/include/TROOT.h
 
 CMakeFiles/sim_MC.dir/src/simulations.cpp.o: ../src/simulations.cpp \
   /usr/include/stdc-predef.h \
@@ -2792,7 +2803,11 @@ CMakeFiles/sim_MC.dir/src/simulations.cpp.o: ../src/simulations.cpp \
   ../include/display.h \
   ../include/stats.h \
   ../include/LTrackerCluster.h \
-  ../include/simulations.h
+  ../include/simulations.h \
+  /usr/include/malloc.h \
+  /usr/local/root/include/TH1.h \
+  /usr/local/root/include/TROOT.h \
+  /usr/local/root/include/TDirectory.h
 
 CMakeFiles/sim_MC.dir/src/stats.cpp.o: ../src/stats.cpp \
   /usr/include/stdc-predef.h \
@@ -3398,6 +3413,8 @@ CMakeFiles/sim_MC.dir/src/stats.cpp.o: ../src/stats.cpp \
 
 /usr/include/x86_64-linux-gnu/bits/getopt_core.h:
 
+/usr/include/malloc.h:
+
 /usr/include/x86_64-linux-gnu/bits/confname.h:
 
 /usr/local/root/include/TBranchCacheInfo.h:
@@ -3861,6 +3878,8 @@ CMakeFiles/sim_MC.dir/src/stats.cpp.o: ../src/stats.cpp \
 /usr/include/c++/11/cerrno:
 
 /usr/include/errno.h:
+
+/usr/local/root/include/TROOT.h:
 
 /usr/local/root/include/TVectorDfwd.h:
 

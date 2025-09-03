@@ -26,18 +26,23 @@
 #include <cmath>
 #include <cstdint>
 #include <string>
-
-
-
-
-
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <iostream>
+#include <algorithm>
+#include <malloc.h>
+#include "TH1.h"        // for TH1::AddDirectory(false)
+#include "TROOT.h"      // declares gROOT
+#include "TDirectory.h" // declares gDirectory
 
 simulations::simulations()
 {
-    simulations::gen_tracks = {2, 4, 10, 30};
+    simulations::gen_tracks = {2,3,4,5,10,20};
     // radius = {6, 4, 2, 1.8, 1.6, 1.4, 1.2, 1., 0.8, 0.6, 0.4, 0.2, 0.1, 0.05};
     // simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
-    radius = {0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.23, 0.21, 0.19, 0.17, 0.15, 0.13, 0.11, 0.09, 0.07, 0.05, 0.03, 0.01, 0};
+    //radius = {0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.23, 0.21, 0.19, 0.17, 0.15, 0.13, 0.11, 0.09, 0.07, 0.05, 0.03, 0.01, 0};
+    radius = {0};
 
     // limite massimo dimensione del chip ~13.7
     // limite minimo dimensione singolo pixel ~0.029
@@ -230,6 +235,11 @@ void simulations::sim_old_algo(int iteration_per_event)
 
 void simulations::sim_trk_32L(int iteration_per_event)
 {
+    float pi = TMath::Pi();
+    float degtorad = TMath::DegToRad();
+    float nbins = (iteration_per_event * radius.size() * gen_tracks.size()) / 20 ;
+    TH1F *htheta = new TH1F("htheta", "theta;#theta;counts", nbins, - 0.1, 1.1 * pi/2);
+    TH1F *hphi = new TH1F("hphi", "phi;#phi;counts", nbins, -1.05 * pi, 1.05 * pi);
 
     auto start_time = std::chrono::steady_clock::now();
     display simu;
@@ -247,7 +257,6 @@ void simulations::sim_trk_32L(int iteration_per_event)
     reco_real2.reserve(iteration_per_event);
     gen_trk.reserve(iteration_per_event);
 
-
     std::string path = "../data/limadou_sim32L.csv";
     bool file_exists = std::filesystem::exists(path);
     std::ofstream file(path, std::ios::app);
@@ -256,7 +265,6 @@ void simulations::sim_trk_32L(int iteration_per_event)
     if (!file_exists)
     {
         file << "GenTrk, Raggio, Eff, err_e, Eff_real, err_er, fake_reco_trk, err_frt, GenTrk, RecoTrk, RecoReal, RealTime, CPUTime, eff3hit, eff2hit\n";
-        
     }
 
     for (int i = 0; i < gen_tracks.size(); ++i)
@@ -295,6 +303,13 @@ void simulations::sim_trk_32L(int iteration_per_event)
                 ltt.computeTracklets();
                 ltt.new_algo(radius[m]);
                 t.Stop();
+
+                ltt.remap_angles(ltt.tracks);
+                for (int j = 0; j < ltt.tracks.size(); ++j)
+                {
+                    htheta->Fill(ltt.tracks[j].theta);
+                    hphi->Fill(ltt.tracks[j].phi);
+                }
 
                 r_time.push_back(t.RealTime());
                 c_time.push_back(t.CpuTime());
@@ -345,12 +360,10 @@ void simulations::sim_trk_32L(int iteration_per_event)
     file.close();
     std::cout << "File CSV scritto correttamente in: " << path << "\n";
 
-    // char fil[200];
-    // sprintf(fil, "../data/stats_new_algo_reco.root");
-    // TFile f(fil, "RECREATE");
-    // htheta->Write();
-    // hphi->Write();
-    // f.Close();
+    char fil[200];
+    sprintf(fil, "../data/angle_reco.root");
+    TFile f(fil, "RECREATE");
+    htheta->Write();
+    hphi->Write();
+    f.Close();
 }
-
-

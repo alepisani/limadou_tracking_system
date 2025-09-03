@@ -110,6 +110,7 @@ public:
   bool track_hit_TR(double, double, double, double);
   void printRecoTracks_old_alg(TCanvas *reco, int);
   void printRecoTracks_new_alg(TCanvas *reco);
+  void remap_angles(std::vector<LTrackCandidate> &tracks);
   friend std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker);
 
   // clusters separated by layer

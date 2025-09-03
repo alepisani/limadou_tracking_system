@@ -578,7 +578,8 @@ void LTrackerTrack::computeTrackCandidates()
 void LTrackerTrack::new_algo(double radius)
 {
   chi2_cut = 5;
-  double degtorad = TMath::DegToRad();
+  float degtorad = TMath::DegToRad();
+  float pi = TMath::Pi();
   int candidateCounter = 0;
   std::vector<LCluster> clus_vec;
   clus_vec.reserve(3);
@@ -622,7 +623,7 @@ void LTrackerTrack::new_algo(double radius)
         double phi = trkCand.phi;
 
         // check if recotrk passa dai trigger
-        if (t.track_hit_TR((double)trkCand.x0, (double)trkCand.y0, theta, phi) && trkCand.chi2 < chi2_cut)
+        if (t.track_hit_TR((double)trkCand.x0, (double)trkCand.y0, theta, phi) && trkCand.chi2 < chi2_cut )
         {
           track_candidates.push_back(trkCand);
           if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id)
@@ -675,33 +676,40 @@ bool LTrackerTrack::track_hit_TR(double x1, double y1, double theta, double phi)
   double yTR1b = y1 - (display::StaveZ[1] + display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
   double xTR1t = x1 - (display::StaveZ[1] - display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
   double yTR1t = y1 - (display::StaveZ[1] - display::TR1Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
+
   double xTR2b = x1 + (-display::StaveZ[1] + display::TR2CenterZ - display::TR2Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
   double yTR2b = y1 + (-display::StaveZ[1] + display::TR2CenterZ - display::TR2Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
   double xTR2t = x1 + (-display::StaveZ[1] + display::TR2CenterZ + display::TR2Thickness / 2) * TMath::Tan(theta) * TMath::Cos(phi);
   double yTR2t = y1 + (-display::StaveZ[1] + display::TR2CenterZ + display::TR2Thickness / 2) * TMath::Tan(theta) * TMath::Sin(phi);
 
-  if ((xTR1b < display::TR1Size[0] / 2 && xTR1b > -display::TR1Size[0] / 2 &&
-       ((yTR1b < (2.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1b > (1.5 * display::TR1Size[1] + 2 * display::TR1GapY)) ||
-        (yTR1b < (1.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1b > (0.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
-        (yTR1b < (0.5 * display::TR1Size[1] + 0 * display::TR1GapY) && yTR1b > -(0.5 * display::TR1Size[1] + 0 * display::TR1GapY)) ||
-        (yTR1b < -(0.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1b > -(1.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
-        (yTR1b < -(1.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1b > -(2.5 * display::TR1Size[1] + 2 * display::display::TR1GapY))) &&
+  if (
+      // --- Bottom face ---
+      ((xTR1b < display::TR1Size[0] / 2 && xTR1b > -display::TR1Size[0] / 2 &&
+        ((yTR1b < (2.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1b > (1.5 * display::TR1Size[1] + 2 * display::TR1GapY)) ||
+         (yTR1b < (1.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1b > (0.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
+         (yTR1b < (0.5 * display::TR1Size[1] + 0 * display::TR1GapY) && yTR1b > -(0.5 * display::TR1Size[1] + 0 * display::TR1GapY)) ||
+         (yTR1b < -(0.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1b > -(1.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
+         (yTR1b < -(1.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1b > -(2.5 * display::TR1Size[1] + 2 * display::TR1GapY))))
+       &&
        (yTR2b < display::TR2Size[1] / 2 && yTR2b > -display::TR2Size[1] / 2 &&
-            (xTR2b < (2 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2b > (1 * display::TR2Size[0] + 1.5 * display::TR2GapX)) ||
-        (xTR2b < (1 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2b > (0 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
-        (xTR2b < -(0 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2b > -(1 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
-        (xTR2b < -(1 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2b > -(2 * display::TR2Size[0] + 1.5 * display::display::TR2GapX)))) ||
+        ((xTR2b < (2 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2b > (1 * display::TR2Size[0] + 1.5 * display::TR2GapX)) ||
+         (xTR2b < (1 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2b > (0 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
+         (xTR2b < -(0 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2b > -(1 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
+         (xTR2b < -(1 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2b > -(2 * display::TR2Size[0] + 1.5 * display::TR2GapX)))))
+      ||
+      // --- Top face ---
       ((xTR1t < display::TR1Size[0] / 2 && xTR1t > -display::TR1Size[0] / 2 &&
         ((yTR1t < (2.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1t > (1.5 * display::TR1Size[1] + 2 * display::TR1GapY)) ||
          (yTR1t < (1.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1t > (0.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
          (yTR1t < (0.5 * display::TR1Size[1] + 0 * display::TR1GapY) && yTR1t > -(0.5 * display::TR1Size[1] + 0 * display::TR1GapY)) ||
          (yTR1t < -(0.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1t > -(1.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
-         (yTR1t < -(1.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1t > -(2.5 * display::TR1Size[1] + 2 * display::display::TR1GapY))) &&
-        (yTR2t < display::TR2Size[1] / 2 && yTR2t > -display::TR2Size[1] / 2 &&
-             (xTR2t < (2 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2t > (1 * display::TR2Size[0] + 1.5 * display::TR2GapX)) ||
+         (yTR1t < -(1.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1t > -(2.5 * display::TR1Size[1] + 2 * display::TR1GapY))))
+       &&
+       (yTR2t < display::TR2Size[1] / 2 && yTR2t > -display::TR2Size[1] / 2 &&
+        ((xTR2t < (2 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2t > (1 * display::TR2Size[0] + 1.5 * display::TR2GapX)) ||
          (xTR2t < (1 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2t > (0 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
          (xTR2t < -(0 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2t > -(1 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
-         (xTR2t < -(1 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2t > -(2 * display::TR2Size[0] + 1.5 * display::display::TR2GapX))))))
+         (xTR2t < -(1 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2t > -(2 * display::TR2Size[0] + 1.5 * display::TR2GapX))))))
   {
     return true;
   }

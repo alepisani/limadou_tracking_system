@@ -49,7 +49,7 @@ void run(int *events){
     t.Start();
     tracker.computeTracklets();
     //tracker.computeTrackCandidates();
-    tracker.new_algo(0.2);
+    tracker.new_algo(0.15);
     t.Stop();
 
     tracker.printRecoTracks_new_alg(real_tracks);
@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
 
     //track simulation
     int *events;
-    int ev = 50;
+    int ev = 100;
     events = &ev; 
     run(events);
 

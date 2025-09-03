@@ -97,6 +97,7 @@ std::ostream &operator<<(std::ostream &output, const stats &s) {
     output << "how many fake hit: " << stats::fakehit << endl;
     output << "how many reco tracks: " << stats::hmrt << endl;
     output << "how many reco tracks are real: " << stats::hmrtar << endl;
+    output << "how many tracks i should be able to reco: " << stats::hmgthL012 + stats::hmgth2L << endl;
     output << "how many reco tracks are real (hitted 3 layer): " << stats::hmrtar3 << endl;
     output << "how many reco tracks are real (hitted 2 layer): " << stats::hmrtar2 << endl;
     output << "how many cluster (beam test) on layer 2: " << stats::hmthL2 << endl;

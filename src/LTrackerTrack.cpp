@@ -655,7 +655,7 @@ void LTrackerTrack::new_algo(double radius)
   for (int i = 0; i < tracks.size(); i++)
   {
     tracks[i].id = i;
-    cout << tracks[i].chi2 << endl;
+    //cout << tracks[i].chi2 << endl;
   }
 
   stats::hmrt = tracks.size();

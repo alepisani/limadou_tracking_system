@@ -163,8 +163,8 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
      * you can set the seed for reproducibility
      */
 
-    TRandom3 *rnd = new TRandom3(0);
-    // TRandom3 *rnd = new TRandom3(3456);       //con 50ev non taglia su TR1 TR2
+    //TRandom3 *rnd = new TRandom3(0);
+    TRandom3 *rnd = new TRandom3(43278);  
 
     if (allTheta.empty() || allPhi.empty() || all_cls_size.empty())
     {

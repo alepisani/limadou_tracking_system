@@ -163,13 +163,15 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
     //min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -pi, 4 * pi);
     //min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -2 * pi, 2 * pi);
     //test
-    min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -pi/2, pi);
-    min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -2*pi, 2*pi);
+    //constraint on theta > 0 since this could be the problem of the odd phi distibution: 
+    // cos and sin phi are periodic for each pi, if i let a dof in phi could be absorbed by theta negative values
+    min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -0.2, 1.2 * pi/2);
+    min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -1.2 * pi, 1.2 * pi);
     min->Minimize();
     return {min->X(), min->Errors(), min->MinValue()};
   };
 
-  double vars[4] = {0.0, 0.0, 0.0, 0.0};
+  double vars[4] = {0.0, 0.0, pi/4, 0.0};
   double step_coarse[4] = {0.01, 0.01, 0.01, 0.01};
   double step_fine[4] = {0.001, 0.001, 0.001, 0.001};
 
@@ -198,110 +200,6 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
 }
 
 
-// static or free function version
-double LTrackerTrack::fct_slope(const std::vector<LCluster> &clusters, const double *par)
-{
-  const double x0 = par[0];
-  const double y0 = par[1];
-  const double sx = par[2]; // dx/dz
-  const double sy = par[3]; // dy/dz
-
-  double chi2 = 0.0;
-  for (size_t i = 0; i < clusters.size(); ++i)
-  {
-    double dz = clusters[i].z - display::z_origin_shift;
-    double x_fit = x0 + dz * sx;
-    double y_fit = y0 + dz * sy;
-    double dx = (clusters[i].x - x_fit);
-    double dy = (clusters[i].y - y_fit);
-
-    // protect against zero errors:
-    double ex = (clusters[i].errx > 0 ? clusters[i].errx : 1.0);
-    double ey = (clusters[i].erry > 0 ? clusters[i].erry : 1.0);
-
-    chi2 += (dx * dx) / (ex * ex) + (dy * dy) / (ey * ey);
-  }
-  return chi2;
-}
-
-void LTrackerTrack::fitStraightLine_slope(const std::vector<LCluster> &clusters, LTrackCandidate &trkCand)
-{
-    if (clusters.size() < 2) return; // need >=2 to form slope
-
-    // initial guesses from first and last cluster
-    const auto &c0 = clusters.front();
-    const auto &cN = clusters.back();
-    double dz_total = cN.z - c0.z;
-    double init_sx = (dz_total != 0.0) ? (cN.x - c0.x) / dz_total : 0.0;
-    double init_sy = (dz_total != 0.0) ? (cN.y - c0.y) / dz_total : 0.0;
-    double vars[4] = { c0.x, c0.y, init_sx, init_sy };
-    double step_coarse[4] = {0.01, 0.01, 0.001, 0.001};
-
-    auto minimize = [&](double *initialVars, double *steps) {
-        std::unique_ptr<ROOT::Math::Minimizer> min(
-            ROOT::Math::Factory::CreateMinimizer("Minuit2",""));
-        min->SetMaxFunctionCalls(1000000);
-        min->SetMaxIterations(10000);
-        min->SetTolerance(0.01);
-        min->SetPrintLevel(0);
-
-        // bind clusters into a callable
-        std::function<double(const double*)> boundFct =
-            [&](const double *p){ return fct_slope(clusters, p); };
-
-        ROOT::Math::Functor f(boundFct, 4);
-        min->SetFunction(f);
-
-        min->SetVariable(0, "x0", initialVars[0], steps[0]);
-        min->SetVariable(1, "y0", initialVars[1], steps[1]);
-        min->SetVariable(2, "sx", initialVars[2], steps[2]);
-        min->SetVariable(3, "sy", initialVars[3], steps[3]);
-
-        min->Minimize();
-
-        const double *par = min->X();
-        const double *err = min->Errors();
-        double chi2 = min->MinValue();
-        return std::tuple<const double*, const double*, double>(par, err, chi2);
-    };
-
-    const double *params, *errors;
-    double chi2;
-    std::tie(params, errors, chi2) = minimize(vars, step_coarse);
-
-    // Convert slopes to (theta, phi)
-    double sx = params[2], sy = params[3];
-    double r = std::sqrt(sx*sx + sy*sy);       // = tan(theta)
-    double theta = std::atan(r);
-    double phi   = std::atan2(sy, sx);
-
-    // approximate error propagation (neglecting covariance)
-    double esx = errors[2], esy = errors[3];
-    double dtheta_dsx = (r > 0.0) ? (sx / (r * (1.0 + r*r))) : 0.0;
-    double dtheta_dsy = (r > 0.0) ? (sy / (r * (1.0 + r*r))) : 0.0;
-    double var_theta = dtheta_dsx*dtheta_dsx * esx*esx + dtheta_dsy*dtheta_dsy * esy*esy;
-    double err_theta = std::sqrt(std::max(0.0, var_theta));
-
-    double denom = (sx*sx + sy*sy);
-    double dphi_dsx = (denom > 0.0) ? (-sy / denom) : 0.0;
-    double dphi_dsy = (denom > 0.0) ? ( sx / denom) : 0.0;
-    double var_phi = dphi_dsx*dphi_dsx * esx*esx + dphi_dsy*dphi_dsy * esy*esy;
-    double err_phi = std::sqrt(std::max(0.0, var_phi));
-
-    // fill track candidate
-    trkCand.x0 = params[0];
-    trkCand.y0 = params[1];
-    trkCand.z0 = display::z_origin_shift;
-    trkCand.err_x0 = errors[0];
-    trkCand.err_y0 = errors[1];
-    trkCand.err_theta = err_theta;
-    trkCand.err_phi = err_phi;
-    trkCand.chi2 = chi2;
-    trkCand.theta = theta;
-    trkCand.phi = phi;
-}
-
-
 /**
  * the fit function uses a wider range for the definition intervals for the angles paramenter.
  * that is because we're trying to minimaze a periodical variable and don't want to end up at the edge.
@@ -320,11 +218,15 @@ void LTrackerTrack::remap_angles(std::vector<LTrackCandidate> &tracks)
   {
 
     // remap theta
-    if (tracks[j].theta <= 0.)
+    if (tracks[j].theta <= 0.){
       tracks[j].theta *= -1;
-    if (tracks[j].theta > pi / 2)
+      tracks[j].phi *= -1;
+    }
+      
+    if (tracks[j].theta > pi / 2){
       tracks[j].theta -= pi / 2;
-
+    }
+    
     // remap phi
     if (tracks[j].phi < -pi)
       tracks[j].phi += 2 * pi;
@@ -712,7 +614,6 @@ void LTrackerTrack::new_algo(double radius)
         clus_vec.assign({clus_0, clus_1, clus_2});
 
         fitStraightLine(clus_vec, trkCand);
-        //fitStraightLine_slope(clus_vec, trkCand);
 
         trkCand.id = candidateCounter++;
         trkCand.n_clus = clus_vec.size();
@@ -757,7 +658,7 @@ void LTrackerTrack::new_algo(double radius)
   for (int i = 0; i < tracks.size(); i++)
   {
     tracks[i].id = i;
-    //cout << tracks[i].chi2 << endl;
+    //printf("chi2: %f\n", tracks[i].chi2);
   }
 
   stats::hmrt = tracks.size();

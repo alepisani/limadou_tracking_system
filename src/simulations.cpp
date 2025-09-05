@@ -38,8 +38,9 @@
 
 simulations::simulations()
 {
-    simulations::gen_tracks = {2, 5, 10, 50};
-    radius = {6, 4, 2, 1.4, 1., 0.4, 0.05};
+    // radius in mm
+    simulations::gen_tracks = {2, 5, 10, 20};
+    radius = {2, 1.5, 1.3, 1.1, 1., 0.8, 0.6, 0.4, 0.2, 0.1, 0.05};
     //simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
     //radius = {1, 0.9, 0.8, 0.7, 0.65, 0.6, 0.55, 0.5, 0.47, 0.45, 0.43, 0.4, 0.37, 0.35, 0.33, 0.3, 0.27, 0.25, 0.23, 0.2, 0.15, 0.1, 0.05, 0.01, 0};
 
@@ -250,7 +251,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
 
     simu.take_distributions();
 
-    std::vector<double> r_time, c_time, reco, reco_real, gen_trk, reco_real3, reco_real2;
+    std::vector<double> r_time, c_time, reco, reco_real, gen_trk, reco_real3, reco_real2, fake3, fake2;
     r_time.reserve(iteration_per_event);
     c_time.reserve(iteration_per_event);
     reco.reserve(iteration_per_event);
@@ -258,6 +259,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
     reco_real3.reserve(iteration_per_event);
     reco_real2.reserve(iteration_per_event);
     gen_trk.reserve(iteration_per_event);
+    fake3.reserve(iteration_per_event);
+    fake2.reserve(iteration_per_event);
 
     std::string path = "../data/limadou_sim32L.csv";
     bool file_exists = std::filesystem::exists(path);
@@ -266,7 +269,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
     // Scrivi intestazione solo se il file non esisteva prima
     if (!file_exists)
     {
-        file << "GenTrk, Raggio, Eff, err_e, Eff_real, err_er, fake_reco_trk, err_frt, GenTrk, RecoTrk, RecoReal, RealTime, CPUTime, eff3hit, eff2hit\n";
+        file << "GenTrk, Raggio, Eff, err_e, Eff_real, err_er, fake_reco_trk, err_frt, GenTrk, RecoTrk, RecoReal, RealTime, CPUTime, eff3hit, eff2hit, fake3, fake2\n";
     }
 
     for (int i = 0; i < gen_tracks.size(); ++i)
@@ -279,6 +282,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
         reco_real.clear();
         reco_real3.clear();
         reco_real2.clear();
+        fake2.clear();
+        fake3.clear();
 
         for (int m = 0; m < radius.size(); ++m)
         {
@@ -291,6 +296,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
             reco_real.clear();
             reco_real3.clear();
             reco_real2.clear();
+            fake2.clear();
+            fake3.clear();
             stats.reset();
             ltt.Reset();
 
@@ -320,6 +327,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
                 reco_real3.push_back(stats::hmrtar3);
                 reco_real2.push_back(stats::hmrtar2);
                 gen_trk.push_back(stats::hmgthL012 + stats::hmgth2L);
+                fake3.push_back(stats::hmrtaf3);
+                fake2.push_back(stats::hmrtaf2);
 
                 printProgressBarWithETA(j + 1, iteration_per_event, start_time);
             }
@@ -330,6 +339,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
             double ineff_fake = eff - eff_real;
             double eff3hit = mean(reco_real3) / mean(gen_trk);
             double eff2hit = mean(reco_real2) / mean(gen_trk);
+            double ineff_fake3 = mean(fake3) / mean(gen_trk);
+            double ineff_fake2 = mean(fake2) / mean(gen_trk);
             double err_reco = TMath::RMS(reco.begin(), reco.end()) / TMath::Sqrt(iteration_per_event);
             double err_reco_real = TMath::RMS(reco_real.begin(), reco_real.end()) / TMath::Sqrt(iteration_per_event);
             double err_gen_trk = TMath::RMS(gen_trk.begin(), gen_trk.end()) / TMath::Sqrt(iteration_per_event);
@@ -353,7 +364,9 @@ void simulations::sim_trk_32L(int iteration_per_event)
                  << std::fixed << std::setprecision(6) << mean(r_time) << ","
                  << std::fixed << std::setprecision(6) << mean(c_time) << ","
                  << std::fixed << std::setprecision(6) << eff3hit << ","
-                 << std::fixed << std::setprecision(6) << eff2hit << "\n";
+                 << std::fixed << std::setprecision(6) << eff2hit << ","
+                 << std::fixed << std::setprecision(6) << ineff_fake3 << ","
+                 << std::fixed << std::setprecision(6) << ineff_fake2 << "\n";
         }
 
         std::cout << std::endl;

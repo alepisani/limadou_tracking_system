@@ -23,17 +23,17 @@ LTrackerTrack::LTrackerTrack() {}
 
 void LTrackerTrack::Reset()
 {
-    std::unordered_map<int, LCluster>().swap(tidy_clusters_lay0);
-    std::unordered_map<int, LCluster>().swap(tidy_clusters_lay1);
-    std::unordered_map<int, LCluster>().swap(tidy_clusters_lay2);
-    std::vector<LTracklet>().swap(tracklet_lay01);
-    std::vector<LTracklet>().swap(tracklet_lay12);
-    std::vector<LTracklet>().swap(tracklet_lay02);
-    std::vector<LTrackCandidate>().swap(track_candidates);
-    std::vector<LTrackCandidate>().swap(tracks);
-    std::vector<int>().swap(used_clusters_lay0);
-    std::vector<int>().swap(used_clusters_lay1);
-    std::vector<int>().swap(used_clusters_lay2);
+  std::unordered_map<int, LCluster>().swap(tidy_clusters_lay0);
+  std::unordered_map<int, LCluster>().swap(tidy_clusters_lay1);
+  std::unordered_map<int, LCluster>().swap(tidy_clusters_lay2);
+  std::vector<LTracklet>().swap(tracklet_lay01);
+  std::vector<LTracklet>().swap(tracklet_lay12);
+  std::vector<LTracklet>().swap(tracklet_lay02);
+  std::vector<LTrackCandidate>().swap(track_candidates);
+  std::vector<LTrackCandidate>().swap(tracks);
+  std::vector<int>().swap(used_clusters_lay0);
+  std::vector<int>().swap(used_clusters_lay1);
+  std::vector<int>().swap(used_clusters_lay2);
 }
 
 void LCluster::fill_cluster(LCluster &cl, double x, double y, double z, double errx, double erry, double errz, int id)
@@ -104,6 +104,7 @@ void LTrackerTrack::print_tracklet(const LCluster cl_0, const LCluster cl_2)
   trk->Draw();
 }
 
+
 // Distance function to be minimised
 double LTrackerTrack::fct(const std::vector<LCluster> &clusters, const double *par)
 {
@@ -149,12 +150,11 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
     min->SetVariable(0, "x0", initialVars[0], steps[0]);
     min->SetVariable(1, "y0", initialVars[1], steps[1]);
 
-    /**
-     * we're using a wider range because we are trying to optimise a circular function. 
-     * maybe the function goes to one end but the optimal fit value could be just on the edge of the other end.
-     * the real theta distribution is between (0,pi/2), now is (-pi/2, pi);
-     * the real  phi distribution is between (-pi,+pi), now is (-2pi, 2pi);
-    */
+    // we're using a wider range because we are trying to optimise a circular function.
+    // maybe the function goes to one end but the optimal fit value could be just on the edge of the other end.
+    // the real theta distribution is between (0,pi/2), now is (-pi/2, pi);
+    // the real  phi distribution is between (-pi,+pi), now is (-2pi, 2pi);
+
 
     //what real intervals should look like
     //min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0, pi/2);
@@ -165,12 +165,7 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
     //test
     min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -pi/2, pi);
     min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -2*pi, 2*pi);
-    
-    
-  
     min->Minimize();
-
-    
     return {min->X(), min->Errors(), min->MinValue()};
   };
 
@@ -182,7 +177,7 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
   double chi2;
   std::tie(params, errors, chi2) = minimize(vars, step_coarse, "coarse");
 
-  if (chi2 <= 100.0)
+  if (chi2 <= 30.0)
   {
     double refined_vars[4] = {params[0], params[1], params[2], params[3]};
     std::tie(params, errors, chi2) = minimize(refined_vars, step_fine, "fine");
@@ -196,17 +191,118 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
   trkCand.err_theta = errors[2];
   trkCand.err_phi = errors[3];
   trkCand.chi2 = chi2;
-  //trkCand.err_theta = errors[2] * 180 / TMath::Pi();
-  //trkCand.err_phi = errors[3] * 180 / TMath::Pi();
 
   trkCand.theta = params[2];
   trkCand.phi = params[3];
-  //trkCand.theta = params[2] * 180 / TMath::Pi();
-  //trkCand.phi = params[3] * 180 / TMath::Pi();
+
 }
 
 
-/** 
+// static or free function version
+double LTrackerTrack::fct_slope(const std::vector<LCluster> &clusters, const double *par)
+{
+  const double x0 = par[0];
+  const double y0 = par[1];
+  const double sx = par[2]; // dx/dz
+  const double sy = par[3]; // dy/dz
+
+  double chi2 = 0.0;
+  for (size_t i = 0; i < clusters.size(); ++i)
+  {
+    double dz = clusters[i].z - display::z_origin_shift;
+    double x_fit = x0 + dz * sx;
+    double y_fit = y0 + dz * sy;
+    double dx = (clusters[i].x - x_fit);
+    double dy = (clusters[i].y - y_fit);
+
+    // protect against zero errors:
+    double ex = (clusters[i].errx > 0 ? clusters[i].errx : 1.0);
+    double ey = (clusters[i].erry > 0 ? clusters[i].erry : 1.0);
+
+    chi2 += (dx * dx) / (ex * ex) + (dy * dy) / (ey * ey);
+  }
+  return chi2;
+}
+
+void LTrackerTrack::fitStraightLine_slope(const std::vector<LCluster> &clusters, LTrackCandidate &trkCand)
+{
+    if (clusters.size() < 2) return; // need >=2 to form slope
+
+    // initial guesses from first and last cluster
+    const auto &c0 = clusters.front();
+    const auto &cN = clusters.back();
+    double dz_total = cN.z - c0.z;
+    double init_sx = (dz_total != 0.0) ? (cN.x - c0.x) / dz_total : 0.0;
+    double init_sy = (dz_total != 0.0) ? (cN.y - c0.y) / dz_total : 0.0;
+    double vars[4] = { c0.x, c0.y, init_sx, init_sy };
+    double step_coarse[4] = {0.01, 0.01, 0.001, 0.001};
+
+    auto minimize = [&](double *initialVars, double *steps) {
+        std::unique_ptr<ROOT::Math::Minimizer> min(
+            ROOT::Math::Factory::CreateMinimizer("Minuit2",""));
+        min->SetMaxFunctionCalls(1000000);
+        min->SetMaxIterations(10000);
+        min->SetTolerance(0.01);
+        min->SetPrintLevel(0);
+
+        // bind clusters into a callable
+        std::function<double(const double*)> boundFct =
+            [&](const double *p){ return fct_slope(clusters, p); };
+
+        ROOT::Math::Functor f(boundFct, 4);
+        min->SetFunction(f);
+
+        min->SetVariable(0, "x0", initialVars[0], steps[0]);
+        min->SetVariable(1, "y0", initialVars[1], steps[1]);
+        min->SetVariable(2, "sx", initialVars[2], steps[2]);
+        min->SetVariable(3, "sy", initialVars[3], steps[3]);
+
+        min->Minimize();
+
+        const double *par = min->X();
+        const double *err = min->Errors();
+        double chi2 = min->MinValue();
+        return std::tuple<const double*, const double*, double>(par, err, chi2);
+    };
+
+    const double *params, *errors;
+    double chi2;
+    std::tie(params, errors, chi2) = minimize(vars, step_coarse);
+
+    // Convert slopes to (theta, phi)
+    double sx = params[2], sy = params[3];
+    double r = std::sqrt(sx*sx + sy*sy);       // = tan(theta)
+    double theta = std::atan(r);
+    double phi   = std::atan2(sy, sx);
+
+    // approximate error propagation (neglecting covariance)
+    double esx = errors[2], esy = errors[3];
+    double dtheta_dsx = (r > 0.0) ? (sx / (r * (1.0 + r*r))) : 0.0;
+    double dtheta_dsy = (r > 0.0) ? (sy / (r * (1.0 + r*r))) : 0.0;
+    double var_theta = dtheta_dsx*dtheta_dsx * esx*esx + dtheta_dsy*dtheta_dsy * esy*esy;
+    double err_theta = std::sqrt(std::max(0.0, var_theta));
+
+    double denom = (sx*sx + sy*sy);
+    double dphi_dsx = (denom > 0.0) ? (-sy / denom) : 0.0;
+    double dphi_dsy = (denom > 0.0) ? ( sx / denom) : 0.0;
+    double var_phi = dphi_dsx*dphi_dsx * esx*esx + dphi_dsy*dphi_dsy * esy*esy;
+    double err_phi = std::sqrt(std::max(0.0, var_phi));
+
+    // fill track candidate
+    trkCand.x0 = params[0];
+    trkCand.y0 = params[1];
+    trkCand.z0 = display::z_origin_shift;
+    trkCand.err_x0 = errors[0];
+    trkCand.err_y0 = errors[1];
+    trkCand.err_theta = err_theta;
+    trkCand.err_phi = err_phi;
+    trkCand.chi2 = chi2;
+    trkCand.theta = theta;
+    trkCand.phi = phi;
+}
+
+
+/**
  * the fit function uses a wider range for the definition intervals for the angles paramenter.
  * that is because we're trying to minimaze a periodical variable and don't want to end up at the edge.
  * that's why we need to remap the right angles valus to take the physical values we're intrested in.
@@ -215,27 +311,27 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
  *        phi: (-2pi, 2pi) while should be (-pi,+pi)
  */
 
-void LTrackerTrack::remap_angles(std::vector<LTrackCandidate> &tracks){
+void LTrackerTrack::remap_angles(std::vector<LTrackCandidate> &tracks)
+{
 
   float pi = TMath::Pi();
-  float degtorad = TMath::DegToRad();
 
-  for(int j = 0; j < tracks.size(); ++j){
-    //angles comes out in degrees --> change it to rad
+  for (int j = 0; j < tracks.size(); ++j)
+  {
 
-    //remap theta
-    if(tracks[j].theta <= 0.) tracks[j].theta *= -1;
-    if(tracks[j].theta > pi/2) tracks[j].theta -= pi/2;
+    // remap theta
+    if (tracks[j].theta <= 0.)
+      tracks[j].theta *= -1;
+    if (tracks[j].theta > pi / 2)
+      tracks[j].theta -= pi / 2;
 
-    //remap phi
-    if(tracks[j].phi < -pi) tracks[j].phi += 2*pi;
-    if(tracks[j].phi > pi) tracks[j].phi -= 2*pi;
-
-
+    // remap phi
+    if (tracks[j].phi < -pi)
+      tracks[j].phi += 2 * pi;
+    if (tracks[j].phi > pi)
+      tracks[j].phi -= 2 * pi;
   }
-
 }
-
 
 // Add unused tracklets to without used clusters to final tracks (chi2 = 1 by definition)
 void LTrackerTrack::addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer)
@@ -273,8 +369,8 @@ void LTrackerTrack::addSpuriousTracks(std::vector<int> &used_tracklets, std::vec
     spurious.clus_id.push_back(first_cluster.id);
     spurious.clus_id.push_back(second_cluster.id);
     spurious.tracklet_id.push_back(trkl.id);
-    //spurious.theta = TMath::ATan(tan_theta) * 180 / TMath::Pi();
-    //spurious.phi = TMath::ACos(cos_phi) * 180 / TMath::Pi();
+    // spurious.theta = TMath::ATan(tan_theta) * 180 / TMath::Pi();
+    // spurious.phi = TMath::ACos(cos_phi) * 180 / TMath::Pi();
     spurious.theta = TMath::ATan(tan_theta);
     spurious.phi = TMath::ACos(cos_phi);
     if (delta_y < 0)
@@ -331,8 +427,8 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.clus_id.push_back(cls_lay0.id);
     spurious.clus_id.push_back(cls_lay1.id);
     spurious.tracklet_id.push_back(trkl01.id);
-    //spurious.theta = theta * 180 / TMath::Pi();
-    //spurious.phi = phi * 180 / TMath::Pi();
+    // spurious.theta = theta * 180 / TMath::Pi();
+    // spurious.phi = phi * 180 / TMath::Pi();
     spurious.theta = theta;
     spurious.phi = phi;
     spurious.err_x0 = -1.;
@@ -354,6 +450,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
         stats::hmrtar++;
         stats::hmrtar2++;
       }
+      else stats::hmrtaf2++;
       stats::hmrt++;
       // cout << "010101010100101" << endl;
       tracks.push_back(spurious);
@@ -396,8 +493,8 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.clus_id.push_back(cls_lay1.id);
     spurious.clus_id.push_back(cls_lay2.id);
     spurious.tracklet_id.push_back(trkl12.id);
-    //spurious.theta = theta * 180 / TMath::Pi();
-    //spurious.phi = phi * 180 / TMath::Pi();
+    // spurious.theta = theta * 180 / TMath::Pi();
+    // spurious.phi = phi * 180 / TMath::Pi();
     spurious.theta = theta;
     spurious.phi = phi;
     spurious.err_x0 = -1.;
@@ -416,6 +513,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
         stats::hmrtar++;
         stats::hmrtar2++;
       }
+      else stats::hmrtaf2++;
       stats::hmrt++;
       // cout << "212121212121221122121" << endl;
       tracks.push_back(spurious);
@@ -458,8 +556,8 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.clus_id.push_back(cls_lay0.id);
     spurious.clus_id.push_back(cls_lay2.id);
     spurious.tracklet_id.push_back(trkl02.id);
-    //spurious.theta = theta * 180 / TMath::Pi();
-    //spurious.phi = phi * 180 / TMath::Pi();
+    // spurious.theta = theta * 180 / TMath::Pi();
+    // spurious.phi = phi * 180 / TMath::Pi();
     spurious.theta = theta;
     spurious.phi = phi;
     spurious.err_x0 = -1.;
@@ -478,6 +576,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
         stats::hmrtar++;
         stats::hmrtar2++;
       }
+      else stats::hmrtaf2++;
       stats::hmrt++;
       // cout << "020202020200202" << endl;
       tracks.push_back(spurious);
@@ -516,6 +615,7 @@ void LTrackerTrack::computeTrackCandidates()
         {
           stats::hmrtar++;
         }
+        else stats::hmrtaf3++;
 
         // compute residuals
         for (auto &clus : clus_vec)
@@ -577,7 +677,7 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackerTrack::new_algo(double radius)
 {
-  chi2_cut = 5;
+  chi2_cut = 50;
   float degtorad = TMath::DegToRad();
   float pi = TMath::Pi();
   int candidateCounter = 0;
@@ -612,18 +712,19 @@ void LTrackerTrack::new_algo(double radius)
         clus_vec.assign({clus_0, clus_1, clus_2});
 
         fitStraightLine(clus_vec, trkCand);
+        //fitStraightLine_slope(clus_vec, trkCand);
 
         trkCand.id = candidateCounter++;
         trkCand.n_clus = clus_vec.size();
         trkCand.tracklet_id = {trkl02.id};
         trkCand.clus_id = {trkl02.firstClusterId, clus_1.id, trkl02.secondClusterId};
-        //double theta = trkCand.theta * degtorad;
-        //double phi = trkCand.phi * degtorad;
+        // double theta = trkCand.theta * degtorad;
+        // double phi = trkCand.phi * degtorad;
         double theta = trkCand.theta;
         double phi = trkCand.phi;
 
         // check if recotrk passa dai trigger
-        if (t.track_hit_TR((double)trkCand.x0, (double)trkCand.y0, theta, phi) && trkCand.chi2 < chi2_cut )
+        if (t.track_hit_TR((double)trkCand.x0, (double)trkCand.y0, theta, phi) && trkCand.chi2 < chi2_cut)
         {
           track_candidates.push_back(trkCand);
           if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id)
@@ -631,6 +732,7 @@ void LTrackerTrack::new_algo(double radius)
             stats::hmrtar++;
             stats::hmrtar3++;
           }
+          else stats::hmrtaf3++;
         }
       }
     }
@@ -659,7 +761,6 @@ void LTrackerTrack::new_algo(double radius)
   }
 
   stats::hmrt = tracks.size();
-
 }
 
 bool LTrackerTrack::track_hit_TR(double x1, double y1, double theta, double phi)
@@ -689,22 +790,19 @@ bool LTrackerTrack::track_hit_TR(double x1, double y1, double theta, double phi)
          (yTR1b < (1.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1b > (0.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
          (yTR1b < (0.5 * display::TR1Size[1] + 0 * display::TR1GapY) && yTR1b > -(0.5 * display::TR1Size[1] + 0 * display::TR1GapY)) ||
          (yTR1b < -(0.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1b > -(1.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
-         (yTR1b < -(1.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1b > -(2.5 * display::TR1Size[1] + 2 * display::TR1GapY))))
-       &&
+         (yTR1b < -(1.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1b > -(2.5 * display::TR1Size[1] + 2 * display::TR1GapY)))) &&
        (yTR2b < display::TR2Size[1] / 2 && yTR2b > -display::TR2Size[1] / 2 &&
         ((xTR2b < (2 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2b > (1 * display::TR2Size[0] + 1.5 * display::TR2GapX)) ||
          (xTR2b < (1 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2b > (0 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
          (xTR2b < -(0 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2b > -(1 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
-         (xTR2b < -(1 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2b > -(2 * display::TR2Size[0] + 1.5 * display::TR2GapX)))))
-      ||
+         (xTR2b < -(1 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2b > -(2 * display::TR2Size[0] + 1.5 * display::TR2GapX))))) ||
       // --- Top face ---
       ((xTR1t < display::TR1Size[0] / 2 && xTR1t > -display::TR1Size[0] / 2 &&
         ((yTR1t < (2.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1t > (1.5 * display::TR1Size[1] + 2 * display::TR1GapY)) ||
          (yTR1t < (1.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1t > (0.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
          (yTR1t < (0.5 * display::TR1Size[1] + 0 * display::TR1GapY) && yTR1t > -(0.5 * display::TR1Size[1] + 0 * display::TR1GapY)) ||
          (yTR1t < -(0.5 * display::TR1Size[1] + 1 * display::TR1GapY) && yTR1t > -(1.5 * display::TR1Size[1] + 1 * display::TR1GapY)) ||
-         (yTR1t < -(1.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1t > -(2.5 * display::TR1Size[1] + 2 * display::TR1GapY))))
-       &&
+         (yTR1t < -(1.5 * display::TR1Size[1] + 2 * display::TR1GapY) && yTR1t > -(2.5 * display::TR1Size[1] + 2 * display::TR1GapY)))) &&
        (yTR2t < display::TR2Size[1] / 2 && yTR2t > -display::TR2Size[1] / 2 &&
         ((xTR2t < (2 * display::TR2Size[0] + 1.5 * display::TR2GapX) && xTR2t > (1 * display::TR2Size[0] + 1.5 * display::TR2GapX)) ||
          (xTR2t < (1 * display::TR2Size[0] + 0.5 * display::TR2GapX) && xTR2t > (0 * display::TR2Size[0] + 0.5 * display::TR2GapX)) ||
@@ -777,8 +875,8 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 
     t = trk.theta;
     p = trk.phi;
-    //t = trk.theta * TMath::DegToRad();
-    //p = trk.phi * TMath::DegToRad();
+    // t = trk.theta * TMath::DegToRad();
+    // p = trk.phi * TMath::DegToRad();
     x2 = trk.x0 + dz * (TMath::Tan(t)) * (TMath::Cos(p));
     y2 = trk.y0 + dz * (TMath::Tan(t)) * (TMath::Sin(p));
     z2 = trk.z0 + dz;
@@ -790,8 +888,10 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
     Double_t z_line[3] = {z1, trk.z0, z2};
     TPolyLine3D *line_track = new TPolyLine3D(3, x_line, y_line, z_line);
     line_track->SetLineWidth(2);
-    if(trk.chi2 > 3) line_track->SetLineColor(kGreen);
-    else line_track->SetLineColor(kRed);
+    if (trk.chi2 > 3)
+      line_track->SetLineColor(kGreen);
+    else
+      line_track->SetLineColor(kRed);
     line_track->Draw();
 
     TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 0, 0, 0, 0, 0);
@@ -810,7 +910,6 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 
   reco->Update();
 }
-
 
 std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker)
 {

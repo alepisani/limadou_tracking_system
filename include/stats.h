@@ -15,6 +15,8 @@ public:
     static int hmrtar;            // how many reco tracks are real
     static int hmrtar3;           // how many reco tracks are real (hitted 3 layers)
     static int hmrtar2;           // how many reco tracks are real (hitted 2 layers)  
+    static int hmrtaf3;           // how many reco tracks are fake (hitted 3 layers)      
+    static int hmrtaf2;           // how many reco tracks are fake (hitted 2 layers)
     static double hmgthL012;      // how many generated tracks hitted all 3 layers
     static bool hitL0;
     static bool hitL1;

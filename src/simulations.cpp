@@ -38,11 +38,13 @@
 
 simulations::simulations()
 {
-    //simulations::gen_tracks = {50};
-    // radius = {6, 4, 2, 1.8, 1.6, 1.4, 1.2, 1., 0.8, 0.6, 0.4, 0.2, 0.1, 0.05};
-    simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
-    //radius = {0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.23, 0.21, 0.19, 0.17, 0.15, 0.13, 0.11, 0.09, 0.07, 0.05, 0.03, 0.01, 0};
-    radius = {0.7, 0.65, 0.6, 0.55, 0.5, 0.47, 0.45, 0.43, 0.4, 0.37, 0.35, 0.33, 0.3, 0.27, 0.25, 0.23, 0.2, 0.15, 0.1, 0.05, 0.01, 0};
+    simulations::gen_tracks = {2, 5, 10, 50};
+    radius = {6, 4, 2, 1.4, 1., 0.4, 0.05};
+    //simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
+    //radius = {1, 0.9, 0.8, 0.7, 0.65, 0.6, 0.55, 0.5, 0.47, 0.45, 0.43, 0.4, 0.37, 0.35, 0.33, 0.3, 0.27, 0.25, 0.23, 0.2, 0.15, 0.1, 0.05, 0.01, 0};
+
+    //simulations::gen_tracks = {100};
+    //radius = {0.3};
 
     // limite massimo dimensione del chip ~13.7 mm --> raggio massimo ~ 6mm = 6000 microm
     // limite minimo dimensione singolo pixel ~0.029 mm --> raggio minimo ~ 0.015 = 15 microm
@@ -237,9 +239,9 @@ void simulations::sim_trk_32L(int iteration_per_event)
 {
     float pi = TMath::Pi();
     float degtorad = TMath::DegToRad();
-    float nbins = (iteration_per_event * radius.size() * gen_tracks.size()) / 20 ;
-    TH1F *htheta = new TH1F("htheta", "theta;#theta;counts", nbins, - 0.1, 1.1 * pi/2);
-    TH1F *hphi = new TH1F("hphi", "phi;#phi;counts", nbins, -1.05 * pi, 1.05 * pi);
+    float nbins = (iteration_per_event * radius.size() * gen_tracks.size());
+    TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", nbins, - 0.1, 1.1 * pi/2);
+    TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", nbins, -2.05 * pi, 2.05 * pi);
 
     auto start_time = std::chrono::steady_clock::now();
     display simu;

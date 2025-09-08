@@ -157,16 +157,11 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
 
 
     //what real intervals should look like
-    //min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0, pi/2);
-    //min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -pi, pi);
-    //what intervals are --> make efficiency raise
-    //min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -pi, 4 * pi);
-    //min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -2 * pi, 2 * pi);
+    min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0, pi/2);
+    min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -pi, pi);
     //test
-    //constraint on theta > 0 since this could be the problem of the odd phi distibution: 
-    // cos and sin phi are periodic for each pi, if i let a dof in phi could be absorbed by theta negative values
-    min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -0.2, 1.2 * pi/2);
-    min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -1.2 * pi, 1.2 * pi);
+    //min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -0.2, 1.2 * pi/2);
+    //min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -1.2 * pi, 1.2 * pi);
     min->Minimize();
     return {min->X(), min->Errors(), min->MinValue()};
   };

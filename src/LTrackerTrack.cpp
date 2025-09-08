@@ -574,7 +574,7 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackerTrack::new_algo(double radius)
 {
-  chi2_cut = 50;
+  chi2_cut = 50000;
   float degtorad = TMath::DegToRad();
   float pi = TMath::Pi();
   int candidateCounter = 0;
@@ -614,13 +614,9 @@ void LTrackerTrack::new_algo(double radius)
         trkCand.n_clus = clus_vec.size();
         trkCand.tracklet_id = {trkl02.id};
         trkCand.clus_id = {trkl02.firstClusterId, clus_1.id, trkl02.secondClusterId};
-        // double theta = trkCand.theta * degtorad;
-        // double phi = trkCand.phi * degtorad;
-        double theta = trkCand.theta;
-        double phi = trkCand.phi;
 
         // check if recotrk passa dai trigger
-        if (t.track_hit_TR((double)trkCand.x0, (double)trkCand.y0, theta, phi) && trkCand.chi2 < chi2_cut)
+        if (t.track_hit_TR((double)trkCand.x0, (double)trkCand.y0, trkCand.theta, trkCand.phi) && trkCand.chi2 < chi2_cut)
         {
           track_candidates.push_back(trkCand);
           if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id)
@@ -653,10 +649,11 @@ void LTrackerTrack::new_algo(double radius)
   for (int i = 0; i < tracks.size(); i++)
   {
     tracks[i].id = i;
-    //printf("chi2: %f\n", tracks[i].chi2);
+    // printf("chi2: %f\n", tracks[i].chi2);
   }
 
   stats::hmrt = tracks.size();
+  // printf("tracks %ld\n", tracks.size());
 }
 
 bool LTrackerTrack::track_hit_TR(double x1, double y1, double theta, double phi)
@@ -747,12 +744,6 @@ void LTrackerTrack::printRecoTracks_old_alg(TCanvas *reco, int events)
     TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
     f->Draw();
 
-    /*     cout << "L2 ------ x:" << x2 << ",   y: " << y2 << ",    z: " << z2 << endl;
-        cout << "L1 ------ x:" << trk.x0 << "+- " << trk.err_x0 << ",   y: " << trk.y0 << "+- " << trk.err_y0 << ",    z: " << trk.z0 << endl;
-        cout << "L0 ------ x:" << x1 << ",   y: " << y1 << ",    z: " << z1 << endl;
-        cout << "(gradi) theta: " << trk.theta << "     phi: " << trk.phi << endl;
-        cout << "(rad)   theta: " << t         << "     phi: " <<     p   << endl;
-        cout << "~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;  */
   }
 
   reco->Update();
@@ -762,29 +753,24 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 {
 
   int i = 0;
-  cout << "trakcs size" << tracks.size() << endl;
   for (auto &trk : tracks)
   {
-    float x1, y1, z1, dz, x2, y2, z2, t, p;
+    float x1, y1, z1, dz, x2, y2, z2;
 
     dz = 100;
-
-    t = trk.theta;
-    p = trk.phi;
-    // t = trk.theta * TMath::DegToRad();
-    // p = trk.phi * TMath::DegToRad();
-    x2 = trk.x0 + dz * (TMath::Tan(t)) * (TMath::Cos(p));
-    y2 = trk.y0 + dz * (TMath::Tan(t)) * (TMath::Sin(p));
+    
+    x2 = trk.x0 + dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
+    y2 = trk.y0 + dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
     z2 = trk.z0 + dz;
-    x1 = trk.x0 - dz * (TMath::Tan(t)) * (TMath::Cos(p));
-    y1 = trk.y0 - dz * (TMath::Tan(t)) * (TMath::Sin(p));
+    x1 = trk.x0 - dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
+    y1 = trk.y0 - dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
     z1 = trk.z0 - dz;
     Double_t x_line[3] = {x1, trk.x0, x2};
     Double_t y_line[3] = {y1, trk.y0, y2};
     Double_t z_line[3] = {z1, trk.z0, z2};
     TPolyLine3D *line_track = new TPolyLine3D(3, x_line, y_line, z_line);
     line_track->SetLineWidth(2);
-    if (trk.chi2 > 3)
+    if (trk.chi2 > 5)
       line_track->SetLineColor(kGreen);
     else
       line_track->SetLineColor(kRed);
@@ -797,11 +783,6 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
     TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
     f->Draw();
 
-    /*     cout << "x: " << trk.x0 << "+- " << trk.err_x0 << "| y: " << trk.y0 << "+- " << trk.err_y0 << "| z: " << trk.z0 << endl;
-        cout << "theta  " << t << "phi " << p << endl;
-        cout << "theta  " << trk.theta << "phi " << trk.phi << endl;
-        cout << "bottom " << x1 << y1 << z1 << endl;
-        cout << "top " << x2 << y2 << z2 << endl; */
   }
 
   reco->Update();

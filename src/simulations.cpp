@@ -242,7 +242,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
     float degtorad = TMath::DegToRad();
     float nbins = (iteration_per_event * radius.size() * gen_tracks.size());
     TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", nbins, - 0.1, 1.1 * pi/2);
-    TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", nbins, -2.05 * pi, 2.05 * pi);
+    TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", nbins, -1.05 * pi, 1.05 * pi);
 
     auto start_time = std::chrono::steady_clock::now();
     display simu;
@@ -313,7 +313,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
                 ltt.new_algo(radius[m]);
                 t.Stop();
 
-                ltt.remap_angles(ltt.tracks);
+                //ltt.remap_angles(ltt.tracks);
                 for (int j = 0; j < ltt.tracks.size(); ++j)
                 {
                     htheta->Fill(ltt.tracks[j].theta);

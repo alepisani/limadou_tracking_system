@@ -63,7 +63,7 @@ struct LCluster
   float y = -999.;
   float erry = -999.;
   float z = -999.;
-  float errz = -999.;
+  float errz = 0.01;
 
   friend std::ostream &operator<<(std::ostream &output, const LCluster &cl)
   {

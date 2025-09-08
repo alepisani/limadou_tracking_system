@@ -7,6 +7,7 @@
 #include <TList.h>
 #include <TPolyLine3D.h>
 #include "TMarker3DBox.h"
+#include <chrono>
 #include "TH1F.h"
 #include "../include/eventdata.h"
 #include "../include/chip.h"
@@ -14,48 +15,52 @@
 #include "../include/stats.h"
 #include "../include/LTrackerCluster.h"
 #include "../include/LTrackerTrack.h"
+#include "../include/simulations.h"
 #include "eventdata.h"
 using namespace std;
 
-eventdata::eventdata(){}
+eventdata::eventdata() {}
 
 std::unordered_map<int, eventdata> alldata;
 
-
-std::ostream &operator<<(std::ostream &output, const eventdata &ev) {
-    for (size_t i = 0; i < ev.cls_mean_x.size(); i++) {
+std::ostream &operator<<(std::ostream &output, const eventdata &ev)
+{
+    for (size_t i = 0; i < ev.cls_mean_x.size(); i++)
+    {
         // output << "turret_idx: " << (int)ev.DIR_turret_idx[i] << " ";
         // output << "stave_idx: " << (int)ev.DIR_stave_idx[i] << " ";
         // output << "chip_idx0: " << (int)ev.DIR_chip_idx0[i] << " ";
         // output << "chip_idx1: " << (int)ev.DIR_chip_idx1[i] << " ";
         // output << "chip_id:   " << ev.DIR_chip_id[i] << " ";
-        //output << "xpos:      " << ev.DIR_xpos[i] << " || ";
-        //output << "ypos:      " << ev.DIR_ypos[i] << " || ";
-        //output << "zpos:      " << ev.DIR_zpos[i] << " || ";
+        // output << "xpos:      " << ev.DIR_xpos[i] << " || ";
+        // output << "ypos:      " << ev.DIR_ypos[i] << " || ";
+        // output << "zpos:      " << ev.DIR_zpos[i] << " || ";
         // output << "cls_idx:   " << ev.DIR_cls_idx[i];
         // output << "total events: " << alldata.size();
-        //output << "hmthL2: " << ;
-        //output << "hmthL1: " << ;
-        //output << "hmthL0: " << ;
+        // output << "hmthL2: " << ;
+        // output << "hmthL1: " << ;
+        // output << "hmthL0: " << ;
         output << endl;
     }
     return output;
 }
 
+void eventdata::takedata()
+{
 
+    // cambia nome file in base a cosa vuoi
+    // TFile *file = TFile::Open("../data_beam_test/");
 
-void eventdata::takedata(){
-
-    //cambia nome file in base a cosa vuoi
-    //TFile *file = TFile::Open("../data_beam_test/");
-    
-    TFile *file = TFile::Open("../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
-    if (!file || file->IsZombie()) {
+    //TFile *file = TFile::Open("../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
+    TFile *file = TFile::Open("../data/HEPD02-FM_m-Exp-20250624-144717-Events-00344_03076-p01_L2.root");  
+    if (!file || file->IsZombie())
+    {
         std::cerr << "Errore nell'aprire il file ROOT\n";
         return;
     }
-    TTree *tree = (TTree*)file->Get("L2;1");
-    if (!tree) {
+    TTree *tree = (TTree *)file->Get("L2;1");
+    if (!tree)
+    {
         std::cerr << "TTree non trovato nel file\n";
         return;
     }
@@ -76,7 +81,6 @@ void eventdata::takedata(){
     std::vector<float> *cls_mean_z = nullptr;
     std::vector<float> *cls_mean_x_err = nullptr;
     std::vector<float> *cls_mean_y_err = nullptr;
-    
 
     /* tree->SetBranchAddress("DIR_turret_idx", &DIR_turret_idx);
     tree->SetBranchAddress("DIR_stave_idx",  &DIR_stave_idx);
@@ -87,19 +91,17 @@ void eventdata::takedata(){
     tree->SetBranchAddress("DIR_ypos",       &DIR_ypos);
     tree->SetBranchAddress("DIR_zpos",       &DIR_zpos);
     tree->SetBranchAddress("DIR_cls_idx",    &DIR_cls_idx); */
-    tree->SetBranchAddress("cls_size",  &cls_size);    //in pixel
-    tree->SetBranchAddress("cls_mean_x",  &cls_mean_x);
-    tree->SetBranchAddress("cls_mean_y",  &cls_mean_y);
-    tree->SetBranchAddress("cls_mean_z",  &cls_mean_z);
-    tree->SetBranchAddress("cls_mean_x_err",  &cls_mean_x_err);
-    tree->SetBranchAddress("cls_mean_y_err",  &cls_mean_y_err);
-
-    
-
+    tree->SetBranchAddress("cls_size", &cls_size); // in pixel
+    tree->SetBranchAddress("cls_mean_x", &cls_mean_x);
+    tree->SetBranchAddress("cls_mean_y", &cls_mean_y);
+    tree->SetBranchAddress("cls_mean_z", &cls_mean_z);
+    tree->SetBranchAddress("cls_mean_x_err", &cls_mean_x_err);
+    tree->SetBranchAddress("cls_mean_y_err", &cls_mean_y_err);
 
     Long64_t nEntries = tree->GetEntries();
 
-    for (Long64_t i = 0; i < nEntries; ++i) {
+    for (Long64_t i = 0; i < nEntries; ++i)
+    {
         tree->GetEntry(i);
         eventdata ev;
         /* ev.DIR_turret_idx = *DIR_turret_idx;
@@ -118,79 +120,104 @@ void eventdata::takedata(){
         ev.cls_mean_x_err = *cls_mean_x_err;
         ev.cls_mean_y_err = *cls_mean_y_err;
         alldata[i] = ev;
-
-        
     }
-    
+
     file->Close();
 }
 
-void eventdata::analize_data(){
-
-    
-    TCanvas* canvas = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
-    TView* rt = TView::CreateView(1);
-    rt->SetRange(-100, -100, 0, 100, 100, 70);
-    rt->ShowAxis();
-
+void eventdata::analize_data()
+{
     takedata();
+    auto start_time = std::chrono::steady_clock::now();
+    float pi = TMath::Pi();
+    int nbins = alldata.size() / 50;
+    TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", nbins, -0.1, 1.1 * pi / 2);
+    TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", nbins, -1.05 * pi, 1.05 * pi);
+    TH1F *hchi2 = new TH1F("hchi2", "#chi2;#chi2;counts", nbins, 0, 5000);
+
+    // TCanvas *canvas = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
+    // TView *rt = TView::CreateView(1);
+    // rt->SetRange(-100, -100, 0, 100, 100, 70);
+    // rt->ShowAxis();
+
     display d;
-    LTrackerTrack ltt;
-    /* for(int i=0; i < alldata.size(); ++i){
-        eventdata ev;
-        LTrackerCluster cl;
-        LCluster c;
-        ev = alldata[i];
-        ev.from_ev_to_cluster(cl, ev, c);
-        if(cl.cls_mean_z < 36. && cl.cls_mean_z > 30.){
-            ltt.tidy_clusters_lay2.push_back(c);
-        }
-        if(cl.cls_mean_z < 29. && cl.cls_mean_z > 22.){
-            ltt.tidy_clusters_lay1.push_back(c);
-        }
-        if(cl.cls_mean_z < 20. && cl.cls_mean_z > 15.){
-            ltt.tidy_clusters_lay0.push_back(c);
-        }
-        
-        
-        ltt.computeTracklets();
-        ltt.new_computing(2.);
-    } */
     eventdata ev;
     LTrackerCluster cl;
-    LCluster c;
     chips cc;
     stats s;
-    ev = alldata[0];
-    cc.print_all_chips(cc,canvas);
-    d.draw_TR12(canvas);
-    ev.from_ev_to_cluster(cl, ev);
-    for (int j = 0; j < cl.cls_mean_z.size(); ++j) {
-        LCluster c;
-        c.x = cl.cls_mean_x[j];
-        c.y = cl.cls_mean_y[j];
-        c.z = cl.cls_mean_z[j];
-        c.errx = cl.cls_mean_err_x[j];
-        c.erry = cl.cls_mean_err_y[j];
-        c.id = j;
-        if (c.z < 36. && c.z > 30.) {
-            ltt.tidy_clusters_lay2.try_emplace(j, c);
+    simulations sim;
+    // cc.print_all_chips(cc, canvas);
+    // d.draw_TR12(canvas);
+
+    // selecting with the [index] the event you want to make the reco
+    int n = alldata.size();
+    for (int i = 0; i < n; ++i)
+    {
+        LTrackerTrack ltt;
+        ev = alldata[i];
+        ev.from_ev_to_cluster(cl, ev);
+        for (int j = 0; j < cl.cls_mean_z.size(); ++j)
+        {
+            LCluster c;
+            c.x = cl.cls_mean_x[j];
+            c.y = cl.cls_mean_y[j];
+            c.z = cl.cls_mean_z[j];
+            c.errx = cl.cls_mean_err_x[j];
+            c.erry = cl.cls_mean_err_y[j];
+            c.id = i;
+            if (c.z < 36. && c.z > 30.)
+            {
+                ltt.tidy_clusters_lay2.try_emplace(j, c);
+                // TMarker3DBox *p = new TMarker3DBox(c.x, c.y, c.z, 2, 2, 0, 0, 0);
+                // p->SetLineWidth(1.4);
+                // p->Draw();
+            }
+            if (c.z < 29. && c.z > 22.)
+            {
+                ltt.tidy_clusters_lay1.try_emplace(j, c);
+                // TMarker3DBox *p = new TMarker3DBox(c.x, c.y, c.z, 2, 2, 0, 0, 0);
+                // p->SetLineWidth(1.4);
+                // p->Draw();
+            }
+            if (c.z < 20. && c.z > 15.)
+            {
+                ltt.tidy_clusters_lay0.try_emplace(j, c);
+                // TMarker3DBox *p = new TMarker3DBox(c.x, c.y, c.z, 2, 2, 0, 0, 0);
+                // p->SetLineWidth(1.4);
+                // p->Draw();
+            }
         }
-        if (c.z < 29. && c.z > 22.) {
-            ltt.tidy_clusters_lay1.try_emplace(j, c);
+        // printf("size of tidy_clusters_lay0: %ld\n", ltt.tidy_clusters_lay0.size());
+        // printf("size of tidy_clusters_lay1: %ld\n", ltt.tidy_clusters_lay1.size());
+        // printf("size of tidy_clusters_lay2: %ld\n", ltt.tidy_clusters_lay2.size());
+        ltt.computeTracklets();
+        // printf("size of tracklet01: %ld\n", ltt.tracklet_lay01.size());
+        // printf("size of tracklet12: %ld\n", ltt.tracklet_lay12.size());
+        // printf("size of tracklet02: %ld\n", ltt.tracklet_lay02.size());
+        ltt.new_algo(2.);
+        
+        for (int m = 0; m < ltt.tracks.size(); ++m)
+        {
+            htheta->Fill(ltt.tracks[m].theta);
+            hphi->Fill(ltt.tracks[m].phi);
+            hchi2->Fill(ltt.tracks[m].chi2);
         }
-        if (c.z < 20. && c.z > 15.) {
-            ltt.tidy_clusters_lay0.try_emplace(j, c);
-        }
+        // printf("tracks %ld\n", ltt.tracks.size());
+        // ltt.printRecoTracks_new_alg(canvas);
+        sim.printProgressBarWithETA(i + 1, n, start_time, 30);
     }
 
-    ltt.computeTracklets();
-    ltt.new_algo(2.);
-    ltt.printRecoTracks_new_alg(canvas);
-
+    char fil[200];
+    sprintf(fil, "../data/reco_muons.root");
+    TFile f(fil, "RECREATE");
+    htheta->Write();
+    hphi->Write();
+    hchi2->Write();
+    f.Close();
 }
 
-void eventdata::print_data_on_canvas(TCanvas* can){
+void eventdata::print_data_on_canvas(TCanvas *can)
+{
 
     int negative_clus;
     can->cd();
@@ -199,95 +226,105 @@ void eventdata::print_data_on_canvas(TCanvas* can){
     chips c;
     c.print_all_chips(c, can);
 
-    //int events = alldata.size();
+    // int events = alldata.size();
     int events = 1;
-    TH1F* hx = new TH1F("x", "x;x;counts", events, -display::TR2Size[0]*2.5, display::TR2Size[0]*2.5);
-    TH1F* hy = new TH1F("y", "y;y;counts", events, -100, 100);
-    TH1F* hz = new TH1F("z", "z;z;counts", events, 10, 40);
+    TH1F *hx = new TH1F("x", "x;x;counts", events, -display::TR2Size[0] * 2.5, display::TR2Size[0] * 2.5);
+    TH1F *hy = new TH1F("y", "y;y;counts", events, -100, 100);
+    TH1F *hz = new TH1F("z", "z;z;counts", events, 10, 40);
 
     eventdata ev;
     std::vector<LTrackerCluster> clusters;
 
-    for (int i = 0; i < events; i++){
+    for (int i = 0; i < events; i++)
+    {
         LTrackerCluster cluster;
         ev = alldata[i];
-        //cluster.CalculateClusterPosition(ev);
+        // cluster.CalculateClusterPosition(ev);
         ev.from_ev_to_cluster(cluster, ev);
 
         clusters.push_back(cluster);
-    }    
+    }
 
     cout << "events: " << events << endl;
 
-    for(int i=0; i<clusters.size(); i++){
-        //cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-        //cout << clusters[i] << endl;
+    for (int i = 0; i < clusters.size(); i++)
+    {
+        // cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+        // cout << clusters[i] << endl;
         bool hit_L2 = false;
         bool hit_L1 = false;
         bool hit_L0 = false;
-        if(clusters[i].cls_mean_x.empty()){
-        stats::hmbh0L++;
+        if (clusters[i].cls_mean_x.empty())
+        {
+            stats::hmbh0L++;
         }
-        for(int j=0; j<clusters[i].cls_mean_x.size(); j++){
+        for (int j = 0; j < clusters[i].cls_mean_x.size(); j++)
+        {
 
-            TMarker3DBox *p = new TMarker3DBox(clusters[i].cls_mean_x[j],clusters[i].cls_mean_y[j],clusters[i].cls_mean_z[j],2,2,0,0,0);
+            TMarker3DBox *p = new TMarker3DBox(clusters[i].cls_mean_x[j], clusters[i].cls_mean_y[j], clusters[i].cls_mean_z[j], 2, 2, 0, 0, 0);
             p->SetLineColor(kRed);
             p->SetLineWidth(3);
             p->Draw();
             hx->Fill(clusters[i].cls_mean_x[j]);
             hy->Fill(clusters[i].cls_mean_y[j]);
-            hz->Fill(clusters[i].cls_mean_z[j]);    
-                 
-            //stats
+            hz->Fill(clusters[i].cls_mean_z[j]);
 
-            if(clusters[i].cls_mean_z[j] < 36. && clusters[i].cls_mean_z[j] > 30.){
+            // stats
+
+            if (clusters[i].cls_mean_z[j] < 36. && clusters[i].cls_mean_z[j] > 30.)
+            {
                 stats::hmthL2++;
                 hit_L2 = true;
             }
-            if(clusters[i].cls_mean_z[j] < 29. && clusters[i].cls_mean_z[j] > 22.){
+            if (clusters[i].cls_mean_z[j] < 29. && clusters[i].cls_mean_z[j] > 22.)
+            {
                 stats::hmthL1++;
                 hit_L1 = true;
             }
-            if(clusters[i].cls_mean_z[j] < 20. && clusters[i].cls_mean_z[j] > 15.){
+            if (clusters[i].cls_mean_z[j] < 20. && clusters[i].cls_mean_z[j] > 15.)
+            {
                 stats::hmthL0++;
                 hit_L0 = true;
             }
-            if(clusters[i].cls_mean_z[j] < 0.){
+            if (clusters[i].cls_mean_z[j] < 0.)
+            {
                 negative_clus++;
             }
-        }   
-        if(hit_L2 && hit_L1 && hit_L0){
-            stats::hmbh3L++;}
-        if((hit_L2 && hit_L1 && !hit_L0) || (hit_L2 && !hit_L1 && hit_L0) || (!hit_L2 && hit_L1 && hit_L0)){
-            stats::hmbh2L++;}
-        if((hit_L2 && !hit_L1 && !hit_L0) || (!hit_L2 && hit_L1 && !hit_L0) || (!hit_L2 && !hit_L1 && hit_L0)){
-            stats::hmbh1L++;}
+        }
+        if (hit_L2 && hit_L1 && hit_L0)
+        {
+            stats::hmbh3L++;
+        }
+        if ((hit_L2 && hit_L1 && !hit_L0) || (hit_L2 && !hit_L1 && hit_L0) || (!hit_L2 && hit_L1 && hit_L0))
+        {
+            stats::hmbh2L++;
+        }
+        if ((hit_L2 && !hit_L1 && !hit_L0) || (!hit_L2 && hit_L1 && !hit_L0) || (!hit_L2 && !hit_L1 && hit_L0))
+        {
+            stats::hmbh1L++;
+        }
     }
-    
-
 
     cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++   negative_clus  " << negative_clus << endl;
     char file[200];
-    sprintf(file,"../data_beam_test/data.root");
-    TFile f(file,"RECREATE");
+    sprintf(file, "../data_beam_test/data.root");
+    TFile f(file, "RECREATE");
     hx->Write();
     hy->Write();
     hz->Write();
-    
+
     f.Close();
 }
 
-void eventdata::from_ev_to_cluster(LTrackerCluster& cluster, eventdata& ev){
+void eventdata::from_ev_to_cluster(LTrackerCluster &cluster, eventdata &ev)
+{
 
     cluster.cls_mean_x = ev.cls_mean_x;
     cluster.cls_mean_y = ev.cls_mean_y;
     cluster.cls_mean_z = ev.cls_mean_z;
     cluster.cls_mean_err_x = ev.cls_mean_x_err;
     cluster.cls_mean_err_y = ev.cls_mean_y_err;
-    cluster.cls_idx = {-1,-1,-1};
+    cluster.cls_idx = {-1, -1, -1};
 
-
-    //values to be discuss and maybe change
-
+    // values to be discuss and maybe change
 }
-

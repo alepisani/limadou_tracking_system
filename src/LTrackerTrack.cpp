@@ -87,23 +87,58 @@ void LTrackerTrack::computeTracklets()
 
 void LTrackerTrack::print_tracklet(const LCluster cl_0, const LCluster cl_2)
 {
-
-  double x0, y0, z0, x2, y2, z2;
+ 
+  float x0, y0, z0, x2, y2, z2;
+  float fx0, fy0, fz0, fx2, fy2, fz2;
   x0 = cl_0.x;
   y0 = cl_0.y;
   z0 = cl_0.z;
   x2 = cl_2.x;
   y2 = cl_2.y;
   z2 = cl_2.z;
-  Double_t x_line[2] = {x0, x2};
-  Double_t y_line[2] = {y0, y2};
-  Double_t z_line[2] = {z0, z2};
-  TPolyLine3D *trk = new TPolyLine3D(2, x_line, y_line, z_line);
+  float dx = x2 - x0;
+  float dy = y2 - y0;
+  fx0 = x0 - dx;
+  fy0 = y0 - dy;
+  fz0 = z0 - display::dist_z;
+  fx2 = x2 + dx;
+  fy2 = y2 + dy;
+  fz2 = z2 + display::dist_z;
+  
+  Double_t x_line[4] = {fx0, x0, x2, fx2};
+  Double_t y_line[4] = {fy0, y0, y2, fy2};
+  Double_t z_line[4] = {fz0, z0, z2, fz2};
+  TPolyLine3D *trk = new TPolyLine3D(4, x_line, y_line, z_line);
   trk->SetLineWidth(2);
-  trk->SetLineColor(kGreen);
+  trk->SetLineColor(kBlue);
   trk->Draw();
 }
 
+
+void LTrackerTrack::print_all_tracklet(LTrackerTrack ltt)
+{
+ 
+  for (auto &trkl01 : ltt.tracklet_lay01){
+    auto cls_lay0 = tidy_clusters_lay0[trkl01.firstClusterId];
+    auto cls_lay1 = tidy_clusters_lay1[trkl01.secondClusterId];
+    print_tracklet(cls_lay0, cls_lay1);
+  }
+
+  for (auto &trkl12 : ltt.tracklet_lay12){
+    auto cls_lay1 = tidy_clusters_lay1[trkl12.firstClusterId];
+    auto cls_lay2 = tidy_clusters_lay2[trkl12.secondClusterId];
+    print_tracklet(cls_lay1, cls_lay2);
+  }
+
+  for (auto &trkl02 : ltt.tracklet_lay02){
+    auto cls_lay0 = tidy_clusters_lay0[trkl02.firstClusterId];
+    auto cls_lay2 = tidy_clusters_lay2[trkl02.secondClusterId];
+    print_tracklet(cls_lay0, cls_lay2);
+  }
+  
+
+
+}
 
 // Distance function to be minimised
 double LTrackerTrack::fct(const std::vector<LCluster> &clusters, const double *par)
@@ -125,7 +160,6 @@ double LTrackerTrack::fct(const std::vector<LCluster> &clusters, const double *p
 
   return chi2;
 };
-
 
 void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrackCandidate &trkCand)
 {
@@ -155,18 +189,17 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
     // the real theta distribution is between (0,pi/2), now is (-pi/2, pi);
     // the real  phi distribution is between (-pi,+pi), now is (-2pi, 2pi);
 
-
-    //what real intervals should look like
-    min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0, pi/2);
+    // what real intervals should look like
+    min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0., pi / 2);
     min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -pi, pi);
-    //test
-    //min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -0.2, 1.2 * pi/2);
-    //min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -1.2 * pi, 1.2 * pi);
+    // test
+    // min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -0.2, 1.2 * pi/2);
+    // min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -1.2 * pi, 1.2 * pi);
     min->Minimize();
     return {min->X(), min->Errors(), min->MinValue()};
   };
 
-  double vars[4] = {0.0, 0.0, pi/4, 0.0};
+  double vars[4] = {0.0, 0.0, pi / 4, 0.0};
   double step_coarse[4] = {0.01, 0.01, 0.01, 0.01};
   double step_fine[4] = {0.001, 0.001, 0.001, 0.001};
 
@@ -194,7 +227,6 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
 
 }
 
-
 /**
  * the fit function uses a wider range for the definition intervals for the angles paramenter.
  * that is because we're trying to minimaze a periodical variable and don't want to end up at the edge.
@@ -213,20 +245,11 @@ void LTrackerTrack::remap_angles(std::vector<LTrackCandidate> &tracks)
   {
 
     // remap theta
-    if (tracks[j].theta <= 0.){
+    if (tracks[j].theta <= 0.)
+    {
       tracks[j].theta *= -1;
       tracks[j].phi *= -1;
     }
-      
-    if (tracks[j].theta > pi / 2){
-      tracks[j].theta -= pi / 2;
-    }
-    
-    // remap phi
-    if (tracks[j].phi < -pi)
-      tracks[j].phi += 2 * pi;
-    if (tracks[j].phi > pi)
-      tracks[j].phi -= 2 * pi;
   }
 }
 
@@ -347,7 +370,8 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
         stats::hmrtar++;
         stats::hmrtar2++;
       }
-      else stats::hmrtaf2++;
+      else
+        stats::hmrtaf2++;
       stats::hmrt++;
       // cout << "010101010100101" << endl;
       tracks.push_back(spurious);
@@ -410,7 +434,8 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
         stats::hmrtar++;
         stats::hmrtar2++;
       }
-      else stats::hmrtaf2++;
+      else
+        stats::hmrtaf2++;
       stats::hmrt++;
       // cout << "212121212121221122121" << endl;
       tracks.push_back(spurious);
@@ -473,7 +498,8 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
         stats::hmrtar++;
         stats::hmrtar2++;
       }
-      else stats::hmrtaf2++;
+      else
+        stats::hmrtaf2++;
       stats::hmrt++;
       // cout << "020202020200202" << endl;
       tracks.push_back(spurious);
@@ -512,7 +538,8 @@ void LTrackerTrack::computeTrackCandidates()
         {
           stats::hmrtar++;
         }
-        else stats::hmrtaf3++;
+        else
+          stats::hmrtaf3++;
 
         // compute residuals
         for (auto &clus : clus_vec)
@@ -574,7 +601,7 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackerTrack::new_algo(double radius)
 {
-  chi2_cut = 50000;
+  chi2_cut = 5000;
   float degtorad = TMath::DegToRad();
   float pi = TMath::Pi();
   int candidateCounter = 0;
@@ -624,7 +651,8 @@ void LTrackerTrack::new_algo(double radius)
             stats::hmrtar++;
             stats::hmrtar3++;
           }
-          else stats::hmrtaf3++;
+          else
+            stats::hmrtaf3++;
         }
       }
     }
@@ -743,7 +771,6 @@ void LTrackerTrack::printRecoTracks_old_alg(TCanvas *reco, int events)
     m->Draw();
     TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
     f->Draw();
-
   }
 
   reco->Update();
@@ -758,7 +785,7 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
     float x1, y1, z1, dz, x2, y2, z2;
 
     dz = 100;
-    
+
     x2 = trk.x0 + dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
     y2 = trk.y0 + dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
     z2 = trk.z0 + dz;
@@ -782,7 +809,6 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
     m->Draw();
     TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
     f->Draw();
-
   }
 
   reco->Update();

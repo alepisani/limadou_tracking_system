@@ -51,8 +51,8 @@ void eventdata::takedata()
     // cambia nome file in base a cosa vuoi
     // TFile *file = TFile::Open("../data_beam_test/");
 
-    //TFile *file = TFile::Open("../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
-    TFile *file = TFile::Open("../data/HEPD02-FM_m-Exp-20250624-144717-Events-00344_03076-p01_L2.root");  
+    TFile *file = TFile::Open("../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
+    // TFile *file = TFile::Open("../data/HEPD02-FM_m-Exp-20250624-144717-Events-00344_03076-p01_L2.root");
     if (!file || file->IsZombie())
     {
         std::cerr << "Errore nell'aprire il file ROOT\n";
@@ -128,34 +128,42 @@ void eventdata::takedata()
 void eventdata::analize_data()
 {
     takedata();
+    int cls_max = 0;
+    int index = 0;
     auto start_time = std::chrono::steady_clock::now();
     float pi = TMath::Pi();
-    int nbins = alldata.size() / 50;
-    TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", nbins, -0.1, 1.1 * pi / 2);
-    TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", nbins, -1.05 * pi, 1.05 * pi);
-    TH1F *hchi2 = new TH1F("hchi2", "#chi2;#chi2;counts", nbins, 0, 5000);
+    int nbins = alldata.size() / 150;
+    // TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", nbins, -0.1, 1.1 * pi / 2);
+    // TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", nbins, -1.05 * pi, 1.05 * pi);
+    // TH1F *hchi2 = new TH1F("hchi2", "#chi2;#chi2;counts", nbins, 0, 5000);
+    // TH1F *hcls = new TH1F("hcls", "#cls;#cls;counts", alldata.size(), 0, 182);
 
-    // TCanvas *canvas = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
-    // TView *rt = TView::CreateView(1);
-    // rt->SetRange(-100, -100, 0, 100, 100, 70);
-    // rt->ShowAxis();
+    TCanvas *canvas = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
+    TView *rt = TView::CreateView(1);
+    rt->SetRange(-100, -100, 0, 100, 100, 70);
+    rt->ShowAxis();
 
     display d;
-    eventdata ev;
-    LTrackerCluster cl;
     chips cc;
     stats s;
     simulations sim;
-    // cc.print_all_chips(cc, canvas);
-    // d.draw_TR12(canvas);
+    cc.print_all_chips(cc, canvas);
+    d.draw_TR12(canvas);
 
     // selecting with the [index] the event you want to make the reco
-    int n = alldata.size();
-    for (int i = 0; i < n; ++i)
+    // int n = alldata.size();
+    int n = 10;
+    for (int i = 5; i < n; ++i)
     {
         LTrackerTrack ltt;
+        eventdata ev;
+        LTrackerCluster cl;
         ev = alldata[i];
+
         ev.from_ev_to_cluster(cl, ev);
+        // if (cl.cls_mean_z.size() > cls_max)
+        //     cls_max = cl.cls_mean_z.size();
+        // hcls->Fill(cl.cls_mean_z.size());
         for (int j = 0; j < cl.cls_mean_z.size(); ++j)
         {
             LCluster c;
@@ -168,52 +176,51 @@ void eventdata::analize_data()
             if (c.z < 36. && c.z > 30.)
             {
                 ltt.tidy_clusters_lay2.try_emplace(j, c);
-                // TMarker3DBox *p = new TMarker3DBox(c.x, c.y, c.z, 2, 2, 0, 0, 0);
-                // p->SetLineWidth(1.4);
-                // p->Draw();
+                TMarker3DBox *p = new TMarker3DBox(c.x, c.y, c.z, 2, 2, 0, 0, 0);
+                p->SetLineWidth(1.4);
+                p->Draw();
             }
             if (c.z < 29. && c.z > 22.)
             {
                 ltt.tidy_clusters_lay1.try_emplace(j, c);
-                // TMarker3DBox *p = new TMarker3DBox(c.x, c.y, c.z, 2, 2, 0, 0, 0);
-                // p->SetLineWidth(1.4);
-                // p->Draw();
+                TMarker3DBox *p = new TMarker3DBox(c.x, c.y, c.z, 2, 2, 0, 0, 0);
+                p->SetLineWidth(1.4);
+                p->Draw();
             }
             if (c.z < 20. && c.z > 15.)
             {
                 ltt.tidy_clusters_lay0.try_emplace(j, c);
-                // TMarker3DBox *p = new TMarker3DBox(c.x, c.y, c.z, 2, 2, 0, 0, 0);
-                // p->SetLineWidth(1.4);
-                // p->Draw();
+                TMarker3DBox *p = new TMarker3DBox(c.x, c.y, c.z, 2, 2, 0, 0, 0);
+                p->SetLineWidth(1.4);
+                p->Draw();
             }
         }
-        // printf("size of tidy_clusters_lay0: %ld\n", ltt.tidy_clusters_lay0.size());
-        // printf("size of tidy_clusters_lay1: %ld\n", ltt.tidy_clusters_lay1.size());
-        // printf("size of tidy_clusters_lay2: %ld\n", ltt.tidy_clusters_lay2.size());
+
         ltt.computeTracklets();
-        // printf("size of tracklet01: %ld\n", ltt.tracklet_lay01.size());
-        // printf("size of tracklet12: %ld\n", ltt.tracklet_lay12.size());
-        // printf("size of tracklet02: %ld\n", ltt.tracklet_lay02.size());
         ltt.new_algo(2.);
-        
+
         for (int m = 0; m < ltt.tracks.size(); ++m)
         {
-            htheta->Fill(ltt.tracks[m].theta);
-            hphi->Fill(ltt.tracks[m].phi);
-            hchi2->Fill(ltt.tracks[m].chi2);
+            // htheta->Fill(ltt.tracks[m].theta);
+            // hphi->Fill(ltt.tracks[m].phi);
+            // hchi2->Fill(ltt.tracks[m].chi2);
+            printf("\n chi2: %f\n", ltt.tracks[m].chi2);
         }
-        // printf("tracks %ld\n", ltt.tracks.size());
-        // ltt.printRecoTracks_new_alg(canvas);
+
+        ltt.printRecoTracks_new_alg(canvas);
+        ltt.print_all_tracklet(ltt);
         sim.printProgressBarWithETA(i + 1, n, start_time, 30);
     }
 
-    char fil[200];
-    sprintf(fil, "../data/reco_muons.root");
-    TFile f(fil, "RECREATE");
-    htheta->Write();
-    hphi->Write();
-    hchi2->Write();
-    f.Close();
+    // char fil[200];
+    // sprintf(fil, "../data/reco_muons.root");
+    // TFile f(fil, "RECREATE");
+    // htheta->Write();
+    // hphi->Write();
+    // hchi2->Write();
+    // hcls->Write();
+    // f.Close();
+    // printf("\n cls_max: %d \n", cls_max);
 }
 
 void eventdata::print_data_on_canvas(TCanvas *can)

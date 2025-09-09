@@ -96,20 +96,23 @@ void LTrackerTrack::print_tracklet(const LCluster cl_0, const LCluster cl_2)
   x2 = cl_2.x;
   y2 = cl_2.y;
   z2 = cl_2.z;
-  float dx = x2 - x0;
-  float dy = y2 - y0;
-  fx0 = x0 - dx;
-  fy0 = y0 - dy;
-  fz0 = z0 - display::dist_z;
-  fx2 = x2 + dx;
-  fy2 = y2 + dy;
-  fz2 = z2 + display::dist_z;
+  // float dx = x2 - x0;
+  // float dy = y2 - y0;
+  // fx0 = x0 - dx;
+  // fy0 = y0 - dy;
+  // fz0 = z0 - display::dist_z;
+  // fx2 = x2 + dx;
+  // fy2 = y2 + dy;
+  // fz2 = z2 + display::dist_z;
   
-  Double_t x_line[4] = {fx0, x0, x2, fx2};
-  Double_t y_line[4] = {fy0, y0, y2, fy2};
-  Double_t z_line[4] = {fz0, z0, z2, fz2};
-  TPolyLine3D *trk = new TPolyLine3D(4, x_line, y_line, z_line);
-  trk->SetLineWidth(2);
+  // Double_t x_line[4] = {fx0, x0, x2, fx2};
+  // Double_t y_line[4] = {fy0, y0, y2, fy2};
+  // Double_t z_line[4] = {fz0, z0, z2, fz2};
+  Double_t x_line[2] = {x0, x2};
+  Double_t y_line[2] = {y0, y2};
+  Double_t z_line[2] = {z0, z2};
+  TPolyLine3D *trk = new TPolyLine3D(2, x_line, y_line, z_line);
+  trk->SetLineWidth(1);
   trk->SetLineColor(kBlue);
   trk->Draw();
 }
@@ -173,7 +176,7 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
     ROOT::Math::Minimizer *min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "");
     min->SetMaxFunctionCalls(1000000);
     min->SetMaxIterations(10000);
-    min->SetTolerance(0.01);
+    min->SetTolerance(0.0001);
     min->SetPrintLevel(0);
 
     std::function<double(const std::vector<LCluster> &, const double *)> unboundFct = fct;
@@ -192,14 +195,18 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
     // what real intervals should look like
     min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0., pi / 2);
     min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -pi, pi);
-    // test
-    // min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], -0.2, 1.2 * pi/2);
-    // min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -1.2 * pi, 1.2 * pi);
     min->Minimize();
     return {min->X(), min->Errors(), min->MinValue()};
   };
 
-  double vars[4] = {0.0, 0.0, pi / 4, 0.0};
+  double dx = clusters[2].x - clusters[0].x;
+  double dy = clusters[2].y - clusters[0].y;
+  double dz = clusters[2].z - clusters[0].z;
+  double r = sqrt(dx*dx + dy*dy + dz*dz);
+  double guess_theta = acos(dz / r); 
+  double guess_phi = atan2(dy, dx); 
+
+  double vars[4] = {clusters[0].x, clusters[0].y, guess_theta, guess_phi};
   double step_coarse[4] = {0.01, 0.01, 0.01, 0.01};
   double step_fine[4] = {0.001, 0.001, 0.001, 0.001};
 
@@ -207,7 +214,7 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
   double chi2;
   std::tie(params, errors, chi2) = minimize(vars, step_coarse, "coarse");
 
-  if (chi2 <= 30.0)
+  if (chi2 <= 100.0)
   {
     double refined_vars[4] = {params[0], params[1], params[2], params[3]};
     std::tie(params, errors, chi2) = minimize(refined_vars, step_fine, "fine");
@@ -601,7 +608,7 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackerTrack::new_algo(double radius)
 {
-  chi2_cut = 5000;
+  chi2_cut = 5000000;
   float degtorad = TMath::DegToRad();
   float pi = TMath::Pi();
   int candidateCounter = 0;

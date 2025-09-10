@@ -9,6 +9,7 @@
 #include <TPolyLine3D.h>
 #include "TMarker3DBox.h"
 #include "TH1F.h"
+#include "TH2.h"
 #include <TTree.h>
 #include <fstream>
 #include <filesystem>
@@ -39,8 +40,8 @@
 simulations::simulations()
 {
     // radius in mm
-    simulations::gen_tracks = {2, 5, 10, 20};
-    radius = {2, 1.5, 1.3, 1.1, 1., 0.8, 0.6, 0.4, 0.2, 0.1, 0.05};
+    simulations::gen_tracks = {2};
+    radius = {2.};
     //simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
     //radius = {1, 0.9, 0.8, 0.7, 0.65, 0.6, 0.55, 0.5, 0.47, 0.45, 0.43, 0.4, 0.37, 0.35, 0.33, 0.3, 0.27, 0.25, 0.23, 0.2, 0.15, 0.1, 0.05, 0.01, 0};
 
@@ -240,9 +241,14 @@ void simulations::sim_trk_32L(int iteration_per_event)
 {
     float pi = TMath::Pi();
     float degtorad = TMath::DegToRad();
+    float radtodeg = TMath::RadToDeg();
+    std::vector<float> alltheta;
+    std::vector<float> allphi;
     float nbins = (iteration_per_event * radius.size() * gen_tracks.size());
-    TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", nbins, - 0.1, 1.1 * pi/2);
-    TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", nbins, -1.05 * pi, 1.05 * pi);
+    TH1F *htheta_reco = new TH1F("htheta_reco", "#theta;#theta;counts", 180, -5, 95);
+    TH1F *hphi_reco = new TH1F("hphi_reco", "#phi;#phi;counts", 720, -190, 190);
+    TH1F *hchi2_reco = new TH1F("hchi2_reco", "#chi2;#chi2;counts", nbins, 0, 5000);
+    TH2D *h_reco = new TH2D("h_theta_vs_phi","#theta vs #phi;#phi (deg);#theta (deg)",90, -185, 185, 45, 0, 90);
 
     auto start_time = std::chrono::steady_clock::now();
     display simu;
@@ -316,8 +322,10 @@ void simulations::sim_trk_32L(int iteration_per_event)
                 //ltt.remap_angles(ltt.tracks);
                 for (int j = 0; j < ltt.tracks.size(); ++j)
                 {
-                    htheta->Fill(ltt.tracks[j].theta);
-                    hphi->Fill(ltt.tracks[j].phi);
+                    htheta_reco->Fill(ltt.tracks[m].theta * radtodeg);
+                    hphi_reco->Fill(ltt.tracks[m].phi * radtodeg);
+                    hchi2_reco->Fill(ltt.tracks[m].chi2);
+                    h_reco->Fill(ltt.tracks[m].phi * radtodeg, ltt.tracks[m].theta * radtodeg);
                 }
 
                 r_time.push_back(t.RealTime());
@@ -376,9 +384,11 @@ void simulations::sim_trk_32L(int iteration_per_event)
     std::cout << "File CSV scritto correttamente in: " << path << "\n";
 
     char fil[200];
-    sprintf(fil, "../data/angle_reco.root");
-    TFile f(fil, "RECREATE");
-    htheta->Write();
-    hphi->Write();
+    sprintf(fil, "../data/simulations_angle_reco.root");
+    TFile f(fil, "UPDATE");
+    htheta_reco->Write();
+    hphi_reco->Write();
+    hchi2_reco->Write();
+    h_reco->Write();
     f.Close();
 }

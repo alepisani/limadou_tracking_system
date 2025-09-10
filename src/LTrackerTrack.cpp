@@ -173,6 +173,7 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
 
   auto minimize = [&](double *initialVars, double *steps, const char *tag) -> std::tuple<const double *, const double *, double>
   {
+    // could change Minuit2 with other minimizer such as minuit or pleanty other
     ROOT::Math::Minimizer *min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "");
     min->SetMaxFunctionCalls(1000000);
     min->SetMaxIterations(10000);
@@ -608,7 +609,7 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackerTrack::new_algo(double radius)
 {
-  chi2_cut = 5000000;
+  chi2_cut = 5000;
   float degtorad = TMath::DegToRad();
   float pi = TMath::Pi();
   int candidateCounter = 0;

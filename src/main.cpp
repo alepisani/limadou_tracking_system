@@ -84,20 +84,42 @@ int main(int argc, char** argv) {
 
     //track simulation
     //int *events;
-    //int ev = 3;
+    //int ev = 1;
     //events = &ev; 
     //run(events);
 
 
-    //simulations sim;
+    simulations sim;
     //sim.sim_only_trk_3L(1000);
     //sim.sim_old_algo(100);
-    //sim.sim_trk_32L(100);
+    sim.sim_trk_32L(3000);
 
     //reco from MUONS
-    eventdata e;
-    e.analize_data();
+    //eventdata e;
+    //e.analize_data();
 
+    /*
+    //compute theta max
+    int xtr1, ytr1, ztr1;
+    int xtr2, ytr2, ztr2;
+    ztr1 = display::TR1CenterZ + display::TR1Size[2];
+    ztr2 = display::TR2CenterZ;
+    xtr1 = -0.5 * display::TR1Size[0];
+    xtr2 = 2 * display::TR2Size[0] + 1.5 * display::TR2GapX;
+    ytr1 = -2.5 * display::TR1Size[1] - 2 * display::TR1GapY;
+    ytr2 = 0.5 * display::TR2Size[1];    
+    double delta_y = ytr2 - ytr1;
+    double delta_x = xtr2 - xtr1;
+    double delta_z = ztr2 - ztr1;
+    double delta_r = TMath::Sqrt(delta_y * delta_y + delta_x * delta_x);
+    double r = TMath::Sqrt(delta_x * delta_x + delta_y * delta_y + delta_z * delta_z);
+    double phi = TMath::ATan2(delta_y, delta_x);
+    double theta = TMath::ACos(delta_z / r);
+    double radtodeg = TMath::RadToDeg();
+    double thera_deg = theta * radtodeg;
+    printf("theta max: %f\n", thera_deg);
+    // theta max: 75.274958
+    */
 
 
     // Thread secondario per leggere l'input senza bloccare l'interfaccia grafica

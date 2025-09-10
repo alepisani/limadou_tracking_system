@@ -10,6 +10,7 @@
 #include <TTree.h>
 #include <TPolyLine3D.h>
 #include "TH1F.h"
+#include "TH2.h"
 #include "TRandom3.h"
 #include "TMarker3DBox.h"
 #include "TFile.h"
@@ -502,6 +503,10 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
      * is only use during simulations
      */
     TRandom3 *rnd = new TRandom3(0);
+    //TH1F *htheta_real = new TH1F("htheta_real", "#theta;#theta;counts", 180, -5, 95);
+    //TH1F *hphi_real = new TH1F("hphi_real", "#phi;#phi;counts", 720, -190, 190);
+    //TH2D *h_real = new TH2D("h_theta_phi_real","#theta vs #phi;#phi (deg);#theta (deg)",720, -185, 185, 180, 0, 90);
+    double radtodeg = TMath::RadToDeg();
 
     // MC
     for (int i = 0; i < events; i++)
@@ -553,6 +558,7 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             int ind_phi = rnd->Uniform(0, allPhi.size() - 1);
             int ind_cls_size = rnd->Uniform(0, all_cls_size.size() - 1);
             theta = (allTheta[ind_theta] / 180) * TMath::Pi();
+            //theta = rnd->Uniform(0, 3.14);
             phi = (allPhi[ind_phi] / 180) * TMath::Pi();
             cls_size = (all_cls_size[ind_cls_size]);
             cls_size_x = cls_size * PixelSizeRows;
@@ -597,6 +603,11 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         {
             stats::hmgthTR1++;
         }
+
+        //fill the histograms
+        //htheta_real->Fill(theta * radtodeg);
+        //hphi_real->Fill(phi * radtodeg);
+        //h_real->Fill(theta * radtodeg, phi * radtodeg);
 
         // fake hit rate (rate = 10^-6 per event)
         double rate = rnd->Uniform(0, 1);
@@ -713,5 +724,14 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         
 
     }
+    
+    //char file[200];
+    //sprintf(file, "../data/simulations_angle_reco.root");
+    //TFile f(file, "RECREATE");
+    //htheta_real->Write();
+    //hphi_real->Write();
+    //h_real->Write();
+    //f.Close();
+
 
 }

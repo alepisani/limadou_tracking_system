@@ -9,6 +9,7 @@
 #include "TMarker3DBox.h"
 #include <chrono>
 #include "TH1F.h"
+#include "TH2.h"
 #include "../include/eventdata.h"
 #include "../include/chip.h"
 #include "../include/display.h"
@@ -51,8 +52,8 @@ void eventdata::takedata()
     // cambia nome file in base a cosa vuoi
     // TFile *file = TFile::Open("../data_beam_test/");
 
-    TFile *file = TFile::Open("../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
-    // TFile *file = TFile::Open("../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root");
+    // TFile *file = TFile::Open("../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
+    TFile *file = TFile::Open("../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root");
     if (!file || file->IsZombie())
     {
         std::cerr << "Errore nell'aprire il file ROOT\n";
@@ -132,15 +133,16 @@ void eventdata::analize_data()
      */
     bool print_canvas = false;
 
-
+    double radtodeg = TMath::RadToDeg();
     takedata();
     int cls_max = 0;
     int index = 0;
     auto start_time = std::chrono::steady_clock::now();
     float pi = TMath::Pi();
-    int nbins = alldata.size() / 150;
-    TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", nbins, -0.1, 1.1 * pi / 2);
-    TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", nbins, -1.05 * pi, 1.05 * pi);
+    int nbins = alldata.size() / 200;
+    TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", 180, -5, 95);
+    TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", 720, -190, 190);
+    TH2D *h = new TH2D("h_theta_vs_phi","#theta vs #phi;#phi (deg);#theta (deg)",nbins, -185, 185, nbins, 0, 90);
     TH1F *hchi2 = new TH1F("hchi2", "#chi2;#chi2;counts", nbins, 0, 5000);
 
     TCanvas *canvas = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
@@ -161,7 +163,7 @@ void eventdata::analize_data()
     // selecting with the [index] the event you want to make the reco
     int n;
     if(!print_canvas) n = alldata.size();
-    if(print_canvas) n = 150;
+    if(print_canvas) n = 25;
     for (int i = 0; i < n; ++i)
     {
         LTrackerTrack ltt;
@@ -181,6 +183,7 @@ void eventdata::analize_data()
             c.errx = cl.cls_mean_err_x[j];
             c.erry = cl.cls_mean_err_y[j];
             c.id = i;
+            //cout << "\n cluster: \n" << c;
             if (c.z < 36. && c.z > 30.)
             {
                 ltt.tidy_clusters_lay2.try_emplace(j, c);
@@ -216,9 +219,10 @@ void eventdata::analize_data()
         if(!print_canvas){
             for (int m = 0; m < ltt.tracks.size(); ++m)
             {
-                htheta->Fill(ltt.tracks[m].theta);
-                hphi->Fill(ltt.tracks[m].phi);
+                htheta->Fill(ltt.tracks[m].theta * radtodeg);
+                hphi->Fill(ltt.tracks[m].phi * radtodeg);
                 hchi2->Fill(ltt.tracks[m].chi2);
+                h->Fill(ltt.tracks[m].phi * radtodeg, ltt.tracks[m].theta * radtodeg);
             }
         }
 
@@ -235,13 +239,15 @@ void eventdata::analize_data()
     }
 
     if(!print_canvas){
+        
         char fil[200];
-        sprintf(fil, "../data/reco_muons.root");
-        TFile f(fil, "RECREATE");
+        sprintf(fil, "../data/reco_HEPD02.root");
+        TFile f(fil, "UPDATE");
         htheta->Write();
         hphi->Write();
         hchi2->Write();
         f.Close();
+        
     }
 
 }

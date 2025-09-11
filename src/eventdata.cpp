@@ -10,6 +10,7 @@
 #include <chrono>
 #include "TH1F.h"
 #include "TH2.h"
+#include "TLegend.h"
 #include "../include/eventdata.h"
 #include "../include/chip.h"
 #include "../include/display.h"
@@ -142,7 +143,7 @@ void eventdata::analize_data()
     int nbins = alldata.size() / 200;
     TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", 180, -5, 95);
     TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", 720, -190, 190);
-    TH2D *h = new TH2D("h_theta_vs_phi","#theta vs #phi;#phi (deg);#theta (deg)",nbins, -185, 185, nbins, 0, 90);
+    TH2D *h = new TH2D("h_theta_vs_phi", "#theta vs #phi;#phi (deg);#theta (deg)", nbins, -185, 185, nbins, 0, 90);
     TH1F *hchi2 = new TH1F("hchi2", "#chi2;#chi2;counts", nbins, 0, 5000);
 
     TCanvas *canvas = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
@@ -154,16 +155,18 @@ void eventdata::analize_data()
     chips cc;
     stats s;
     simulations sim;
-    if(print_canvas){
+    if (print_canvas)
+    {
         cc.print_all_chips(cc, canvas);
         d.draw_TR12(canvas);
     }
-    
 
     // selecting with the [index] the event you want to make the reco
     int n;
-    if(!print_canvas) n = alldata.size();
-    if(print_canvas) n = 25;
+    if (!print_canvas)
+        n = alldata.size();
+    if (print_canvas)
+        n = 25;
     for (int i = 0; i < n; ++i)
     {
         LTrackerTrack ltt;
@@ -183,11 +186,12 @@ void eventdata::analize_data()
             c.errx = cl.cls_mean_err_x[j];
             c.erry = cl.cls_mean_err_y[j];
             c.id = i;
-            //cout << "\n cluster: \n" << c;
+            // cout << "\n cluster: \n" << c;
             if (c.z < 36. && c.z > 30.)
             {
                 ltt.tidy_clusters_lay2.try_emplace(j, c);
-                if(print_canvas){
+                if (print_canvas)
+                {
                     TMarker3DBox *p = new TMarker3DBox(c.x, c.y, c.z, 2, 2, 0, 0, 0);
                     p->SetLineWidth(1.4);
                     p->Draw();
@@ -196,7 +200,8 @@ void eventdata::analize_data()
             if (c.z < 29. && c.z > 22.)
             {
                 ltt.tidy_clusters_lay1.try_emplace(j, c);
-                if(print_canvas){
+                if (print_canvas)
+                {
                     TMarker3DBox *p = new TMarker3DBox(c.x, c.y, c.z, 2, 2, 0, 0, 0);
                     p->SetLineWidth(1.4);
                     p->Draw();
@@ -205,7 +210,8 @@ void eventdata::analize_data()
             if (c.z < 20. && c.z > 15.)
             {
                 ltt.tidy_clusters_lay0.try_emplace(j, c);
-                if(print_canvas){
+                if (print_canvas)
+                {
                     TMarker3DBox *p = new TMarker3DBox(c.x, c.y, c.z, 2, 2, 0, 0, 0);
                     p->SetLineWidth(1.4);
                     p->Draw();
@@ -216,7 +222,8 @@ void eventdata::analize_data()
         ltt.computeTracklets();
         ltt.new_algo(2.);
 
-        if(!print_canvas){
+        if (!print_canvas)
+        {
             for (int m = 0; m < ltt.tracks.size(); ++m)
             {
                 htheta->Fill(ltt.tracks[m].theta * radtodeg);
@@ -226,30 +233,34 @@ void eventdata::analize_data()
             }
         }
 
-        if(print_canvas){
+        if (print_canvas)
+        {
             ltt.printRecoTracks_new_alg(canvas);
-            //ltt.print_all_tracklet(ltt);
+            // ltt.print_all_tracklet(ltt);
         }
         sim.printProgressBarWithETA(i + 1, n, start_time, 30);
-        if(print_canvas){
-            for (int m = 0; m < ltt.tracks.size(); ++m){
+        if (print_canvas)
+        {
+            for (int m = 0; m < ltt.tracks.size(); ++m)
+            {
                 printf("\n chi2: %f\n", ltt.tracks[m].chi2);
             }
         }
     }
 
-    if(!print_canvas){
-        
+    if (!print_canvas)
+    {
+
         char fil[200];
-        sprintf(fil, "../data/reco_HEPD02.root");
+        sprintf(fil, "../data/reco_HEPDaaaa02.root");
         TFile f(fil, "UPDATE");
         htheta->Write();
         hphi->Write();
         hchi2->Write();
+        h->Write();
         f.Close();
-        
-    }
 
+    }
 }
 
 void eventdata::print_data_on_canvas(TCanvas *can)

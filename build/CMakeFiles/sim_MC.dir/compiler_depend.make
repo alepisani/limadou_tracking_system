@@ -1912,6 +1912,10 @@ CMakeFiles/sim_MC.dir/src/eventdata.cpp.o: ../src/eventdata.cpp \
   /usr/local/root/include/TH2.h \
   /usr/local/root/include/TMatrixFBasefwd.h \
   /usr/local/root/include/TMatrixDBasefwd.h \
+  /usr/local/root/include/TLegend.h \
+  /usr/local/root/include/TPave.h \
+  /usr/local/root/include/TBox.h \
+  /usr/local/root/include/TAttText.h \
   ../include/eventdata.h \
   /usr/local/root/include/TMath.h \
   /usr/local/root/include/TError.h \
@@ -2747,6 +2751,10 @@ CMakeFiles/sim_MC.dir/src/simulations.cpp.o: ../src/simulations.cpp \
   /usr/local/root/include/TAttCanvas.h \
   /usr/local/root/include/TView.h \
   /usr/local/root/include/TList.h \
+  /usr/local/root/include/TLegend.h \
+  /usr/local/root/include/TPave.h \
+  /usr/local/root/include/TBox.h \
+  /usr/local/root/include/TAttText.h \
   /usr/local/root/include/TPolyLine3D.h \
   /usr/local/root/include/TAtt3D.h \
   /usr/local/root/include/TMarker3DBox.h \
@@ -2818,6 +2826,7 @@ CMakeFiles/sim_MC.dir/src/simulations.cpp.o: ../src/simulations.cpp \
   ../include/LTrackerCluster.h \
   ../include/simulations.h \
   /usr/include/malloc.h \
+  /usr/local/root/include/THStack.h \
   /usr/local/root/include/TH1.h \
   /usr/local/root/include/TROOT.h \
   /usr/local/root/include/TDirectory.h
@@ -3186,6 +3195,8 @@ CMakeFiles/sim_MC.dir/src/stats.cpp.o: ../src/stats.cpp \
 
 ../src/stats.cpp:
 
+/usr/local/root/include/THStack.h:
+
 /usr/include/c++/11/bits/fs_ops.h:
 
 /usr/include/c++/11/filesystem:
@@ -3209,6 +3220,10 @@ CMakeFiles/sim_MC.dir/src/stats.cpp.o: ../src/stats.cpp \
 ../src/main.cpp:
 
 ../include/simulations.h:
+
+/usr/local/root/include/TBox.h:
+
+/usr/local/root/include/TLegend.h:
 
 /usr/include/c++/11/bits/parse_numbers.h:
 
@@ -3373,6 +3388,8 @@ CMakeFiles/sim_MC.dir/src/stats.cpp.o: ../src/stats.cpp \
 /usr/include/c++/11/ext/concurrence.h:
 
 /usr/include/c++/11/bits/unique_ptr.h:
+
+/usr/local/root/include/TAttText.h:
 
 /usr/include/c++/11/bit:
 
@@ -3709,6 +3726,8 @@ CMakeFiles/sim_MC.dir/src/stats.cpp.o: ../src/stats.cpp \
 /usr/local/root/include/TH2.h:
 
 /usr/include/c++/11/bits/vector.tcc:
+
+/usr/local/root/include/TPave.h:
 
 /usr/include/x86_64-linux-gnu/bits/timesize.h:
 

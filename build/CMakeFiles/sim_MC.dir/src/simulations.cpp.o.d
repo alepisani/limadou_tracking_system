@@ -291,7 +291,9 @@ CMakeFiles/sim_MC.dir/src/simulations.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
  /usr/local/root/include/Buttons.h /usr/local/root/include/TAttBBox2D.h \
  /usr/local/root/include/TAttCanvas.h /usr/local/root/include/TView.h \
- /usr/local/root/include/TList.h /usr/local/root/include/TPolyLine3D.h \
+ /usr/local/root/include/TList.h /usr/local/root/include/TLegend.h \
+ /usr/local/root/include/TPave.h /usr/local/root/include/TBox.h \
+ /usr/local/root/include/TAttText.h /usr/local/root/include/TPolyLine3D.h \
  /usr/local/root/include/TAtt3D.h /usr/local/root/include/TMarker3DBox.h \
  /usr/local/root/include/TH1F.h /usr/local/root/include/TH1.h \
  /usr/local/root/include/TAxis.h /usr/local/root/include/TAttAxis.h \
@@ -343,5 +345,6 @@ CMakeFiles/sim_MC.dir/src/simulations.cpp.o: \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/../include/stats.h \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/../include/LTrackerCluster.h \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/include/simulations.h \
- /usr/include/malloc.h /usr/local/root/include/TH1.h \
- /usr/local/root/include/TROOT.h /usr/local/root/include/TDirectory.h
+ /usr/include/malloc.h /usr/local/root/include/THStack.h \
+ /usr/local/root/include/TH1.h /usr/local/root/include/TROOT.h \
+ /usr/local/root/include/TDirectory.h

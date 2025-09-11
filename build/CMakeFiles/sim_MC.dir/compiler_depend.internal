@@ -1917,6 +1917,10 @@ CMakeFiles/sim_MC.dir/src/eventdata.cpp.o
  /usr/local/root/include/TH2.h
  /usr/local/root/include/TMatrixFBasefwd.h
  /usr/local/root/include/TMatrixDBasefwd.h
+ /usr/local/root/include/TLegend.h
+ /usr/local/root/include/TPave.h
+ /usr/local/root/include/TBox.h
+ /usr/local/root/include/TAttText.h
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/include/eventdata.h
  /usr/local/root/include/TMath.h
  /usr/local/root/include/TError.h
@@ -2754,6 +2758,10 @@ CMakeFiles/sim_MC.dir/src/simulations.cpp.o
  /usr/local/root/include/TAttCanvas.h
  /usr/local/root/include/TView.h
  /usr/local/root/include/TList.h
+ /usr/local/root/include/TLegend.h
+ /usr/local/root/include/TPave.h
+ /usr/local/root/include/TBox.h
+ /usr/local/root/include/TAttText.h
  /usr/local/root/include/TPolyLine3D.h
  /usr/local/root/include/TAtt3D.h
  /usr/local/root/include/TMarker3DBox.h
@@ -2825,6 +2833,7 @@ CMakeFiles/sim_MC.dir/src/simulations.cpp.o
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/include/LTrackerCluster.h
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/include/simulations.h
  /usr/include/malloc.h
+ /usr/local/root/include/THStack.h
  /usr/local/root/include/TH1.h
  /usr/local/root/include/TROOT.h
  /usr/local/root/include/TDirectory.h

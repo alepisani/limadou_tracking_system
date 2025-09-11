@@ -297,6 +297,8 @@ CMakeFiles/sim_MC.dir/src/eventdata.cpp.o: \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/float.h \
  /usr/local/root/include/TH2.h /usr/local/root/include/TMatrixFBasefwd.h \
  /usr/local/root/include/TMatrixDBasefwd.h \
+ /usr/local/root/include/TLegend.h /usr/local/root/include/TPave.h \
+ /usr/local/root/include/TBox.h /usr/local/root/include/TAttText.h \
  /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/eventdata.h \
  /usr/local/root/include/TMath.h /usr/local/root/include/TError.h \
  /usr/local/root/include/DllImport.h /usr/include/c++/11/math.h \

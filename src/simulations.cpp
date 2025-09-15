@@ -249,10 +249,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
     float nbins = (iteration_per_event * radius.size() * gen_tracks.size());
     TH1F *htheta_real = new TH1F("htheta_real", "#theta;#theta (deg);counts", 45, 0, 90);
     TH1F *htheta_reco = new TH1F("htheta_reco", "#theta;#theta (deg);counts", 45, 0, 90);
-    TH1F *h_theta_diff = new TH1F("h_theta_diff", "#theta;(#theta_{real} - #theta_{reco}) (deg);counts", 100, 0, 1.5);
-    TH1F *h_theta_norm = new TH1F("h_theta_norm", "#theta;(#theta_{real} - #theta_{reco})/#theta_{real};counts", 100, 0, 1.5);
-    TH1F *h_phi_diff = new TH1F("h_phi_diff", "#phi;(#phi_{real} - #phi_{reco}) (deg);counts", 100, 0, 3.5);
-    TH1F *h_phi_norm = new TH1F("h_phi_norm", "#phi;(#phi_{real} - #phi_{reco})/#phi_{real};counts", 100, 0, 3.5);
+    TH1F *h_theta_diff = new TH1F("h_theta_diff", "#theta;(#theta_{real} - #theta_{reco}) (deg);counts", 100, 0, 0.03);
+    TH1F *h_phi_diff = new TH1F("h_phi_diff", "#phi;(#phi_{real} - #phi_{reco}) (deg);counts", 1000, -190, 190);
     TH1F *hphi_real = new TH1F("hphi_real", "#phi;#phi;counts", 50, -190, 190);
     TH1F *hphi_reco = new TH1F("hphi_reco", "#phi;#phi;counts", 50, -190, 190);
     TH2D *h_real = new TH2D("h_theta_vs_phi_real", "#theta vs #phi;#phi (deg);#theta (deg)", 90, -185, 185, 20, 0, 90);
@@ -267,34 +265,26 @@ void simulations::sim_trk_32L(int iteration_per_event)
     TH2D *hx_real_phi = new TH2D("hx_real_phi", "#phi vs x (REAL); x (mm); #phi (deg)", 90, -77, 77, 50, -185, 185);
     TH2D *hy_reco_phi = new TH2D("hy_reco_phi", "#phi vs y (RECO); y (mm); #phi (deg)", 90, -85, 85, 50, -185, 185);
     TH2D *hy_real_phi = new TH2D("hy_real_phi", "#phi vs y (REAL); y (mm); #phi (deg)", 90, -85, 85, 50, -185, 185);
-    
-    // theta 0, 2      180
-    // phi -5,5        150
-    // x -77, +77      90
-    // y -85, +85      90 
-    // dtheta 0, 1.25  100
-    // dphi -5,5       150
-    TH2D *h_dtheta_theta =  new TH2D("h_dtheta_theta",  "#Delta_{#theta} vs #theta; #theta (deg);   #Delta_{#theta} (deg)", 180, 0, 2,      100, 0, 1.25);
-    TH2D *h_dtheta_phi =    new TH2D("h_dtheta_phi",    "#Delta_{#theta} vs #phi;   #phi (deg);     #Delta_{#theta} (deg)", 150, -5, 5,     100, 0, 1.25);
-    TH2D *h_dtheta_x =      new TH2D("h_dtheta_x",      "#Delta_{#theta} vs x;      x (mm);         #Delta_{#theta} (deg)", 90, -77, 77,    100, 0, 1.25);
-    TH2D *h_dtheta_y =      new TH2D("h_dtheta_y",      "#Delta_{#theta} vs y;      y (mm);         #Delta_{#theta} (deg)", 90, -85, 85,    100, 0, 1.25);
 
-    TH2D *h_dphi_theta =    new TH2D("h_dphi_theta",    "#Delta_{#phi} vs #theta;   #theta (deg);   #Delta_{#phi} (deg)",   360, 0, 2,      150, -5, 5);
-    TH2D *h_dphi_phi =      new TH2D("h_dphi_phi",      "#Delta_{#phi} vs #phi;     #phi (deg);     #Delta_{#phi} (deg)",   150, -5, 5,     150, -5, 5);
-    TH2D *h_dphi_x =        new TH2D("h_dphi_x",        "#Delta_{#phi} vs x;        x (mm);         #Delta_{#phi} (deg)",   90, -77, 77,    150, -5, 5);
-    TH2D *h_dphi_y =        new TH2D("h_dphi_y",        "#Delta_{#phi} vs y;        y (mm);         #Delta_{#phi} (deg)",   90, -85, 85,    150, -5, 5);
-    
-    TH2D *h_dx_theta =      new TH2D("h_dx_theta",      "#Delta_x vs #theta;        #theta (deg);   #Delta_x (mm)",         180, 0, 2,      100, -5, 5);
-    TH2D *h_dx_phi =        new TH2D("h_dx_phi",        "#Delta_x vs #phi;          #phi (deg);     #Delta_x (mm)",         150, -5, 5,     100, -5, 5);
-    TH2D *h_dx_x =          new TH2D("h_dx_x",          "#Delta_x vs x;             x (mm);         #Delta_x (mm)",         90, -77, 77,    100, -5, 5);
-    TH2D *h_dx_y =          new TH2D("h_dx_y",          "#Delta_x vs y;             y (mm);         #Delta_x (mm)",         90, -85, 85,    100, -5, 5);
-    
-    TH2D *h_dy_theta =      new TH2D("h_dy_theta",      "#Delta_x vs #theta;        #theta (deg);   #Delta_x (mm)",         180, 0, 2,      100, -5, 5);
-    TH2D *h_dy_phi =        new TH2D("h_dy_phi",        "#Delta_x vs #phi;          #phi (deg);     #Delta_x (mm)",         150, -5, 5,     100, -5, 5);
-    TH2D *h_dy_x =          new TH2D("h_dy_x",          "#Delta_x vs x;             x (mm);         #Delta_x (mm)",         90, -77, 77,    100, -5, 5);
-    TH2D *h_dy_y =          new TH2D("h_dy_y",          "#Delta_x vs y;             y (mm);         #Delta_x (mm)",         90, -85, 85,    100, -5, 5);
+    TH2D *h_dtheta_theta = new TH2D("h_dtheta_theta", "#Delta_{#theta} vs #theta; #theta (deg);   #Delta_{#theta} (deg)", 180, 0, 90, 100, -12, 12);
+    TH2D *h_dtheta_phi = new TH2D("h_dtheta_phi", "#Delta_{#theta} vs #phi;   #phi (deg);     #Delta_{#theta} (deg)", 150, -200, 200, 100, -12, 12);
+    TH2D *h_dtheta_x = new TH2D("h_dtheta_x", "#Delta_{#theta} vs x;      x (mm);         #Delta_{#theta} (deg)", 90, -77, 77, 100, -12, 12);
+    TH2D *h_dtheta_y = new TH2D("h_dtheta_y", "#Delta_{#theta} vs y;      y (mm);         #Delta_{#theta} (deg)", 90, -85, 85, 100, -12, 12);
 
-    
+    TH2D *h_dphi_theta = new TH2D("h_dphi_theta", "#Delta_{#phi} vs #theta;   #theta (deg);   #Delta_{#phi} (deg)", 360, 0, 90, 150, -300, 300);
+    TH2D *h_dphi_phi = new TH2D("h_dphi_phi", "#Delta_{#phi} vs #phi;     #phi (deg);     #Delta_{#phi} (deg)", 150, -200, 200, 150, -300, 300);
+    TH2D *h_dphi_x = new TH2D("h_dphi_x", "#Delta_{#phi} vs x;        x (mm);         #Delta_{#phi} (deg)", 90, -77, 77, 150, -300, 300);
+    TH2D *h_dphi_y = new TH2D("h_dphi_y", "#Delta_{#phi} vs y;        y (mm);         #Delta_{#phi} (deg)", 90, -85, 85, 150, -300, 300);
+
+    TH2D *h_dx_theta = new TH2D("h_dx_theta", "#Delta_x vs #theta;        #theta (deg);   #Delta_x (mm)", 180, 0, 90, 100, -5, 5);
+    TH2D *h_dx_phi = new TH2D("h_dx_phi", "#Delta_x vs #phi;          #phi (deg);     #Delta_x (mm)", 150, -200, 200, 100, -5, 5);
+    TH2D *h_dx_x = new TH2D("h_dx_x", "#Delta_x vs x;             x (mm);         #Delta_x (mm)", 90, -77, 77, 100, -5, 5);
+    TH2D *h_dx_y = new TH2D("h_dx_y", "#Delta_x vs y;             y (mm);         #Delta_x (mm)", 90, -85, 85, 100, -5, 5);
+
+    TH2D *h_dy_theta = new TH2D("h_dy_theta", "#Delta_x vs #theta;        #theta (deg);   #Delta_x (mm)", 180, 0, 90, 100, -5, 5);
+    TH2D *h_dy_phi = new TH2D("h_dy_phi", "#Delta_x vs #phi;          #phi (deg);     #Delta_x (mm)", 150, -200, 200, 100, -5, 5);
+    TH2D *h_dy_x = new TH2D("h_dy_x", "#Delta_x vs x;             x (mm);         #Delta_x (mm)", 90, -77, 77, 100, -5, 5);
+    TH2D *h_dy_y = new TH2D("h_dy_y", "#Delta_x vs y;             y (mm);         #Delta_x (mm)", 90, -85, 85, 100, -5, 5);
 
     auto start_time = std::chrono::steady_clock::now();
     display simu;
@@ -370,8 +360,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
                     hy_real_theta->Fill(simu.generated_tracks[k].y0, simu.generated_tracks[k].theta * radtodeg);
                     hx_real_phi->Fill(simu.generated_tracks[k].x0, simu.generated_tracks[k].phi * radtodeg);
                     hy_real_phi->Fill(simu.generated_tracks[k].y0, simu.generated_tracks[k].phi * radtodeg);
-                    theta_real = simu.generated_tracks[k].theta;
-                    phi_real = simu.generated_tracks[k].phi;
+                    theta_real = simu.generated_tracks[k].theta * radtodeg;
+                    phi_real = simu.generated_tracks[k].phi * radtodeg;
                     x_real = simu.generated_tracks[k].x0;
                     y_real = simu.generated_tracks[k].y0;
                 }
@@ -391,8 +381,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
                     hy_reco_theta->Fill(ltt.tracks[g].y0, ltt.tracks[g].theta * radtodeg);
                     hx_reco_phi->Fill(ltt.tracks[g].x0, ltt.tracks[g].phi * radtodeg);
                     hy_reco_phi->Fill(ltt.tracks[g].y0, ltt.tracks[g].phi * radtodeg);
-                    theta_reco = ltt.tracks[g].theta;
-                    phi_reco = ltt.tracks[g].phi;
+                    theta_reco = ltt.tracks[g].theta * radtodeg;
+                    phi_reco = ltt.tracks[g].phi * radtodeg;
                     x_reco = ltt.tracks[g].x0;
                     y_reco = ltt.tracks[g].y0;
                 }
@@ -408,30 +398,36 @@ void simulations::sim_trk_32L(int iteration_per_event)
                 fake3.push_back(stats::hmrtaf3);
                 fake2.push_back(stats::hmrtaf2);
 
-                if(ltt.tracks.size()){
-                    h_theta_diff->Fill(theta_real - theta_reco);
-                    h_phi_diff->Fill(phi_real - phi_reco);
-                    h_theta_norm->Fill((theta_real - theta_reco) / theta_real);
-                    h_phi_norm->Fill((phi_real - phi_reco) / phi_real);
-                    
-                    h_dtheta_theta->Fill(theta_real, (theta_real - theta_reco));
-                    h_dtheta_phi->Fill(phi_real, (theta_real - theta_reco));
-                    h_dtheta_x->Fill(x_real, (theta_real - theta_reco));
-                    h_dtheta_y->Fill(y_real, (theta_real - theta_reco));
-                    h_dphi_theta->Fill(theta_real, (phi_real - phi_reco));
-                    h_dphi_phi->Fill(phi_real, (phi_real - phi_reco));
-                    h_dphi_x->Fill(x_real, (phi_real - phi_reco));
-                    h_dphi_y->Fill(y_real, (phi_real - phi_reco));
-                    h_dx_theta->Fill(theta_real, (x_real - x_reco));
-                    h_dx_phi->Fill(phi_real, (x_real - x_reco));
-                    h_dx_x->Fill(x_real, (x_real - x_reco));
-                    h_dx_y->Fill(y_real, (x_real - x_reco));
-                    h_dy_theta->Fill(theta_real, (y_real - y_reco));
-                    h_dy_phi->Fill(phi_real, (y_real - y_reco));
-                    h_dy_x->Fill(x_real, (y_real - y_reco));
-                    h_dy_y->Fill(y_real, (y_real - y_reco));
-                } 
+                double dtheta = theta_real - theta_reco;
+                double dphi = phi_real - phi_reco;
+                double dx = x_real - x_reco;
+                double dy = y_real - y_reco;
 
+                if (ltt.tracks.size())
+                {
+                    h_theta_diff->Fill(dtheta);
+                    h_phi_diff->Fill(dphi);
+
+                    h_dtheta_theta->Fill(theta_real, dtheta);
+                    h_dtheta_phi->Fill(phi_real, dtheta);
+                    h_dtheta_x->Fill(x_real, dtheta);
+                    h_dtheta_y->Fill(y_real, dtheta);
+
+                    h_dphi_theta->Fill(theta_real, dphi);
+                    h_dphi_phi->Fill(phi_real, dphi);
+                    h_dphi_x->Fill(x_real, dphi);
+                    h_dphi_y->Fill(y_real, dphi);
+
+                    h_dx_theta->Fill(theta_real, dx);
+                    h_dx_phi->Fill(phi_real, dx);
+                    h_dx_x->Fill(x_real, dx);
+                    h_dx_y->Fill(y_real, dx);
+
+                    h_dy_theta->Fill(theta_real, dy);
+                    h_dy_phi->Fill(phi_real, dy);
+                    h_dy_x->Fill(x_real, dy);
+                    h_dy_y->Fill(y_real, dy);
+                }
 
                 printProgressBarWithETA(j + 1, iteration_per_event, start_time);
             }
@@ -500,26 +496,41 @@ void simulations::sim_trk_32L(int iteration_per_event)
     hy_reco_phi->Write("hy_reco_phi", TObject::kOverwrite);
     hy_real_phi->Write("hy_real_phi", TObject::kOverwrite);
 
+    h_dtheta_theta->SetStats(0);
     h_dtheta_theta->Write("h_dtheta_theta", TObject::kOverwrite);
+    h_dtheta_phi->SetStats(0);
     h_dtheta_phi->Write("h_dtheta_phi", TObject::kOverwrite);
+    h_dtheta_x->SetStats(0);
     h_dtheta_x->Write("h_dtheta_x", TObject::kOverwrite);
+    h_dtheta_y->SetStats(0);
     h_dtheta_y->Write("h_dtheta_y", TObject::kOverwrite);
-    
+
+    h_dphi_theta->SetStats(0);
     h_dphi_theta->Write("h_dphi_theta", TObject::kOverwrite);
+    h_dphi_phi->SetStats(0);
     h_dphi_phi->Write("h_dphi_phi", TObject::kOverwrite);
+    h_dphi_x->SetStats(0);
     h_dphi_x->Write("h_dphi_x", TObject::kOverwrite);
+    h_dphi_y->SetStats(0);
     h_dphi_y->Write("h_dphi_y", TObject::kOverwrite);
 
+    h_dx_theta->SetStats(0);
     h_dx_theta->Write("h_dx_theta", TObject::kOverwrite);
+    h_dx_phi->SetStats(0);
     h_dx_phi->Write("h_dx_phi", TObject::kOverwrite);
+    h_dx_x->SetStats(0);
     h_dx_x->Write("h_dx_x", TObject::kOverwrite);
+    h_dx_y->SetStats(0);
     h_dx_y->Write("h_dx_y", TObject::kOverwrite);
-    
-    h_dy_theta->Write("h_dy_theta", TObject::kOverwrite);
-    h_dy_phi->Write("h_dy_phi", TObject::kOverwrite);
-    h_dy_x->Write("h_dy_x", TObject::kOverwrite);
-    h_dy_y->Write("h_dy_y", TObject::kOverwrite);
 
+    h_dy_theta->SetStats(0);
+    h_dy_theta->Write("h_dy_theta", TObject::kOverwrite);
+    h_dy_phi->SetStats(0);
+    h_dy_phi->Write("h_dy_phi", TObject::kOverwrite);
+    h_dy_x->SetStats(0);
+    h_dy_x->Write("h_dy_x", TObject::kOverwrite);
+    h_dy_y->SetStats(0);
+    h_dy_y->Write("h_dy_y", TObject::kOverwrite);
 
     // normalization
     if (htheta_reco->Integral() > 0)
@@ -540,8 +551,6 @@ void simulations::sim_trk_32L(int iteration_per_event)
     h_real->Write("h_real_normalized", TObject::kOverwrite);
     h_theta_diff->Write("h_theta_diff", TObject::kOverwrite);
     h_phi_diff->Write("h_phi_diff", TObject::kOverwrite);
-    h_theta_norm->Write("h_theta_norm", TObject::kOverwrite);
-    h_phi_norm->Write("h_phi_norm", TObject::kOverwrite);
 
     // --- make overlay canvas for theta ---
     TCanvas *c_theta = new TCanvas("c_theta_overlay", "theta reco vs real", 800, 600);
@@ -570,6 +579,49 @@ void simulations::sim_trk_32L(int iteration_per_event)
     leg2->Draw();
 
     c_phi->Write(); // saves the overlay canvas
+
+    TCanvas *alldistros = new TCanvas("alldistros", "16 histograms", 1600, 1600);
+    alldistros->Divide(4, 4); // 4 columns, 4 rows
+
+    // First row: dtheta
+    alldistros->cd(1);
+    h_dtheta_theta->Draw("colz");
+    alldistros->cd(2);
+    h_dtheta_phi->Draw("colz");
+    alldistros->cd(3);
+    h_dtheta_x->Draw("colz");
+    alldistros->cd(4);
+    h_dtheta_y->Draw("colz");
+    // Second row: dphi
+    alldistros->cd(5);
+    h_dphi_theta->Draw("colz");
+    alldistros->cd(6);
+    h_dphi_phi->Draw("colz");
+    alldistros->cd(7);
+    h_dphi_x->Draw("colz");
+    alldistros->cd(8);
+    h_dphi_y->Draw("colz");
+    // Third row: dx
+    alldistros->cd(9);
+    h_dx_theta->Draw("colz");
+    alldistros->cd(10);
+    h_dx_phi->Draw("colz");
+    alldistros->cd(11);
+    h_dx_x->Draw("colz");
+    alldistros->cd(12);
+    h_dx_y->Draw("colz");
+    // Fourth row: dy
+    alldistros->cd(13);
+    h_dy_theta->Draw("colz");
+    alldistros->cd(14);
+    h_dy_phi->Draw("colz");
+    alldistros->cd(15);
+    h_dy_x->Draw("colz");
+    alldistros->cd(16);
+    h_dy_y->Draw("colz");
+
+    alldistros->Write();
+    alldistros->SaveAs("../data/alldistros.png");
 
     // finish
     f->Flush();

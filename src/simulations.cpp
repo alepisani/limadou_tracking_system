@@ -402,6 +402,10 @@ void simulations::sim_trk_32L(int iteration_per_event)
                 double dphi = phi_real - phi_reco;
                 double dx = x_real - x_reco;
                 double dy = y_real - y_reco;
+                //printf("dphi = %f; phi_real = %f; phi_reco = %f\n", dphi, phi_real, phi_reco);
+                //printf("tan(theta)cos(phi)_real = %f, tan(theta)cos(phi)_reco = %f\n", TMath::Tan(theta_real) * TMath::Cos(phi_real), TMath::Tan(theta_reco) * TMath::Cos(phi_reco));
+                //printf("tan(theta)sin(phi)_real = %f, tan(theta)sin(phi)_reco = %f\n", TMath::Tan(theta_real) * TMath::Sin(phi_real), TMath::Tan(theta_reco) * TMath::Sin(phi_reco));
+                //printf("---------------------------");
 
                 if (ltt.tracks.size())
                 {
@@ -621,7 +625,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
     h_dy_y->Draw("colz");
 
     alldistros->Write();
-    alldistros->SaveAs("../data/alldistros.png");
+    //alldistros->SaveAs("../data/alldistros_remapped.png");
 
     // finish
     f->Flush();

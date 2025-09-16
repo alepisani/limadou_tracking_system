@@ -195,10 +195,12 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
 
     // what real intervals should look like
     min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0., pi / 2);
-    min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -pi, pi);
+    min->SetLimitedVariable(3, "phi", initialVars[3], steps[3], -1 * pi, 1 * pi);
     min->Minimize();
     return {min->X(), min->Errors(), min->MinValue()};
   };
+
+  // inizialise the variable for the fit function gives better accuracy in the algorithm
 
   double dx = clusters[2].x - clusters[0].x;
   double dy = clusters[2].y - clusters[0].y;
@@ -229,37 +231,16 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
   trkCand.err_theta = errors[2];
   trkCand.err_phi = errors[3];
   trkCand.chi2 = chi2;
-
   trkCand.theta = params[2];
   trkCand.phi = params[3];
 
+  // if(trkCand.phi < -pi) trkCand.phi += 2 * pi;
+  // if(trkCand.phi > +pi) trkCand.phi -= 2 * pi; 
+  
+  
+
 }
 
-/**
- * the fit function uses a wider range for the definition intervals for the angles paramenter.
- * that is because we're trying to minimaze a periodical variable and don't want to end up at the edge.
- * that's why we need to remap the right angles valus to take the physical values we're intrested in.
- * in fit function the angles variable are defined:
- *      theta: (-pi/2, pi) while should be (0,pi/2)
- *        phi: (-2pi, 2pi) while should be (-pi,+pi)
- */
-
-void LTrackerTrack::remap_angles(std::vector<LTrackCandidate> &tracks)
-{
-
-  float pi = TMath::Pi();
-
-  for (int j = 0; j < tracks.size(); ++j)
-  {
-
-    // remap theta
-    if (tracks[j].theta <= 0.)
-    {
-      tracks[j].theta *= -1;
-      tracks[j].phi *= -1;
-    }
-  }
-}
 
 // Add unused tracklets to without used clusters to final tracks (chi2 = 1 by definition)
 void LTrackerTrack::addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer)
@@ -743,46 +724,6 @@ bool LTrackerTrack::track_hit_TR(double x1, double y1, double theta, double phi)
   return false;
 }
 
-void LTrackerTrack::printRecoTracks_old_alg(TCanvas *reco, int events)
-{
-
-  int i = 0;
-  for (auto &trk : tracks)
-  {
-    if (i >= events)
-    {
-      break;
-    }
-    ++i;
-    float x1, y1, z1, dz, x2, y2, z2, t, p;
-    // dz = display::dist_z;
-    dz = 100;
-    t = trk.theta * TMath::DegToRad();
-    p = trk.phi * TMath::DegToRad();
-    x2 = trk.x0 + dz * (TMath::Tan(t)) * (TMath::Cos(p));
-    y2 = trk.y0 + dz * (TMath::Tan(t)) * (TMath::Sin(p));
-    z2 = trk.z0 + dz;
-    x1 = trk.x0 - dz * (TMath::Tan(t)) * (TMath::Cos(p));
-    y1 = trk.y0 - dz * (TMath::Tan(t)) * (TMath::Sin(p));
-    z1 = trk.z0 - dz;
-    Double_t x_line[3] = {x1, trk.x0, x2};
-    Double_t y_line[3] = {y1, trk.y0, y2};
-    Double_t z_line[3] = {z1, trk.z0, z2};
-    TPolyLine3D *line_track = new TPolyLine3D(3, x_line, y_line, z_line);
-    line_track->SetLineWidth(2);
-    line_track->SetLineColor(kRed);
-    line_track->Draw();
-
-    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 0, 0, 0, 0, 0);
-    g->Draw();
-    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 0, 0, 0, 0, 0);
-    m->Draw();
-    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
-    f->Draw();
-  }
-
-  reco->Update();
-}
 
 void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 {
@@ -794,6 +735,7 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 
     dz = 100;
 
+    printf("x0 = %f, y0 = %f, theta_reco = %f, phi_reco = %f\n", trk.x0, trk.y0, trk.theta * TMath::RadToDeg(), trk.phi * TMath::RadToDeg());
     x2 = trk.x0 + dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
     y2 = trk.y0 + dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
     z2 = trk.z0 + dz;

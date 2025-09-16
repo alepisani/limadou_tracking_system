@@ -30,19 +30,24 @@ void run(int *events){
 
     
     stats s;
-    display generated_tracks;
+    display gen_tracks;
     chips cc;
     LTrackerTrack tracker;
     LTrackCandidate tc;
     
     //interfaccia rivelatore
     cc.print_all_chips(cc, real_tracks);
-    generated_tracks.draw_TR12(real_tracks);
+    gen_tracks.draw_TR12(real_tracks);
 
     //funzione MC
-    generated_tracks.take_distributions();
-    generated_tracks.tracks(events, tracker, real_tracks);
-
+    gen_tracks.take_distributions();
+    gen_tracks.tracks(events, tracker, real_tracks);
+    cout << "-----------------------" << endl;
+    for(int i = 0; i < gen_tracks.generated_tracks.size(); ++i){
+        double theta = gen_tracks.generated_tracks[i].theta * TMath::RadToDeg();
+        double phi = gen_tracks.generated_tracks[i].phi * TMath::RadToDeg();
+        printf("x0 = %f, y0 = %f, theta_real = %f, phi_real = %f\n", gen_tracks.generated_tracks[i].x0, gen_tracks.generated_tracks[i].y0, theta, phi);
+    }
 
     //algoritmo di ricostruzione tracce
     TStopwatch t;
@@ -54,12 +59,12 @@ void run(int *events){
 
     tracker.printRecoTracks_new_alg(real_tracks);
 
-    cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
-    cout << "Real time: " << t.RealTime() << " s\n";
-    cout << "CPU time:  " << t.CpuTime()  << " s\n";
-    cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
+    // cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
+    // cout << "Real time: " << t.RealTime() << " s\n";
+    //cout << "CPU time:  " << t.CpuTime()  << " s\n";
+    // cout << "-+-+-+-+-+-+-+-+-+-+-+-+-+-+" << endl;
 
-    cout << "stats \n" << s << endl;
+    // cout << "stats \n" << s << endl;
 
 
 }
@@ -71,10 +76,10 @@ int main(int argc, char** argv) {
     
 
     //track simulation
-    //int *events;
-    //int ev = 1;
-    //events = &ev; 
-    //run(events);
+    // int *events;
+    // int ev = 3;
+    // events = &ev; 
+    // run(events);
 
 
     simulations sim;

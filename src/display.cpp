@@ -256,12 +256,12 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             cls_size_x = cls_size * PixelSizeRows;
             cls_size_y = cls_size * PixelSizeCols;
 
-            xL2 = xTR2 + (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
-            yL2 = yTR2 + (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
-            xL1 = xTR2 + (zTR2 - StaveZ[1]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
-            yL1 = yTR2 + (zTR2 - StaveZ[1]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
-            xL0 = xTR2 + (zTR2 - StaveZ[0]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
-            yL0 = yTR2 + (zTR2 - StaveZ[0]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
+            xL2 = xTR2 - (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
+            yL2 = yTR2 - (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
+            xL1 = xTR2 - (zTR2 - StaveZ[1]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
+            yL1 = yTR2 - (zTR2 - StaveZ[1]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
+            xL0 = xTR2 - (zTR2 - StaveZ[0]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
+            yL0 = yTR2 - (zTR2 - StaveZ[0]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
 
             // apply smiring to the signal left on the layers
             smiring_xL2 = rnd->Uniform(-cls_size_x, +cls_size_x);
@@ -277,8 +277,8 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             yL1 = yL1 + smiring_yL1;
             yL0 = yL0 + smiring_yL0;
 
-            xTR1 = xTR2 + (zTR2 - TR1CenterZ) * (TMath::Tan(theta)) * (TMath::Cos(phi));
-            yTR1 = yTR2 + (zTR2 - TR1CenterZ) * (TMath::Tan(theta)) * (TMath::Sin(phi));
+            xTR1 = xTR2 - (zTR2 - TR1CenterZ) * (TMath::Tan(theta)) * (TMath::Cos(phi));
+            yTR1 = yTR2 - (zTR2 - TR1CenterZ) * (TMath::Tan(theta)) * (TMath::Sin(phi));
 
         } while (!(xTR1 < TR1Size[0] / 2 && xTR1 > -TR1Size[0] / 2 &&
                    ((yTR1 < (2.5 * TR1Size[1] + 2 * TR1GapY) && yTR1 > (1.5 * TR1Size[1] + 2 * TR1GapY)) ||
@@ -353,15 +353,6 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
         geom->cd();
         line_track->Draw();
 
-        /*
-        cout << "real data" << endl;
-        cout << "L2 ------ x:" << xL2 << ",   y: " << yL2 << ",    z: " << StaveZ[2] << endl;
-        cout << "L1 ------ x:" << xL1 << ",   y: " << yL1 << ",    z: " << StaveZ[1] << endl;
-        cout << "L0 ------ x:" << xL0 << ",   y: " << yL0 << ",    z: " << StaveZ[0] << endl;
-        cout << "(gra)theta" << (theta*180)/TMath::Pi() << ",     phi" << (phi*180)/TMath::Pi() << endl;
-        cout << "(rad) theta: " << theta << "     phi: " << phi << endl;
-        cout << "-----------------------------------------------------------------------------";
-        */
 
         LCluster pL2;
         LCluster mL1;
@@ -564,12 +555,12 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             cls_size_x = cls_size * PixelSizeRows;
             cls_size_y = cls_size * PixelSizeCols;
 
-            xL2 = xTR2 + (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
-            yL2 = yTR2 + (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
-            xL1 = xTR2 + (zTR2 - StaveZ[1]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
-            yL1 = yTR2 + (zTR2 - StaveZ[1]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
-            xL0 = xTR2 + (zTR2 - StaveZ[0]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
-            yL0 = yTR2 + (zTR2 - StaveZ[0]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
+            xL2 = xTR2 - (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
+            yL2 = yTR2 - (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
+            xL1 = xTR2 - (zTR2 - StaveZ[1]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
+            yL1 = yTR2 - (zTR2 - StaveZ[1]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
+            xL0 = xTR2 - (zTR2 - StaveZ[0]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
+            yL0 = yTR2 - (zTR2 - StaveZ[0]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
 
             // apply smiring to the signal left on the layers
             smiring_xL2 = rnd->Uniform(-cls_size_x, +cls_size_x);
@@ -585,8 +576,9 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             yL1 = yL1 + smiring_yL1;
             yL0 = yL0 + smiring_yL0;
 
-            xTR1 = xTR2 + (zTR2 - TR1CenterZ) * (TMath::Tan(theta)) * (TMath::Cos(phi));
-            yTR1 = yTR2 + (zTR2 - TR1CenterZ) * (TMath::Tan(theta)) * (TMath::Sin(phi));
+            xTR1 = xTR2 - (zTR2 - TR1CenterZ) * (TMath::Tan(theta)) * (TMath::Cos(phi));
+            yTR1 = yTR2 - (zTR2 - TR1CenterZ) * (TMath::Tan(theta)) * (TMath::Sin(phi));
+            
         } while (!(xTR1 < TR1Size[0] / 2 && xTR1 > -TR1Size[0] / 2 &&
                    ((yTR1 < (2.5 * TR1Size[1] + 2 * TR1GapY) && yTR1 > (1.5 * TR1Size[1] + 2 * TR1GapY)) ||
                     (yTR1 < (1.5 * TR1Size[1] + 1 * TR1GapY) && yTR1 > (0.5 * TR1Size[1] + 1 * TR1GapY)) ||

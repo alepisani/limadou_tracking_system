@@ -21,6 +21,8 @@
 #include "eventdata.h"
 using namespace std;
 
+std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
+
 eventdata::eventdata() {}
 
 std::unordered_map<int, eventdata> alldata;
@@ -54,7 +56,10 @@ void eventdata::takedata()
     // TFile *file = TFile::Open("../data_beam_test/");
 
     // TFile *file = TFile::Open("../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
-    TFile *file = TFile::Open("../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root");    
+    // TFile *file = TFile::Open("../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root");
+
+    TFile *file = TFile::Open(input_filename.c_str()); // open for reading
+
     if (!file || file->IsZombie())
     {
         std::cerr << "Errore nell'aprire il file ROOT\n";
@@ -141,8 +146,10 @@ void eventdata::analize_data()
     auto start_time = std::chrono::steady_clock::now();
     float pi = TMath::Pi();
     int nbins = alldata.size() / 200;
-    TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", 180, -5, 95);
-    TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", 720, -190, 190);
+    int theta_bins = 50;
+    int phi_bins = 50;
+    TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", theta_bins, -5, 90);
+    TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", phi_bins, -185, 185);
     TH2D *h = new TH2D("h_theta_vs_phi", "#theta vs #phi;#phi (deg);#theta (deg)", nbins, -185, 185, nbins, 0, 90);
     TH1F *hchi2 = new TH1F("hchi2", "#chi2;#chi2;counts", nbins, 0, 5000);
 
@@ -250,16 +257,74 @@ void eventdata::analize_data()
 
     if (!print_canvas)
     {
+        TH1F *h_theta = new TH1F("h_theta", "h_theta", theta_bins, -5, 90);
+        TH1F *h_theta_m2 = new TH1F("h_theta_m2", "h_theta_m2", theta_bins, -5, 90);
+        TH1F *h_phi = new TH1F("h_phi", "h_phi", phi_bins, -185, 185);
+        TH1F *h_phi_m2 = new TH1F("h_phi_m2", "h_phi_m2", phi_bins, -185, 185);
 
-        char fil[200];
-        sprintf(fil, "../data/reco_HEPDaaaa02.root");
-        TFile f(fil, "UPDATE");
+        TFile *fIn = new TFile("../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root");
+        TTree *oldTree = (TTree *)fIn->Get("L2");
+        TFile *fOut = new TFile("../data/overlay_plots.root", "RECREATE");
+
+        // --- Input branch (std::vector<float>) ---
+        std::vector<float> *theta = nullptr;
+        std::vector<float> *phi = nullptr;
+        std::vector<float> *theta_m2 = nullptr;
+        std::vector<float> *phi_m2 = nullptr;
+        oldTree->SetBranchAddress("theta", &theta);
+        oldTree->SetBranchAddress("phi", &phi);
+        oldTree->SetBranchAddress("theta_m2", &theta_m2);
+        oldTree->SetBranchAddress("phi_m2", &phi_m2);
+
+        Long64_t nentries = oldTree->GetEntries();
+        for (Long64_t i = 0; i < nentries; i++)
+        {
+            oldTree->GetEntry(i);
+            for (size_t j = 0; j < theta->size(); ++j)
+            {
+                h_theta->Fill(theta->at(j));
+                h_phi->Fill(phi->at(j));
+                h_theta_m2->Fill(theta_m2->at(j));
+                h_phi_m2->Fill(phi_m2->at(j));
+            }
+        }
+        h_theta->Write();
+        h_theta_m2->Write();
         htheta->Write();
+        h_phi->Write();
+        h_phi_m2->Write();
         hphi->Write();
-        hchi2->Write();
-        h->Write();
-        f.Close();
 
+        TCanvas *c_theta = new TCanvas("c_theta_overlay", "compare_theta", 800, 600);
+        h_theta->SetLineColor(kBlue);
+        h_theta_m2->SetLineColor(kRed);
+        htheta->SetLineColor(kBlack);
+        h_theta->Draw("HIST");
+        h_theta_m2->Draw("HISTSAME");
+        htheta->Draw("HISTSAME");
+        TLegend *leg1 = new TLegend(0.6, 0.7, 0.8, 0.8);
+        leg1->AddEntry(h_theta, "follega", "l");
+        leg1->AddEntry(h_theta_m2, "old_algo", "l");
+        leg1->AddEntry(htheta, "new_algo", "l");
+        leg1->Draw();
+        c_theta->Write();
+
+        TCanvas *c_phi = new TCanvas("c_phi_overlay", "compare_phi", 800, 600);
+        h_phi->SetLineColor(kBlue);
+        h_phi_m2->SetLineColor(kRed);
+        hphi->SetLineColor(kBlack);
+        h_phi->Draw("HIST");
+        h_phi_m2->Draw("HISTSAME");
+        hphi->Draw("HISTSAME");
+        TLegend *leg2 = new TLegend(0.6, 0.7, 0.8, 0.8);
+        leg2->AddEntry(h_phi, "follega", "l");
+        leg2->AddEntry(h_phi_m2, "old_algo", "l");
+        leg2->AddEntry(hphi, "new_algo", "l");
+        leg2->Draw();
+        c_phi->Write();
+
+        fOut->Close();
+        fIn->Close();
     }
 }
 

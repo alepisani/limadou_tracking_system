@@ -241,6 +241,10 @@ void simulations::sim_old_algo(int iteration_per_event)
 
 void simulations::sim_trk_32L(int iteration_per_event)
 {
+    int dphi_neg = 0;
+    int dphi_pos = 0;
+    int dphi0 = 0;
+    int dphi_tot = 0;
     float pi = TMath::Pi();
     float degtorad = TMath::DegToRad();
     float radtodeg = TMath::RadToDeg();
@@ -406,6 +410,12 @@ void simulations::sim_trk_32L(int iteration_per_event)
                 //printf("tan(theta)cos(phi)_real = %f, tan(theta)cos(phi)_reco = %f\n", TMath::Tan(theta_real) * TMath::Cos(phi_real), TMath::Tan(theta_reco) * TMath::Cos(phi_reco));
                 //printf("tan(theta)sin(phi)_real = %f, tan(theta)sin(phi)_reco = %f\n", TMath::Tan(theta_real) * TMath::Sin(phi_real), TMath::Tan(theta_reco) * TMath::Sin(phi_reco));
                 //printf("---------------------------");
+
+                
+
+                if(dphi < -150.) dphi_neg++;
+                if(dphi > +150.) dphi_pos++;
+                if(dphi < +150. && dphi > -150.) dphi0++;
 
                 if (ltt.tracks.size())
                 {
@@ -625,10 +635,16 @@ void simulations::sim_trk_32L(int iteration_per_event)
     h_dy_y->Draw("colz");
 
     alldistros->Write();
-    //alldistros->SaveAs("../data/alldistros_remapped.png");
+    alldistros->SaveAs("../data/alldistros.png");
 
     // finish
     f->Flush();
     f->ls();
     f->Close();
+
+    dphi_tot = dphi_neg + dphi0 + dphi_pos;
+    cout << "dphi < -150 = " << dphi_neg << endl;
+    cout << "dphi > +150 = " << dphi_pos << endl;
+    cout << "dphi intorno 0 = " << dphi0 << endl;
+    cout << "dphi_tot " << dphi_tot << endl;
 }

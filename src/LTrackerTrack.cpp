@@ -451,9 +451,9 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     auto cls_lay0 = tidy_clusters_lay0[trkl02.firstClusterId];
     auto cls_lay2 = tidy_clusters_lay2[trkl02.secondClusterId];
     // t.print_tracklet(cls_lay0, cls_lay1);
-    double delta_y = (double)cls_lay0.y - (double)cls_lay2.y;
-    double delta_x = (double)cls_lay0.x - (double)cls_lay2.x;
-    double delta_z = (double)cls_lay0.z - (double)cls_lay2.z;
+    double delta_y = (double)cls_lay2.y - (double)cls_lay0.y;
+    double delta_x = (double)cls_lay2.x - (double)cls_lay0.x;
+    double delta_z = (double)cls_lay2.z - (double)cls_lay0.z;
     double delta_r = TMath::Sqrt(delta_y * delta_y + delta_x * delta_x);
     double r = TMath::Sqrt(delta_x * delta_x + delta_y * delta_y + delta_z * delta_z);
     double phi = TMath::ATan2(delta_y, delta_x);

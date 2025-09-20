@@ -21,7 +21,9 @@
 #include "eventdata.h"
 using namespace std;
 
-std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
+// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-071441-Events-00351_01656-p01_L2.root";
+// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-045249-Events-00351_01585-p01_L2.root";
+std::string input_filename = "../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root";
 
 eventdata::eventdata() {}
 
@@ -52,12 +54,6 @@ std::ostream &operator<<(std::ostream &output, const eventdata &ev)
 void eventdata::takedata()
 {
 
-    // cambia nome file in base a cosa vuoi
-    // TFile *file = TFile::Open("../data_beam_test/");
-
-    // TFile *file = TFile::Open("../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
-    // TFile *file = TFile::Open("../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root");
-
     TFile *file = TFile::Open(input_filename.c_str()); // open for reading
 
     if (!file || file->IsZombie())
@@ -73,15 +69,6 @@ void eventdata::takedata()
     }
 
     // Oggetti temporanei per collegare i branch
-    /* std::vector<unsigned char> *DIR_turret_idx = nullptr;
-    std::vector<unsigned char> *DIR_stave_idx = nullptr;
-    std::vector<unsigned char> *DIR_chip_idx0 = nullptr;
-    std::vector<unsigned char> *DIR_chip_idx1 = nullptr;
-    std::vector<unsigned int>  *DIR_chip_id = nullptr;
-    std::vector<float> *DIR_xpos = nullptr;
-    std::vector<float> *DIR_ypos = nullptr;
-    std::vector<float> *DIR_zpos = nullptr;
-    std::vector<int> *DIR_cls_idx = nullptr; */
     std::vector<unsigned int> *cls_size = nullptr;
     std::vector<float> *cls_mean_x = nullptr;
     std::vector<float> *cls_mean_y = nullptr;
@@ -89,15 +76,6 @@ void eventdata::takedata()
     std::vector<float> *cls_mean_x_err = nullptr;
     std::vector<float> *cls_mean_y_err = nullptr;
 
-    /* tree->SetBranchAddress("DIR_turret_idx", &DIR_turret_idx);
-    tree->SetBranchAddress("DIR_stave_idx",  &DIR_stave_idx);
-    tree->SetBranchAddress("DIR_chip_idx0",  &DIR_chip_idx0);
-    tree->SetBranchAddress("DIR_chip_idx1",  &DIR_chip_idx1);
-    tree->SetBranchAddress("DIR_chip_id",    &DIR_chip_id);
-    tree->SetBranchAddress("DIR_xpos",       &DIR_xpos);
-    tree->SetBranchAddress("DIR_ypos",       &DIR_ypos);
-    tree->SetBranchAddress("DIR_zpos",       &DIR_zpos);
-    tree->SetBranchAddress("DIR_cls_idx",    &DIR_cls_idx); */
     tree->SetBranchAddress("cls_size", &cls_size); // in pixel
     tree->SetBranchAddress("cls_mean_x", &cls_mean_x);
     tree->SetBranchAddress("cls_mean_y", &cls_mean_y);
@@ -111,15 +89,6 @@ void eventdata::takedata()
     {
         tree->GetEntry(i);
         eventdata ev;
-        /* ev.DIR_turret_idx = *DIR_turret_idx;
-        ev.DIR_stave_idx  = *DIR_stave_idx;
-        ev.DIR_chip_idx0  = *DIR_chip_idx0;
-        ev.DIR_chip_idx1  = *DIR_chip_idx1;
-        ev.DIR_chip_id    = *DIR_chip_id;
-        ev.DIR_xpos       = *DIR_xpos;
-        ev.DIR_ypos       = *DIR_ypos;
-        ev.DIR_zpos       = *DIR_zpos;
-        ev.DIR_cls_idx    = *DIR_cls_idx; */
         ev.cls_size = *cls_size;
         ev.cls_mean_x = *cls_mean_x;
         ev.cls_mean_y = *cls_mean_y;
@@ -258,11 +227,15 @@ void eventdata::analize_data()
     if (!print_canvas)
     {
         TH1F *h_theta = new TH1F("h_theta", "h_theta", theta_bins, -5, 90);
+        h_theta->SetStats(0);
         TH1F *h_theta_m2 = new TH1F("h_theta_m2", "h_theta_m2", theta_bins, -5, 90);
+        h_theta_m2->SetStats(0);
         TH1F *h_phi = new TH1F("h_phi", "h_phi", phi_bins, -185, 185);
+        h_phi->SetStats(0);
         TH1F *h_phi_m2 = new TH1F("h_phi_m2", "h_phi_m2", phi_bins, -185, 185);
+        h_phi_m2->SetStats(0);
 
-        TFile *fIn = new TFile("../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root");
+        TFile *fIn = new TFile(input_filename.c_str());
         TTree *oldTree = (TTree *)fIn->Get("L2");
         TFile *fOut = new TFile("../data/overlay_plots.root", "RECREATE");
 
@@ -280,12 +253,21 @@ void eventdata::analize_data()
         for (Long64_t i = 0; i < nentries; i++)
         {
             oldTree->GetEntry(i);
-            for (size_t j = 0; j < theta->size(); ++j)
+
+            // Add size checks before accessing vectors
+            if (theta && phi && theta_m2 && phi_m2)
             {
-                h_theta->Fill(theta->at(j));
-                h_phi->Fill(phi->at(j));
-                h_theta_m2->Fill(theta_m2->at(j));
-                h_phi_m2->Fill(phi_m2->at(j));
+                // Make sure we only loop up to the smallest vector size
+                size_t min_size = std::min({theta->size(), phi->size(),
+                                            theta_m2->size(), phi_m2->size()});
+
+                for (size_t j = 0; j < min_size; ++j)
+                {
+                    h_theta->Fill(theta->at(j));
+                    h_phi->Fill(phi->at(j));
+                    h_theta_m2->Fill(theta_m2->at(j));
+                    h_phi_m2->Fill(phi_m2->at(j));
+                }
             }
         }
         h_theta->Write();
@@ -295,7 +277,20 @@ void eventdata::analize_data()
         h_phi_m2->Write();
         hphi->Write();
 
+        // Find the maximum y value among all histograms
+        double maxY1 = h_theta->GetMaximum();
+        double maxY2 = h_theta_m2->GetMaximum();
+        double maxY3 = htheta->GetMaximum();
+        double maxY = maxY1;
+        if (maxY2 > maxY)
+            maxY = maxY2;
+        if (maxY3 > maxY)
+            maxY = maxY3;
+
+        // Set the y-axis range with 10% padding
+        h_theta->GetYaxis()->SetRangeUser(0, maxY * 1.1);
         TCanvas *c_theta = new TCanvas("c_theta_overlay", "compare_theta", 800, 600);
+        c_theta->SetTitle("#theta comparison");
         h_theta->SetLineColor(kBlue);
         h_theta_m2->SetLineColor(kRed);
         htheta->SetLineColor(kBlack);
@@ -303,13 +298,27 @@ void eventdata::analize_data()
         h_theta_m2->Draw("HISTSAME");
         htheta->Draw("HISTSAME");
         TLegend *leg1 = new TLegend(0.6, 0.7, 0.8, 0.8);
-        leg1->AddEntry(h_theta, "follega", "l");
+        leg1->AddEntry(h_theta, "hough trasform", "l");
         leg1->AddEntry(h_theta_m2, "old_algo", "l");
         leg1->AddEntry(htheta, "new_algo", "l");
         leg1->Draw();
         c_theta->Write();
 
+        // Find the maximum y value among all histograms
+        double maxY1phi = h_phi->GetMaximum();
+        double maxY2phi = h_phi_m2->GetMaximum();
+        double maxY3phi = hphi->GetMaximum();
+        double maxYphi = maxY1phi;
+        if (maxY2phi > maxYphi)
+            maxYphi = maxY2phi;
+        if (maxY3phi > maxYphi)
+            maxYphi = maxY3phi;
+
+        // Set the y-axis range with 10% padding
+        h_phi->GetYaxis()->SetRangeUser(0, maxYphi * 1.1);
+
         TCanvas *c_phi = new TCanvas("c_phi_overlay", "compare_phi", 800, 600);
+        c_phi->SetTitle("#phi comparison");
         h_phi->SetLineColor(kBlue);
         h_phi_m2->SetLineColor(kRed);
         hphi->SetLineColor(kBlack);
@@ -317,7 +326,7 @@ void eventdata::analize_data()
         h_phi_m2->Draw("HISTSAME");
         hphi->Draw("HISTSAME");
         TLegend *leg2 = new TLegend(0.6, 0.7, 0.8, 0.8);
-        leg2->AddEntry(h_phi, "follega", "l");
+        leg2->AddEntry(h_phi, "hough trasform", "l");
         leg2->AddEntry(h_phi_m2, "old_algo", "l");
         leg2->AddEntry(hphi, "new_algo", "l");
         leg2->Draw();

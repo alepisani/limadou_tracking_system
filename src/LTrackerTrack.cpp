@@ -87,7 +87,7 @@ void LTrackerTrack::computeTracklets()
 
 void LTrackerTrack::print_tracklet(const LCluster cl_0, const LCluster cl_2)
 {
- 
+
   float x0, y0, z0, x2, y2, z2;
   float fx0, fy0, fz0, fx2, fy2, fz2;
   x0 = cl_0.x;
@@ -104,7 +104,7 @@ void LTrackerTrack::print_tracklet(const LCluster cl_0, const LCluster cl_2)
   // fx2 = x2 + dx;
   // fy2 = y2 + dy;
   // fz2 = z2 + display::dist_z;
-  
+
   // Double_t x_line[4] = {fx0, x0, x2, fx2};
   // Double_t y_line[4] = {fy0, y0, y2, fy2};
   // Double_t z_line[4] = {fz0, z0, z2, fz2};
@@ -117,30 +117,29 @@ void LTrackerTrack::print_tracklet(const LCluster cl_0, const LCluster cl_2)
   trk->Draw();
 }
 
-
 void LTrackerTrack::print_all_tracklet(LTrackerTrack ltt)
 {
- 
-  for (auto &trkl01 : ltt.tracklet_lay01){
+
+  for (auto &trkl01 : ltt.tracklet_lay01)
+  {
     auto cls_lay0 = tidy_clusters_lay0[trkl01.firstClusterId];
     auto cls_lay1 = tidy_clusters_lay1[trkl01.secondClusterId];
     print_tracklet(cls_lay0, cls_lay1);
   }
 
-  for (auto &trkl12 : ltt.tracklet_lay12){
+  for (auto &trkl12 : ltt.tracklet_lay12)
+  {
     auto cls_lay1 = tidy_clusters_lay1[trkl12.firstClusterId];
     auto cls_lay2 = tidy_clusters_lay2[trkl12.secondClusterId];
     print_tracklet(cls_lay1, cls_lay2);
   }
 
-  for (auto &trkl02 : ltt.tracklet_lay02){
+  for (auto &trkl02 : ltt.tracklet_lay02)
+  {
     auto cls_lay0 = tidy_clusters_lay0[trkl02.firstClusterId];
     auto cls_lay2 = tidy_clusters_lay2[trkl02.secondClusterId];
     print_tracklet(cls_lay0, cls_lay2);
   }
-  
-
-
 }
 
 // Distance function to be minimised
@@ -205,9 +204,9 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
   double dx = clusters[2].x - clusters[0].x;
   double dy = clusters[2].y - clusters[0].y;
   double dz = clusters[2].z - clusters[0].z;
-  double r = sqrt(dx*dx + dy*dy + dz*dz);
-  double guess_theta = acos(dz / r); 
-  double guess_phi = atan2(dy, dx); 
+  double r = sqrt(dx * dx + dy * dy + dz * dz);
+  double guess_theta = acos(dz / r);
+  double guess_phi = atan2(dy, dx);
 
   double vars[4] = {clusters[0].x, clusters[0].y, guess_theta, guess_phi};
   double step_coarse[4] = {0.01, 0.01, 0.01, 0.01};
@@ -235,12 +234,8 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
   trkCand.phi = params[3];
 
   // if(trkCand.phi < -pi) trkCand.phi += 2 * pi;
-  // if(trkCand.phi > +pi) trkCand.phi -= 2 * pi; 
-  
-  
-
+  // if(trkCand.phi > +pi) trkCand.phi -= 2 * pi;
 }
-
 
 // Add unused tracklets to without used clusters to final tracks (chi2 = 1 by definition)
 void LTrackerTrack::addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer)
@@ -724,7 +719,6 @@ bool LTrackerTrack::track_hit_TR(double x1, double y1, double theta, double phi)
   return false;
 }
 
-
 void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 {
 
@@ -747,7 +741,7 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
     Double_t z_line[3] = {z1, trk.z0, z2};
     TPolyLine3D *line_track = new TPolyLine3D(3, x_line, y_line, z_line);
     line_track->SetLineWidth(2);
-    if (trk.chi2 > 5)
+    if (trk.chi2 > 10)
       line_track->SetLineColor(kGreen);
     else
       line_track->SetLineColor(kRed);
@@ -759,6 +753,27 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
     m->Draw();
     TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
     f->Draw();
+
+    if (trk.chi2 > 0.)
+    {
+      double R = 5;      // radius of the circle
+      const int N = 100; // number of points to make circle smooth
+      Double_t x_circ[N], y_circ[N], z_circ[N];
+
+      for (int j = 0; j < N; j++)
+      {
+        double phi = 2 * TMath::Pi() * j / (N - 1); // angle
+        x_circ[j] = trk.x0 + R * TMath::Cos(phi);
+        y_circ[j] = trk.y0 + R * TMath::Sin(phi);
+        z_circ[j] = trk.z0; // circle in XY plane
+      }
+
+      // make polyline
+      TPolyLine3D *circle = new TPolyLine3D(N, x_circ, y_circ, z_circ);
+      circle->SetLineColor(kBlue);
+      circle->SetLineWidth(2);
+      circle->Draw();
+    }
   }
 
   reco->Update();

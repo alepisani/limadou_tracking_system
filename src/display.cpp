@@ -551,9 +551,9 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             theta = (allTheta[ind_theta] / 180) * TMath::Pi();
             //theta = rnd->Uniform(0, 3.14);
             phi = (allPhi[ind_phi] / 180) * TMath::Pi();
-            cls_size = (all_cls_size[ind_cls_size]);
+            cls_size = (all_cls_size[ind_cls_size]) * TMath::Cos(theta);
             cls_size_x = cls_size * PixelSizeRows;
-            cls_size_y = cls_size * PixelSizeCols;
+            cls_size_y = cls_size * PixelSizeCols;  
 
             xL2 = xTR2 - (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
             yL2 = yTR2 - (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Sin(phi));

@@ -76,6 +76,8 @@
         "fitCosmics.C": "cpp",
         "filesystem": "cpp",
         "raggio.C": "cpp",
-        "computeAcceptanceCosmics.C": "cpp"
-    }
+        "computeAcceptanceCosmics.C": "cpp",
+        "raggio_copy.C": "cpp"
+    },
+    "C_Cpp.default.compilerPath": ""
 }

@@ -118,8 +118,7 @@ bool display::is_inside_the_layers(double *x, double *y)
     return false;
 }
 
-void display::take_distributions()
-{
+void display::take_distributions(){
 
     TFile *file = TFile::Open("../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
     //TFile *file = TFile::Open("../../../../data/apisani/muons/TEST_MUONS.root");
@@ -349,7 +348,8 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
         Double_t z_line[2] = {zTR2, zTR1};
         TPolyLine3D *line_track = new TPolyLine3D(2, x_line, y_line, z_line);
         line_track->SetLineColor(kBlue);
-        line_track->SetLineWidth(4);
+        //line_track->SetLineWidth(4);
+        line_track->SetLineWidth(3);
         geom->cd();
         line_track->Draw();
 
@@ -366,7 +366,8 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], cls_size_x, cls_size_y, 0, i);
 
             tracker.tidy_clusters_lay2.try_emplace(i, pL2);
-            TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], err_cl, err_cl, 0, 0, 0);
+            //TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], err_cl, err_cl, 0, 0, 0);
+            TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], 0, 0, 0, 0, 0);
             p->Draw();
         }
         // check if the track hitted the staves in layer 1
@@ -376,7 +377,8 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             stats::hitL1 = true;
             mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], cls_size_x, cls_size_y, 0, i);
             tracker.tidy_clusters_lay1.try_emplace(i, mL1);
-            TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], err_cl, err_cl, 0, 0, 0);
+            //TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], err_cl, err_cl, 0, 0, 0);
+            TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], 0, 0, 0, 0, 0);
             m->Draw();
         }
         // check if the track hitted the staves in layer 0
@@ -386,7 +388,8 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             stats::hitL0 = true;
             qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], cls_size_x, cls_size_y, 0, i);
             tracker.tidy_clusters_lay0.try_emplace(i, qL0);
-            TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], err_cl, err_cl, 0, 0, 0);
+            //TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], err_cl, err_cl, 0, 0, 0);
+            TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], 0, 0, 0, 0, 0);
             q->Draw();
         }
 

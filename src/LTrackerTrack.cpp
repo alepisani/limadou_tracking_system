@@ -570,8 +570,8 @@ void LTrackerTrack::computeTrackCandidates()
     // cout << trk.chi2 << endl;
   }
 
-  // addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay01, tidy_clusters_lay0, tidy_clusters_lay1);
-  // addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay12, tidy_clusters_lay1, tidy_clusters_lay2);
+  addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay01, tidy_clusters_lay0, tidy_clusters_lay1);
+  addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay12, tidy_clusters_lay1, tidy_clusters_lay2);
   addSpuriousTracks(used_tracklets, used_clusters, tracklet_lay02, tidy_clusters_lay0, tidy_clusters_lay2);
 
   // Reassigning track id
@@ -655,7 +655,7 @@ void LTrackerTrack::new_algo(double radius)
     used_clusters.insert(used_clusters.end(), trk.clus_id.begin(), trk.clus_id.end());
   }
 
-  New_addSpuriousTracks(used_tracklets, used_clusters);
+  // New_addSpuriousTracks(used_tracklets, used_clusters);
 
   // Reassigning track id
   for (int i = 0; i < tracks.size(); i++)
@@ -729,7 +729,7 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 
     dz = 100;
 
-    printf("x0 = %f, y0 = %f, theta_reco = %f, phi_reco = %f\n", trk.x0, trk.y0, trk.theta * TMath::RadToDeg(), trk.phi * TMath::RadToDeg());
+    // printf("x0 = %f, y0 = %f, theta_reco = %f, phi_reco = %f\n", trk.x0, trk.y0, trk.theta * TMath::RadToDeg(), trk.phi * TMath::RadToDeg());
     x2 = trk.x0 + dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
     y2 = trk.y0 + dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
     z2 = trk.z0 + dz;
@@ -741,10 +741,10 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
     Double_t z_line[3] = {z1, trk.z0, z2};
     TPolyLine3D *line_track = new TPolyLine3D(3, x_line, y_line, z_line);
     line_track->SetLineWidth(2);
-    if (trk.chi2 > 10)
-      line_track->SetLineColor(kGreen);
-    else
-      line_track->SetLineColor(kRed);
+    //if (trk.chi2 > 10)
+    //  line_track->SetLineColor(kGreen);
+    //else
+    line_track->SetLineColor(kRed);
     line_track->Draw();
 
     TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 0, 0, 0, 0, 0);
@@ -756,7 +756,7 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 
     if (trk.chi2 > 0.)
     {
-      double R = 5;      // radius of the circle
+      double R = 6;      // radius of the circle
       const int N = 100; // number of points to make circle smooth
       Double_t x_circ[N], y_circ[N], z_circ[N];
 

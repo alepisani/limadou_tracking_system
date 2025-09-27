@@ -43,9 +43,10 @@ simulations::simulations()
 {
     // radius in mm
     // simulations::gen_tracks = {1};
-    radius = {2.};
-    simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
-    radius = {2, 1.5, 1, 0.9, 0.8, 0.7, 0.65, 0.6, 0.55, 0.5, 0.47, 0.45, 0.43, 0.4, 0.37, 0.35, 0.33, 0.3, 0.27, 0.25, 0.23, 0.2, 0.15, 0.1, 0.05, 0.01, 0}; //mm
+    radius = {0.4};
+    // simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
+    simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10};
+    // radius = {2, 1.5, 1, 0.9, 0.8, 0.7, 0.65, 0.6, 0.55, 0.5, 0.47, 0.45, 0.43, 0.4, 0.37, 0.35, 0.33, 0.3, 0.27, 0.25, 0.23, 0.2, 0.15, 0.1, 0.05, 0.01, 0}; //mm
 
     // simulations::gen_tracks = {100};
     // radius = {0.3};
@@ -215,7 +216,8 @@ void simulations::sim_old_algo(int iteration_per_event)
             c_time.push_back(t.CpuTime());
             reco.push_back(stats::hmrt);
             reco_real.push_back(stats::hmrtar);
-            gen_tr3L.push_back(stats::hmgthL012);
+            gen_tr3L.push_back(stats::hmgthL012 + stats::hmgth2L);
+            // gen_tr3L.push_back(stats::hmgthL012);
             trkl.push_back(ltt.tracklet_lay02.size() + ltt.tracklet_lay01.size() + ltt.tracklet_lay12.size());
 
             printProgressBarWithETA(j + 1, iteration_per_event, start_time);
@@ -241,10 +243,6 @@ void simulations::sim_old_algo(int iteration_per_event)
 
 void simulations::sim_trk_32L(int iteration_per_event)
 {
-    int dphi_neg = 0;
-    int dphi_pos = 0;
-    int dphi0 = 0;
-    int dphi_tot = 0;
     float pi = TMath::Pi();
     float degtorad = TMath::DegToRad();
     float radtodeg = TMath::RadToDeg();
@@ -398,7 +396,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
                 reco_real.push_back(stats::hmrtar);
                 reco_real3.push_back(stats::hmrtar3);
                 reco_real2.push_back(stats::hmrtar2);
-                gen_trk.push_back(stats::hmgthL012 + stats::hmgth2L);
+                // gen_trk.push_back(stats::hmgthL012 + stats::hmgth2L);
+                gen_trk.push_back(stats::hmgthL012);
                 fake3.push_back(stats::hmrtaf3);
                 fake2.push_back(stats::hmrtaf2);
 
@@ -406,16 +405,6 @@ void simulations::sim_trk_32L(int iteration_per_event)
                 double dphi = phi_real - phi_reco;
                 double dx = x_real - x_reco;
                 double dy = y_real - y_reco;
-                //printf("dphi = %f; phi_real = %f; phi_reco = %f\n", dphi, phi_real, phi_reco);
-                //printf("tan(theta)cos(phi)_real = %f, tan(theta)cos(phi)_reco = %f\n", TMath::Tan(theta_real) * TMath::Cos(phi_real), TMath::Tan(theta_reco) * TMath::Cos(phi_reco));
-                //printf("tan(theta)sin(phi)_real = %f, tan(theta)sin(phi)_reco = %f\n", TMath::Tan(theta_real) * TMath::Sin(phi_real), TMath::Tan(theta_reco) * TMath::Sin(phi_reco));
-                //printf("---------------------------");
-
-                
-
-                if(dphi < -150.) dphi_neg++;
-                if(dphi > +150.) dphi_pos++;
-                if(dphi < +150. && dphi > -150.) dphi0++;
 
                 if (ltt.tracks.size())
                 {
@@ -642,9 +631,4 @@ void simulations::sim_trk_32L(int iteration_per_event)
     f->ls();
     f->Close();
 
-    dphi_tot = dphi_neg + dphi0 + dphi_pos;
-    cout << "dphi < -150 = " << dphi_neg << endl;
-    cout << "dphi > +150 = " << dphi_pos << endl;
-    cout << "dphi intorno 0 = " << dphi0 << endl;
-    cout << "dphi_tot " << dphi_tot << endl;
 }

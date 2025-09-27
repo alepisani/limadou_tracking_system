@@ -42,12 +42,12 @@ void run(int *events){
     //funzione MC
     gen_tracks.take_distributions();
     gen_tracks.tracks(events, tracker, real_tracks);
-    for(int i = 0; i < gen_tracks.generated_tracks.size(); ++i){
-        double theta = gen_tracks.generated_tracks[i].theta * TMath::RadToDeg();
-        double phi = gen_tracks.generated_tracks[i].phi * TMath::RadToDeg();
-        printf("x0 = %f, y0 = %f, theta_real = %f, phi_real = %f\n", gen_tracks.generated_tracks[i].x0, gen_tracks.generated_tracks[i].y0, theta, phi);
-    }
-    cout << "-----------------------" << endl;
+    //for(int i = 0; i < gen_tracks.generated_tracks.size(); ++i){
+    //    double theta = gen_tracks.generated_tracks[i].theta * TMath::RadToDeg();
+    //    double phi = gen_tracks.generated_tracks[i].phi * TMath::RadToDeg();
+    //    printf("x0 = %f, y0 = %f, theta_real = %f, phi_real = %f\n", gen_tracks.generated_tracks[i].x0, gen_tracks.generated_tracks[i].y0, theta, phi);
+    // }
+    // cout << "-----------------------" << endl;
 
     //algoritmo di ricostruzione tracce
     TStopwatch t;
@@ -76,20 +76,20 @@ int main(int argc, char** argv) {
     
 
     //track simulation
-    // int *events;
-    // int ev = 5;
-    // events = &ev; 
-    // run(events);
+    //int *events;
+    //int ev = 30;
+    //events = &ev; 
+    //run(events);
 
 
-    //simulations sim;
+    // simulations sim;
     //sim.sim_only_trk_3L(1000);
-    //sim.sim_old_algo(100);
-    //sim.sim_trk_32L(50000);
+    // sim.sim_old_algo(100);
+    // sim.sim_trk_32L(1000);
 
     //reco from MUONS
-    eventdata e;
-    e.analize_data();
+     eventdata e;
+     e.analize_data();
 
     /*
     //compute theta max

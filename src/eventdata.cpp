@@ -22,8 +22,11 @@
 using namespace std;
 
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-071441-Events-00351_01656-p01_L2.root";
-// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-045249-Events-00351_01585-p01_L2.root";
-std::string input_filename = "../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root";
+std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
+
+// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-045249-Events-00351_01585-p01_L2.root";      // this file has weird peaks
+// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-002417-Events-00351_01449-p01_L2.root";
+// std::string input_filename = "../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root";
 
 eventdata::eventdata() {}
 
@@ -120,7 +123,7 @@ void eventdata::analize_data()
     TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", theta_bins, -5, 90);
     TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", phi_bins, -185, 185);
     TH2D *h = new TH2D("h_theta_vs_phi", "#theta vs #phi;#phi (deg);#theta (deg)", nbins, -185, 185, nbins, 0, 90);
-    TH1F *hchi2 = new TH1F("hchi2", "#chi2;#chi2;counts", nbins, 0, 5000);
+    TH1F *hchi2 = new TH1F("hchi2", "#chi2;#chi2;counts", 5000, 0, 5000);
 
     TCanvas *canvas = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
     TView *rt = TView::CreateView(1);
@@ -137,7 +140,7 @@ void eventdata::analize_data()
         d.draw_TR12(canvas);
     }
 
-    // selecting with the [index] the event you want to make the reco
+    // selecting with the index the event you want to make the reco
     int n;
     if (!print_canvas)
         n = alldata.size();
@@ -151,8 +154,6 @@ void eventdata::analize_data()
         ev = alldata[i];
 
         ev.from_ev_to_cluster(cl, ev);
-        // if (cl.cls_mean_z.size() > cls_max)
-        //     cls_max = cl.cls_mean_z.size();
         for (int j = 0; j < cl.cls_mean_z.size(); ++j)
         {
             LCluster c;
@@ -196,7 +197,7 @@ void eventdata::analize_data()
         }
 
         ltt.computeTracklets();
-        ltt.new_algo(2.);
+        ltt.new_algo(0.4);
 
         if (!print_canvas)
         {
@@ -234,6 +235,10 @@ void eventdata::analize_data()
         h_phi->SetStats(0);
         TH1F *h_phi_m2 = new TH1F("h_phi_m2", "h_phi_m2", phi_bins, -185, 185);
         h_phi_m2->SetStats(0);
+        TH1F *h_chi2 = new TH1F("h_chi2", "#chi2;#chi2;counts", 5000, 0, 5000);
+        h_chi2->SetStats(0);
+        TH1F *h_chi2_m2 = new TH1F("h_chi2_m2", "#chi2;#chi2;counts", 5000, 0, 5000);
+        h_chi2_m2->SetStats(0);
 
         TFile *fIn = new TFile(input_filename.c_str());
         TTree *oldTree = (TTree *)fIn->Get("L2");
@@ -242,12 +247,16 @@ void eventdata::analize_data()
         // --- Input branch (std::vector<float>) ---
         std::vector<float> *theta = nullptr;
         std::vector<float> *phi = nullptr;
+        std::vector<float> *chi2 = nullptr;
         std::vector<float> *theta_m2 = nullptr;
         std::vector<float> *phi_m2 = nullptr;
+        std::vector<float> *chi2_m2 = nullptr;
         oldTree->SetBranchAddress("theta", &theta);
         oldTree->SetBranchAddress("phi", &phi);
+        oldTree->SetBranchAddress("chi2", &chi2);
         oldTree->SetBranchAddress("theta_m2", &theta_m2);
         oldTree->SetBranchAddress("phi_m2", &phi_m2);
+        oldTree->SetBranchAddress("chi2_m2", &chi2_m2);
 
         Long64_t nentries = oldTree->GetEntries();
         for (Long64_t i = 0; i < nentries; i++)
@@ -255,27 +264,43 @@ void eventdata::analize_data()
             oldTree->GetEntry(i);
 
             // Add size checks before accessing vectors
-            if (theta && phi && theta_m2 && phi_m2)
+            if (theta && phi && theta_m2 && phi_m2 && chi2 && chi2_m2)
             {
-                // Make sure we only loop up to the smallest vector size
-                size_t min_size = std::min({theta->size(), phi->size(),
-                                            theta_m2->size(), phi_m2->size()});
-
-                for (size_t j = 0; j < min_size; ++j)
+                for (size_t j = 0; j < theta->size(); ++j)
                 {
+                    // mask for passing throgh the triggers
+                    if(theta->at(j) < 75.3){
                     h_theta->Fill(theta->at(j));
                     h_phi->Fill(phi->at(j));
+                    h_chi2->Fill(chi2->at(j));
+                    }
+                }
+                for (size_t j = 0; j < theta_m2->size(); ++j)
+                {
+                    if(theta_m2->at(j) < 75.3){
                     h_theta_m2->Fill(theta_m2->at(j));
                     h_phi_m2->Fill(phi_m2->at(j));
+                    h_chi2_m2->Fill(chi2_m2->at(j));
+                    }
                 }
             }
         }
+        h_theta->Scale(1.0 / h_theta->Integral("width"));
+        h_theta_m2->Scale(1.0 / h_theta_m2->Integral("width"));
+        htheta->Scale(1.0 / htheta->Integral("width"));
+        h_phi->Scale(1.0 / h_phi->Integral("width"));
+        h_phi_m2->Scale(1.0 / h_phi_m2->Integral("width"));
+        hphi->Scale(1.0 / hphi->Integral("width"));
+
         h_theta->Write();
         h_theta_m2->Write();
         htheta->Write();
         h_phi->Write();
         h_phi_m2->Write();
         hphi->Write();
+        h_chi2->Write();
+        h_chi2_m2->Write();
+        hchi2->Write();
 
         // Find the maximum y value among all histograms
         double maxY1 = h_theta->GetMaximum();
@@ -290,17 +315,22 @@ void eventdata::analize_data()
         // Set the y-axis range with 10% padding
         h_theta->GetYaxis()->SetRangeUser(0, maxY * 1.1);
         TCanvas *c_theta = new TCanvas("c_theta_overlay", "compare_theta", 800, 600);
-        c_theta->SetTitle("#theta comparison");
+        h_theta->SetTitle("#theta comparison");
+        h_theta->GetXaxis()->SetTitle("#theta (deg)");
+        h_theta->GetYaxis()->SetTitle("Counts");
         h_theta->SetLineColor(kBlue);
         h_theta_m2->SetLineColor(kRed);
         htheta->SetLineColor(kBlack);
         h_theta->Draw("HIST");
         h_theta_m2->Draw("HISTSAME");
         htheta->Draw("HISTSAME");
-        TLegend *leg1 = new TLegend(0.6, 0.7, 0.8, 0.8);
-        leg1->AddEntry(h_theta, "hough trasform", "l");
-        leg1->AddEntry(h_theta_m2, "old_algo", "l");
-        leg1->AddEntry(htheta, "new_algo", "l");
+        h->GetXaxis()->SetTitle("Theta [rad]");
+        h->GetYaxis()->SetTitle("Counts");
+
+        TLegend *leg1 = new TLegend(0.6, 0.7, 0.9, 0.9);
+        leg1->AddEntry(h_theta,    Form("hough transform (N=%.0f)", h_theta->GetEntries()), "l");
+        leg1->AddEntry(h_theta_m2, Form("old_algo (N=%.0f)", h_theta_m2->GetEntries()), "l");
+        leg1->AddEntry(htheta,     Form("new_algo (N=%.0f)", htheta->GetEntries()), "l");
         leg1->Draw();
         c_theta->Write();
 
@@ -318,17 +348,19 @@ void eventdata::analize_data()
         h_phi->GetYaxis()->SetRangeUser(0, maxYphi * 1.1);
 
         TCanvas *c_phi = new TCanvas("c_phi_overlay", "compare_phi", 800, 600);
-        c_phi->SetTitle("#phi comparison");
+        h_phi->SetTitle("#phi comparison");
+        h_phi->GetXaxis()->SetTitle("#phi (deg)");
+        h_phi->GetYaxis()->SetTitle("Counts");
         h_phi->SetLineColor(kBlue);
         h_phi_m2->SetLineColor(kRed);
         hphi->SetLineColor(kBlack);
         h_phi->Draw("HIST");
         h_phi_m2->Draw("HISTSAME");
         hphi->Draw("HISTSAME");
-        TLegend *leg2 = new TLegend(0.6, 0.7, 0.8, 0.8);
-        leg2->AddEntry(h_phi, "hough trasform", "l");
-        leg2->AddEntry(h_phi_m2, "old_algo", "l");
-        leg2->AddEntry(hphi, "new_algo", "l");
+        TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9);
+        leg2->AddEntry(h_phi,    Form("hough transform (N=%.0f)", h_phi->GetEntries()), "l");
+        leg2->AddEntry(h_phi_m2, Form("old_algo (N=%.0f)", h_phi_m2->GetEntries()), "l");
+        leg2->AddEntry(hphi,     Form("new_algo (N=%.0f)", hphi->GetEntries()), "l");
         leg2->Draw();
         c_phi->Write();
 

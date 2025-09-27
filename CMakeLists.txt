@@ -5,6 +5,16 @@ project(sim_MC)
 
 set(CMAKE_CXX_STANDARD 17)
 
+# Handle path differences between Windows and WSL
+if(CMAKE_HOST_UNIX AND EXISTS "/mnt/c/")
+    # We're in WSL
+    string(REGEX REPLACE "^/mnt/c/" "C:/" WIN_PATH "${CMAKE_SOURCE_DIR}")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+else()
+    # We're in Windows
+    set(WIN_PATH "${CMAKE_SOURCE_DIR}")
+endif()
+
 # Aggiungi i file sorgente
 set(SOURCES
     src/LTrackerTrack.cpp

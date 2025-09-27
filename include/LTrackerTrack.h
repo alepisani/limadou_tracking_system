@@ -129,6 +129,12 @@ public:
   // final tracks
   std::vector<LTrackCandidate> tracks;
 
+  std::vector<double> vector_dx0;
+  std::vector<double> vector_dy0;
+  std::vector<double> vector_dx1;
+  std::vector<double> vector_dy1;
+  std::vector<double> vector_dx2;
+  std::vector<double> vector_dy2;
   float chi2_cut = 100;
 };
 

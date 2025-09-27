@@ -6,6 +6,8 @@
 #include <TPolyLine3D.h>
 #include <TCanvas.h>
 #include <TView.h>
+#include "TH1F.h"
+#include <TFile.h>
 #include "TMarker3DBox.h"
 #include "../include/stats.h"
 #include "../include/display.h"
@@ -585,7 +587,7 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackerTrack::new_algo(double radius)
 {
-  chi2_cut = 5000;
+  chi2_cut = 500;
   float degtorad = TMath::DegToRad();
   float pi = TMath::Pi();
   int candidateCounter = 0;
@@ -638,6 +640,22 @@ void LTrackerTrack::new_algo(double radius)
           else
             stats::hmrtaf3++;
         }
+
+        // compute residuals (dtheta01,12 / dx, dy)
+        double dx0, dx1, dx2, dy0, dy1, dy2;
+        dx0 = clus_0.x - (trkCand.x0 - display::dist_z * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi));
+        dy0 = clus_0.y - (trkCand.y0 - display::dist_z * TMath::Tan(trkCand.theta) * TMath::Sin(trkCand.phi));
+        dx1 = clus_1.x - trkCand.x0;
+        dy1 = clus_1.y - trkCand.y0;
+        dx2 = clus_2.x - (trkCand.x0 + display::dist_z * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi));
+        dy2 = clus_2.y - (trkCand.y0 + display::dist_z * TMath::Tan(trkCand.theta) * TMath::Sin(trkCand.phi));
+        vector_dx0.push_back(dx0);
+        vector_dx1.push_back(dx1);
+        vector_dx2.push_back(dx2);
+        vector_dy0.push_back(dy0);
+        vector_dy1.push_back(dy1);
+        vector_dy2.push_back(dy2);
+
       }
     }
   }
@@ -655,7 +673,7 @@ void LTrackerTrack::new_algo(double radius)
     used_clusters.insert(used_clusters.end(), trk.clus_id.begin(), trk.clus_id.end());
   }
 
-  // New_addSpuriousTracks(used_tracklets, used_clusters);
+  New_addSpuriousTracks(used_tracklets, used_clusters);
 
   // Reassigning track id
   for (int i = 0; i < tracks.size(); i++)
@@ -666,6 +684,7 @@ void LTrackerTrack::new_algo(double radius)
 
   stats::hmrt = tracks.size();
   // printf("tracks %ld\n", tracks.size());
+
 }
 
 bool LTrackerTrack::track_hit_TR(double x1, double y1, double theta, double phi)
@@ -721,8 +740,6 @@ bool LTrackerTrack::track_hit_TR(double x1, double y1, double theta, double phi)
 
 void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 {
-
-  int i = 0;
   for (auto &trk : tracks)
   {
     float x1, y1, z1, dz, x2, y2, z2;
@@ -741,17 +758,17 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
     Double_t z_line[3] = {z1, trk.z0, z2};
     TPolyLine3D *line_track = new TPolyLine3D(3, x_line, y_line, z_line);
     line_track->SetLineWidth(2);
-    //if (trk.chi2 > 10)
-    //  line_track->SetLineColor(kGreen);
-    //else
+    // if (trk.chi2 > 10)
+    //   line_track->SetLineColor(kGreen);
+    // else
     line_track->SetLineColor(kRed);
     line_track->Draw();
 
-    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 0, 0, 0, 0, 0);
+    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 2, 2, 0, 0, 0);
     g->Draw();
-    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 0, 0, 0, 0, 0);
+    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 2, 2, 0, 0, 0);
     m->Draw();
-    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
+    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 2, 2, 0, 0, 0);
     f->Draw();
 
     if (trk.chi2 > 0.)

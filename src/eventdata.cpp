@@ -120,10 +120,21 @@ void eventdata::analize_data()
     int nbins = alldata.size() / 200;
     int theta_bins = 50;
     int phi_bins = 50;
+    TH1F *h_dx0 = new TH1F("hdx0", "#dx0;#dx0;counts", 100, -5, 5);
+    TH1F *h_dx1 = new TH1F("hdx1", "#dx1;#dx1;counts", 100, -5, 5);
+    TH1F *h_dx2 = new TH1F("hdx2", "#dx2;#dx2;counts", 100, -5, 5);
+    TH1F *h_dy0 = new TH1F("hdy0", "#dy0;#dy0;counts", 100, -5, 5);
+    TH1F *h_dy1 = new TH1F("hdy1", "#dy1;#dy1;counts", 100, -5, 5);
+    TH1F *h_dy2 = new TH1F("hdy2", "#dy2;#dy2;counts", 100, -5, 5);
+
     TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", theta_bins, -5, 90);
     TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", phi_bins, -185, 185);
     TH2D *h = new TH2D("h_theta_vs_phi", "#theta vs #phi;#phi (deg);#theta (deg)", nbins, -185, 185, nbins, 0, 90);
     TH1F *hchi2 = new TH1F("hchi2", "#chi2;#chi2;counts", 5000, 0, 5000);
+    TH2D *h_chi2_theta = new TH2D("h_chi2_theta", "#chi^2 vs #theta;        #theta (deg);   #chi^2", 30, 0, 90, 50, -2, 500);
+    h_chi2_theta->SetStats(0);
+    TH2D *h_chi2_phi = new TH2D("h_chi2_phi", "#chi^2 vs #phi;          #phi (deg);     #chi^2", 30, -200, 200, 50, -2, 500);
+    h_chi2_phi->SetStats(0);
 
     TCanvas *canvas = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
     TView *rt = TView::CreateView(1);
@@ -145,7 +156,7 @@ void eventdata::analize_data()
     if (!print_canvas)
         n = alldata.size();
     if (print_canvas)
-        n = 25;
+        n = 5000;
     for (int i = 0; i < n; ++i)
     {
         LTrackerTrack ltt;
@@ -199,6 +210,16 @@ void eventdata::analize_data()
         ltt.computeTracklets();
         ltt.new_algo(0.4);
 
+        for (int i = 0; i < ltt.vector_dx0.size(); ++i)
+        {
+            h_dx0->Fill(ltt.vector_dx0[i]);
+            h_dx1->Fill(ltt.vector_dx1[i]);
+            h_dx2->Fill(ltt.vector_dx2[i]);
+            h_dy0->Fill(ltt.vector_dy0[i]);
+            h_dy1->Fill(ltt.vector_dy1[i]);
+            h_dy2->Fill(ltt.vector_dy2[i]);
+        }
+
         if (!print_canvas)
         {
             for (int m = 0; m < ltt.tracks.size(); ++m)
@@ -207,6 +228,8 @@ void eventdata::analize_data()
                 hphi->Fill(ltt.tracks[m].phi * radtodeg);
                 hchi2->Fill(ltt.tracks[m].chi2);
                 h->Fill(ltt.tracks[m].phi * radtodeg, ltt.tracks[m].theta * radtodeg);
+                h_chi2_theta->Fill(ltt.tracks[m].theta * radtodeg, ltt.tracks[m].chi2);
+                h_chi2_phi->Fill(ltt.tracks[m].phi * radtodeg, ltt.tracks[m].chi2);
             }
         }
 
@@ -269,18 +292,20 @@ void eventdata::analize_data()
                 for (size_t j = 0; j < theta->size(); ++j)
                 {
                     // mask for passing throgh the triggers
-                    if(theta->at(j) < 75.3){
-                    h_theta->Fill(theta->at(j));
-                    h_phi->Fill(phi->at(j));
-                    h_chi2->Fill(chi2->at(j));
+                    if (theta->at(j) < 75.3)
+                    {
+                        h_theta->Fill(theta->at(j));
+                        h_phi->Fill(phi->at(j));
+                        h_chi2->Fill(chi2->at(j));
                     }
                 }
                 for (size_t j = 0; j < theta_m2->size(); ++j)
                 {
-                    if(theta_m2->at(j) < 75.3){
-                    h_theta_m2->Fill(theta_m2->at(j));
-                    h_phi_m2->Fill(phi_m2->at(j));
-                    h_chi2_m2->Fill(chi2_m2->at(j));
+                    if (theta_m2->at(j) < 75.3)
+                    {
+                        h_theta_m2->Fill(theta_m2->at(j));
+                        h_phi_m2->Fill(phi_m2->at(j));
+                        h_chi2_m2->Fill(chi2_m2->at(j));
                     }
                 }
             }
@@ -301,6 +326,8 @@ void eventdata::analize_data()
         h_chi2->Write();
         h_chi2_m2->Write();
         hchi2->Write();
+        h_chi2_theta->Write();
+        h_chi2_phi->Write();
 
         // Find the maximum y value among all histograms
         double maxY1 = h_theta->GetMaximum();
@@ -328,9 +355,9 @@ void eventdata::analize_data()
         h->GetYaxis()->SetTitle("Counts");
 
         TLegend *leg1 = new TLegend(0.6, 0.7, 0.9, 0.9);
-        leg1->AddEntry(h_theta,    Form("hough transform (N=%.0f)", h_theta->GetEntries()), "l");
+        leg1->AddEntry(h_theta, Form("hough transform (N=%.0f)", h_theta->GetEntries()), "l");
         leg1->AddEntry(h_theta_m2, Form("old_algo (N=%.0f)", h_theta_m2->GetEntries()), "l");
-        leg1->AddEntry(htheta,     Form("new_algo (N=%.0f)", htheta->GetEntries()), "l");
+        leg1->AddEntry(htheta, Form("new_algo (N=%.0f)", htheta->GetEntries()), "l");
         leg1->Draw();
         c_theta->Write();
 
@@ -358,11 +385,18 @@ void eventdata::analize_data()
         h_phi_m2->Draw("HISTSAME");
         hphi->Draw("HISTSAME");
         TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9);
-        leg2->AddEntry(h_phi,    Form("hough transform (N=%.0f)", h_phi->GetEntries()), "l");
+        leg2->AddEntry(h_phi, Form("hough transform (N=%.0f)", h_phi->GetEntries()), "l");
         leg2->AddEntry(h_phi_m2, Form("old_algo (N=%.0f)", h_phi_m2->GetEntries()), "l");
-        leg2->AddEntry(hphi,     Form("new_algo (N=%.0f)", hphi->GetEntries()), "l");
+        leg2->AddEntry(hphi, Form("new_algo (N=%.0f)", hphi->GetEntries()), "l");
         leg2->Draw();
         c_phi->Write();
+
+        h_dx0->Write();
+        h_dx1->Write();
+        h_dx2->Write();
+        h_dy0->Write();
+        h_dy1->Write();
+        h_dy2->Write();
 
         fOut->Close();
         fIn->Close();

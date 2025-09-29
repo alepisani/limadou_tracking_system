@@ -86,8 +86,6 @@ int main(int argc, char **argv)
     eventdata e;
     e.analize_data();
 
-    LTrackerTrack ltt;
-
     /*
     //compute theta max
     int xtr1, ytr1, ztr1;

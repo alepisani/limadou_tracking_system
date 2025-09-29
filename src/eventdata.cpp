@@ -21,8 +21,8 @@
 #include "eventdata.h"
 using namespace std;
 
-// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-071441-Events-00351_01656-p01_L2.root";
-std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
+std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-071441-Events-00351_01656-p01_L2.root";
+// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
 
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-045249-Events-00351_01585-p01_L2.root";      // this file has weird peaks
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-002417-Events-00351_01449-p01_L2.root";
@@ -120,17 +120,17 @@ void eventdata::analize_data()
     int nbins = alldata.size() / 200;
     int theta_bins = 50;
     int phi_bins = 50;
-    TH1F *h_dx0 = new TH1F("hdx0", "#dx0;#dx0;counts", 100, -5, 5);
-    TH1F *h_dx1 = new TH1F("hdx1", "#dx1;#dx1;counts", 100, -5, 5);
-    TH1F *h_dx2 = new TH1F("hdx2", "#dx2;#dx2;counts", 100, -5, 5);
-    TH1F *h_dy0 = new TH1F("hdy0", "#dy0;#dy0;counts", 100, -5, 5);
-    TH1F *h_dy1 = new TH1F("hdy1", "#dy1;#dy1;counts", 100, -5, 5);
-    TH1F *h_dy2 = new TH1F("hdy2", "#dy2;#dy2;counts", 100, -5, 5);
+    TH1F *h_dx0 = new TH1F("hdx0", "#dx0;#dx0;counts", 1000, -1, 1);
+    TH1F *h_dx1 = new TH1F("hdx1", "#dx1;#dx1;counts", 1000, -1, 1);
+    TH1F *h_dx2 = new TH1F("hdx2", "#dx2;#dx2;counts", 1000, -1, 1);
+    TH1F *h_dy0 = new TH1F("hdy0", "#dy0;#dy0;counts", 1000, -1, 1);
+    TH1F *h_dy1 = new TH1F("hdy1", "#dy1;#dy1;counts", 1000, -1, 1);
+    TH1F *h_dy2 = new TH1F("hdy2", "#dy2;#dy2;counts", 1000, -1, 1);
 
     TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", theta_bins, -5, 90);
     TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", phi_bins, -185, 185);
     TH2D *h = new TH2D("h_theta_vs_phi", "#theta vs #phi;#phi (deg);#theta (deg)", nbins, -185, 185, nbins, 0, 90);
-    TH1F *hchi2 = new TH1F("hchi2", "#chi2;#chi2;counts", 5000, 0, 5000);
+    TH1F *hchi2 = new TH1F("hchi2", "#chi2;#chi2;counts", 5000, 0, 500);
     TH2D *h_chi2_theta = new TH2D("h_chi2_theta", "#chi^2 vs #theta;        #theta (deg);   #chi^2", 30, 0, 90, 50, -2, 500);
     h_chi2_theta->SetStats(0);
     TH2D *h_chi2_phi = new TH2D("h_chi2_phi", "#chi^2 vs #phi;          #phi (deg);     #chi^2", 30, -200, 200, 50, -2, 500);
@@ -258,13 +258,14 @@ void eventdata::analize_data()
         h_phi->SetStats(0);
         TH1F *h_phi_m2 = new TH1F("h_phi_m2", "h_phi_m2", phi_bins, -185, 185);
         h_phi_m2->SetStats(0);
-        TH1F *h_chi2 = new TH1F("h_chi2", "#chi2;#chi2;counts", 5000, 0, 5000);
+        TH1F *h_chi2 = new TH1F("h_chi2", "#chi2;#chi2;counts", 500, 0, 500);
         h_chi2->SetStats(0);
-        TH1F *h_chi2_m2 = new TH1F("h_chi2_m2", "#chi2;#chi2;counts", 5000, 0, 5000);
+        TH1F *h_chi2_m2 = new TH1F("h_chi2_m2", "#chi2;#chi2;counts", 500, 0, 500);
         h_chi2_m2->SetStats(0);
 
         TFile *fIn = new TFile(input_filename.c_str());
         TTree *oldTree = (TTree *)fIn->Get("L2");
+        
         TFile *fOut = new TFile("../data/overlay_plots.root", "RECREATE");
 
         // --- Input branch (std::vector<float>) ---

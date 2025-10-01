@@ -77,14 +77,14 @@ int main(int argc, char **argv)
     // events = &ev;
     // run(events);
 
-    // simulations sim;
+    simulations sim;
     // sim.sim_only_trk_3L(1000);
     // sim.sim_old_algo(100);
-    // sim.sim_trk_32L(1000);
+    sim.sim_trk_32L(1000);
 
     // reco from MUONS
-    eventdata e;
-    e.analize_data();
+    // eventdata e;
+    // e.analize_data();
 
     /*
     //compute theta max

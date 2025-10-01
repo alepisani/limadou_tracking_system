@@ -52,6 +52,12 @@ struct LTrackCandidate
     output << "phi : " << tr.phi << " +- " << tr.err_phi << std::endl;
     output << "x0 : " << tr.x0 << " +- " << tr.err_x0 << std::endl;
     output << "y0 : " << tr.y0 << " +- " << tr.err_y0 << std::endl;
+    output << "dx0 : " << tr.dx0 << std::endl;
+    output << "dx1 : " << tr.dx1 << std::endl;
+    output << "dx2 : " << tr.dx2 << std::endl;
+    output << "dy0 : " << tr.dy0 << std::endl;
+    output << "dy1 : " << tr.dy1 << std::endl;
+    output << "dy2 : " << tr.dy2 << std::endl;
     output << "z0 : " << tr.z0 << std::endl;
     output << "chi2: " << tr.chi2 << std::endl;
     return output;

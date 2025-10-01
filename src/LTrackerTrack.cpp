@@ -152,7 +152,7 @@ double LTrackerTrack::fct(const std::vector<LCluster> &clusters, const double *p
   double theta = par[2];
   double phi = par[3];
 
-  double chi2 = 0.0;
+  double chi2 = 0.;
   for (int i = 0; i < 3; i++)
   {
     double x_fit = x0 + (clusters[i].z - display::z_origin_shift) * TMath::Tan(theta) * TMath::Cos(phi);
@@ -160,19 +160,6 @@ double LTrackerTrack::fct(const std::vector<LCluster> &clusters, const double *p
     double dx = (clusters[i].x - x_fit) / clusters[i].errx;
     double dy = (clusters[i].y - y_fit) / clusters[i].erry;
     chi2 += dx * dx + dy * dy;
-
-    if (0)
-    {
-      cout << endl;
-      cout << "------------" << endl;
-      cout << "err_x " << clusters[i].errx << endl;
-      cout << "err_y " << clusters[i].erry << endl;
-      cout << "x " << clusters[i].x << endl;
-      cout << "y " << clusters[i].y << endl;
-      cout << "dx " << dx << endl;
-      cout << "dy " << dy << endl;
-      cout << "chi " << chi2 << endl;
-    }
   }
 
   return chi2;
@@ -593,7 +580,7 @@ void LTrackerTrack::computeTrackCandidates()
 void LTrackerTrack::new_algo(double radius)
 {
   // 1000, 500, 400, 300, 200, 100, 75, 50, 25, 10, 5, 1
-  chi2_cut = 500;
+  chi2_cut = 50000;
   float degtorad = TMath::DegToRad();
   float pi = TMath::Pi();
   int candidateCounter = 0;

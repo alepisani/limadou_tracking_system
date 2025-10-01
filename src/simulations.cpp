@@ -47,7 +47,7 @@ simulations::simulations()
     // simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
     // simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10};
     // radius = {2, 1.5, 1, 0.9, 0.8, 0.7, 0.65, 0.6, 0.55, 0.5, 0.47, 0.45, 0.43, 0.4, 0.37, 0.35, 0.33, 0.3, 0.27, 0.25, 0.23, 0.2, 0.15, 0.1, 0.05, 0.01, 0}; //mm
-    chi2cut = {1000, 800, 500, 400, 300, 200, 150, 100, 75, 50, 25, 10, 1};
+    // chi2cut = {1000, 800, 500, 400, 300, 200, 150, 100, 75, 50, 25, 10, 1};
 
 
     // simulations::gen_tracks = {100};
@@ -251,6 +251,9 @@ void simulations::sim_trk_32L(int iteration_per_event)
     std::vector<float> alltheta;
     std::vector<float> allphi;
     float nbins = (iteration_per_event * radius.size() * gen_tracks.size());
+    
+    TH1F *hchi2 = new TH1F("hchi2", "#chi^{2};#chi^{2};counts", 50002, -2, 50000);
+
     TH1F *htheta_real = new TH1F("htheta_real", "#theta;#theta (deg);counts", 45, 0, 90);
     TH1F *htheta_reco = new TH1F("htheta_reco", "#theta;#theta (deg);counts", 45, 0, 90);
     TH1F *h_theta_diff = new TH1F("h_theta_diff", "#theta;(#theta_{real} - #theta_{reco}) (deg);counts", 100, 0, 0.03);
@@ -390,6 +393,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
                     phi_reco = ltt.tracks[g].phi * radtodeg;
                     x_reco = ltt.tracks[g].x0;
                     y_reco = ltt.tracks[g].y0;
+                    hchi2->Fill(ltt.tracks[g].chi2);
                 }
 
                 simu.generated_tracks.clear();
@@ -433,6 +437,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
                     h_dy_phi->Fill(phi_real, dy);
                     h_dy_x->Fill(x_real, dy);
                     h_dy_y->Fill(y_real, dy);
+
                 }
 
                 printProgressBarWithETA(j + 1, iteration_per_event, start_time);
@@ -485,6 +490,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
     TFile *f = TFile::Open(fil, "RECREATE");
 
     // --- write your histograms individually ---
+    hchi2->Write();
+
     htheta_reco->Write("htheta_reco", TObject::kOverwrite);
     htheta_real->Write("htheta_real", TObject::kOverwrite);
     hphi_reco->Write("hphi_reco", TObject::kOverwrite);

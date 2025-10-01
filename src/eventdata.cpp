@@ -22,11 +22,11 @@
 using namespace std;
 
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-071441-Events-00351_01656-p01_L2.root";
-std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
+// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
 
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-045249-Events-00351_01585-p01_L2.root";      // this file has weird peaks
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-002417-Events-00351_01449-p01_L2.root";
-// std::string input_filename = "../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root";
+std::string input_filename = "../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root";
 
 eventdata::eventdata() {}
 
@@ -120,12 +120,12 @@ void eventdata::analize_data()
     int nbins = alldata.size() / 200;
     int theta_bins = 50;
     int phi_bins = 50;
-    TH1F *h_dx0 = new TH1F("hdx0", "#dx0;#dx0;counts", 1000, -10, 10);
-    TH1F *h_dx1 = new TH1F("hdx1", "#dx1;#dx1;counts", 1000, -10, 10);
-    TH1F *h_dx2 = new TH1F("hdx2", "#dx2;#dx2;counts", 1000, -10, 10);
-    TH1F *h_dy0 = new TH1F("hdy0", "#dy0;#dy0;counts", 1000, -10, 10);
-    TH1F *h_dy1 = new TH1F("hdy1", "#dy1;#dy1;counts", 1000, -10, 10);
-    TH1F *h_dy2 = new TH1F("hdy2", "#dy2;#dy2;counts", 1000, -10, 10);
+    TH1F *h_dx0 = new TH1F("hdx0", "#dx0;#dx0;counts", 1000, -5, 5);
+    TH1F *h_dx1 = new TH1F("hdx1", "#dx1;#dx1;counts", 1000, -5, 5);
+    TH1F *h_dx2 = new TH1F("hdx2", "#dx2;#dx2;counts", 1000, -5, 5);
+    TH1F *h_dy0 = new TH1F("hdy0", "#dy0;#dy0;counts", 1000, -5, 5);
+    TH1F *h_dy1 = new TH1F("hdy1", "#dy1;#dy1;counts", 1000, -5, 5);
+    TH1F *h_dy2 = new TH1F("hdy2", "#dy2;#dy2;counts", 1000, -5, 5);
 
     TH1F *h_errx0 = new TH1F("herrx0", "errx;errx;counts", 100, 0, 0.1);
     TH1F *h_erry0 = new TH1F("herry0", "erry;erry;counts", 100, 0, 0.1);
@@ -133,7 +133,7 @@ void eventdata::analize_data()
     TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", theta_bins, -5, 90);
     TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", phi_bins, -185, 185);
     TH2D *h = new TH2D("h_theta_vs_phi", "#theta vs #phi;#phi (deg);#theta (deg)", nbins, -185, 185, nbins, 0, 90);
-    TH1F *hchi2 = new TH1F("hchi2", "#chi2;#chi2;counts", 5000, 0, 500);
+    TH1F *hchi2 = new TH1F("hchi2_newalgo", "#chi2;#chi2;counts", 500, 0, 50000);
     TH2D *h_chi2_theta = new TH2D("h_chi2_theta", "#chi^2 vs #theta;        #theta (deg);   #chi^2", 30, 0, 90, 50, -2, 500);
     h_chi2_theta->SetStats(0);
     TH2D *h_chi2_phi = new TH2D("h_chi2_phi", "#chi^2 vs #phi;          #phi (deg);     #chi^2", 30, -200, 200, 50, -2, 500);
@@ -148,7 +148,8 @@ void eventdata::analize_data()
 
     TH2D *h_chi2_errx0 = new TH2D("h_chi2_errx0", "#chi^{2} vs errx0;        errx0;   #chi^{2}", 100, 0, 0.05, 100, -2, 500);
     TH2D *h_chi2_erry0 = new TH2D("h_chi2_erry0", "#chi^{2} vs erry0;        erry0;   #chi^{2}", 100, 0, 0.05, 100, -2, 500);
-    
+
+    TH2D *h_err_dx = new TH2D("herrdx", "err vs dx;        err;   dx", 100, 0, 0.05, 100, -1, 1);
 
     TCanvas *canvas = new TCanvas("MC_tracks", "3D View_mc", 800, 600);
     TView *rt = TView::CreateView(1);
@@ -170,8 +171,8 @@ void eventdata::analize_data()
     if (!print_canvas)
         n = alldata.size();
     if (print_canvas)
-        n = 1500;
-    for (int i = 1000; i < n; ++i)
+        n = 1000;
+    for (int i = 0; i < n; ++i)
     {
         LTrackerTrack ltt;
         eventdata ev;
@@ -224,17 +225,6 @@ void eventdata::analize_data()
         ltt.computeTracklets();
         ltt.new_algo(0.4);
 
-        for (int i = 0; i < ltt.vector_dx0.size(); ++i)
-        {
-            h_dx0->Fill(ltt.vector_dx0[i]);
-            h_dx1->Fill(ltt.vector_dx1[i]);
-            h_dx2->Fill(ltt.vector_dx2[i]);
-            h_dy0->Fill(ltt.vector_dy0[i]);
-            h_dy1->Fill(ltt.vector_dy1[i]);
-            h_dy2->Fill(ltt.vector_dy2[i]);
-        }
-
-
         if (!print_canvas)
         {
             for (int m = 0; m < ltt.tracks.size(); ++m)
@@ -245,21 +235,29 @@ void eventdata::analize_data()
                 h->Fill(ltt.tracks[m].phi * radtodeg, ltt.tracks[m].theta * radtodeg);
                 h_chi2_theta->Fill(ltt.tracks[m].theta * radtodeg, ltt.tracks[m].chi2);
                 h_chi2_phi->Fill(ltt.tracks[m].phi * radtodeg, ltt.tracks[m].chi2);
-                
+
                 // if(ltt.tracks[m].n_clus == 3){}
                 h_chi2_dx0->Fill(ltt.tracks[m].dx0, ltt.tracks[m].chi2);
                 h_chi2_dx1->Fill(ltt.tracks[m].dx1, ltt.tracks[m].chi2);
                 h_chi2_dx2->Fill(ltt.tracks[m].dx2, ltt.tracks[m].chi2);
                 h_chi2_dy0->Fill(ltt.tracks[m].dy0, ltt.tracks[m].chi2);
                 h_chi2_dy1->Fill(ltt.tracks[m].dy1, ltt.tracks[m].chi2);
-                h_chi2_dy2->Fill(ltt.tracks[m].dy2, ltt.tracks[m].chi2);      
-                
+                h_chi2_dy2->Fill(ltt.tracks[m].dy2, ltt.tracks[m].chi2);
+
+                h_dx0->Fill(ltt.tracks[m].dx0);
+                h_dx1->Fill(ltt.tracks[m].dx1);
+                h_dx2->Fill(ltt.tracks[m].dx2);
+                h_dy0->Fill(ltt.tracks[m].dy0);
+                h_dy1->Fill(ltt.tracks[m].dy1);
+                h_dy2->Fill(ltt.tracks[m].dy2);
+
                 h_errx0->Fill(ltt.tracks[m].err_x0);
                 h_erry0->Fill(ltt.tracks[m].err_y0);
 
-                h_chi2_errx0->Fill(ltt.tracks[m].err_x0, ltt.tracks[m].chi2); 
-                h_chi2_erry0->Fill(ltt.tracks[m].err_y0, ltt.tracks[m].chi2); 
-                
+                h_chi2_errx0->Fill(ltt.tracks[m].err_x0, ltt.tracks[m].chi2);
+                h_chi2_erry0->Fill(ltt.tracks[m].err_y0, ltt.tracks[m].chi2);
+
+                h_err_dx->Fill(ltt.tracks[m].err_x0, ltt.tracks[m].dx0);
             }
         }
 
@@ -269,11 +267,15 @@ void eventdata::analize_data()
             // ltt.print_all_tracklet(ltt);
         }
         sim.printProgressBarWithETA(i + 1, n, start_time, 30);
+
         if (print_canvas)
         {
             for (int m = 0; m < ltt.tracks.size(); ++m)
             {
-                printf("\n chi2: %f\n", ltt.tracks[m].chi2);
+                if (ltt.tracks[m].chi2 > 400.)
+                {
+                    // cout << ltt.tracks[m] << endl;
+                }
             }
         }
     }
@@ -359,7 +361,7 @@ void eventdata::analize_data()
         hchi2->Write();
         h_chi2_theta->Write();
         h_chi2_phi->Write();
-        
+
         h_chi2_dx0->Write();
         h_chi2_dx1->Write();
         h_chi2_dx2->Write();
@@ -372,6 +374,8 @@ void eventdata::analize_data()
 
         h_chi2_errx0->Write();
         h_chi2_erry0->Write();
+
+        h_err_dx->Write();
 
         // Find the maximum y value among all histograms
         double maxY1 = h_theta->GetMaximum();

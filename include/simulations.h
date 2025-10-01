@@ -33,6 +33,7 @@ public:
     std::vector<double> reco_hmgth3l;
     std::vector<double> tracklet;
     std::vector<double> radius;
+    std::vector<double> chi2cut;
     std::vector<double> delta_gentrk_recoreal;
     std::vector<double> delta_gentrk_reco;
     std::vector<double> efficiency;
@@ -42,7 +43,6 @@ public:
     void sim_only_trk_3L(int);
     void sim_old_algo(int);
     void sim_trk_32L(int);
-    void sim_trk_32L_minimal_memory(int);
     void printProgressBarWithETA(int, int, std::chrono::steady_clock::time_point, int);
       
 

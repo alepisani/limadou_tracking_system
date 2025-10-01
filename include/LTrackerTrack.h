@@ -25,6 +25,12 @@ struct LTrackCandidate
   float err_x0 = -1.;
   float err_y0 = -1.;
   float chi2 = -1.;
+  float dx0 = -1.;
+  float dx1 = -1.;
+  float dx2 = -1.;
+  float dy0 = -1.;
+  float dy1 = -1.;
+  float dy2 = -1.;
 
   friend std::ostream &operator<<(std::ostream &output, const LTrackCandidate &tr)
   {
@@ -135,6 +141,8 @@ public:
   std::vector<double> vector_dy1;
   std::vector<double> vector_dx2;
   std::vector<double> vector_dy2;
+  std::vector<double> vector_dtheta;
+  std::vector<double> vector_dphi;
   float chi2_cut = 100;
 };
 

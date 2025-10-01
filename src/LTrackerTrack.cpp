@@ -160,6 +160,19 @@ double LTrackerTrack::fct(const std::vector<LCluster> &clusters, const double *p
     double dx = (clusters[i].x - x_fit) / clusters[i].errx;
     double dy = (clusters[i].y - y_fit) / clusters[i].erry;
     chi2 += dx * dx + dy * dy;
+
+    if (0)
+    {
+      cout << endl;
+      cout << "------------" << endl;
+      cout << "err_x " << clusters[i].errx << endl;
+      cout << "err_y " << clusters[i].erry << endl;
+      cout << "x " << clusters[i].x << endl;
+      cout << "y " << clusters[i].y << endl;
+      cout << "dx " << dx << endl;
+      cout << "dy " << dy << endl;
+      cout << "chi " << chi2 << endl;
+    }
   }
 
   return chi2;
@@ -188,11 +201,6 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
 
     min->SetVariable(0, "x0", initialVars[0], steps[0]);
     min->SetVariable(1, "y0", initialVars[1], steps[1]);
-
-    // we're using a wider range because we are trying to optimise a circular function.
-    // maybe the function goes to one end but the optimal fit value could be just on the edge of the other end.
-    // the real theta distribution is between (0,pi/2), now is (-pi/2, pi);
-    // the real  phi distribution is between (-pi,+pi), now is (-2pi, 2pi);
 
     // what real intervals should look like
     min->SetLimitedVariable(2, "theta", initialVars[2], steps[2], 0., pi / 2);
@@ -234,9 +242,6 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
   trkCand.chi2 = chi2;
   trkCand.theta = params[2];
   trkCand.phi = params[3];
-
-  // if(trkCand.phi < -pi) trkCand.phi += 2 * pi;
-  // if(trkCand.phi > +pi) trkCand.phi -= 2 * pi;
 }
 
 // Add unused tracklets to without used clusters to final tracks (chi2 = 1 by definition)
@@ -587,6 +592,7 @@ void LTrackerTrack::computeTrackCandidates()
 
 void LTrackerTrack::new_algo(double radius)
 {
+  // 1000, 500, 400, 300, 200, 100, 75, 50, 25, 10, 5, 1
   chi2_cut = 500;
   float degtorad = TMath::DegToRad();
   float pi = TMath::Pi();
@@ -631,6 +637,19 @@ void LTrackerTrack::new_algo(double radius)
         // check if recotrk passa dai trigger
         if (t.track_hit_TR((double)trkCand.x0, (double)trkCand.y0, trkCand.theta, trkCand.phi) && trkCand.chi2 < chi2_cut)
         {
+          double dx0, dx1, dx2, dy0, dy1, dy2;
+          dx0 = clus_0.x - (trkCand.x0 - display::dist_z * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi));
+          dy0 = clus_0.y - (trkCand.y0 - display::dist_z * TMath::Tan(trkCand.theta) * TMath::Sin(trkCand.phi));
+          dx1 = clus_1.x - trkCand.x0;
+          dy1 = clus_1.y - trkCand.y0;
+          dx2 = clus_2.x - (trkCand.x0 + display::dist_z * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi));
+          dy2 = clus_2.y - (trkCand.y0 + display::dist_z * TMath::Tan(trkCand.theta) * TMath::Sin(trkCand.phi));
+          trkCand.dx0 = dx0;
+          trkCand.dx1 = dx1;
+          trkCand.dx2 = dx2;
+          trkCand.dy0 = dy0;
+          trkCand.dy1 = dy1;
+          trkCand.dy2 = dy2;
           track_candidates.push_back(trkCand);
           if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id)
           {
@@ -642,20 +661,13 @@ void LTrackerTrack::new_algo(double radius)
         }
 
         // compute residuals (dtheta01,12 / dx, dy)
-        double dx0, dx1, dx2, dy0, dy1, dy2;
-        dx0 = clus_0.x - (trkCand.x0 - display::dist_z * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi));
-        dy0 = clus_0.y - (trkCand.y0 - display::dist_z * TMath::Tan(trkCand.theta) * TMath::Sin(trkCand.phi));
-        dx1 = clus_1.x - trkCand.x0;
-        dy1 = clus_1.y - trkCand.y0;
-        dx2 = clus_2.x - (trkCand.x0 + display::dist_z * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi));
-        dy2 = clus_2.y - (trkCand.y0 + display::dist_z * TMath::Tan(trkCand.theta) * TMath::Sin(trkCand.phi));
-        vector_dx0.push_back(dx0);
-        vector_dx1.push_back(dx1);
-        vector_dx2.push_back(dx2);
-        vector_dy0.push_back(dy0);
-        vector_dy1.push_back(dy1);
-        vector_dy2.push_back(dy2);
 
+        //vector_dx0.push_back(dx0);
+        //vector_dx1.push_back(dx1);
+        //vector_dx2.push_back(dx2);
+        //vector_dy0.push_back(dy0);
+        //vector_dy1.push_back(dy1);
+        //vector_dy2.push_back(dy2);
       }
     }
   }
@@ -684,7 +696,6 @@ void LTrackerTrack::new_algo(double radius)
 
   stats::hmrt = tracks.size();
   // printf("tracks %ld\n", tracks.size());
-
 }
 
 bool LTrackerTrack::track_hit_TR(double x1, double y1, double theta, double phi)
@@ -742,54 +753,60 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 {
   for (auto &trk : tracks)
   {
-    float x1, y1, z1, dz, x2, y2, z2;
-
-    dz = 100;
-
-    // printf("x0 = %f, y0 = %f, theta_reco = %f, phi_reco = %f\n", trk.x0, trk.y0, trk.theta * TMath::RadToDeg(), trk.phi * TMath::RadToDeg());
-    x2 = trk.x0 + dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
-    y2 = trk.y0 + dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
-    z2 = trk.z0 + dz;
-    x1 = trk.x0 - dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
-    y1 = trk.y0 - dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
-    z1 = trk.z0 - dz;
-    Double_t x_line[3] = {x1, trk.x0, x2};
-    Double_t y_line[3] = {y1, trk.y0, y2};
-    Double_t z_line[3] = {z1, trk.z0, z2};
-    TPolyLine3D *line_track = new TPolyLine3D(3, x_line, y_line, z_line);
-    line_track->SetLineWidth(2);
-    // if (trk.chi2 > 10)
-    //   line_track->SetLineColor(kGreen);
-    // else
-    line_track->SetLineColor(kRed);
-    line_track->Draw();
-
-    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 2, 2, 0, 0, 0);
-    g->Draw();
-    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 2, 2, 0, 0, 0);
-    m->Draw();
-    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 2, 2, 0, 0, 0);
-    f->Draw();
-
-    if (trk.chi2 > 0.)
+    if (trk.chi2 > 300.)
     {
-      double R = 6;      // radius of the circle
-      const int N = 100; // number of points to make circle smooth
-      Double_t x_circ[N], y_circ[N], z_circ[N];
+      // cout << endl;
+      // cout << trk << endl;
 
-      for (int j = 0; j < N; j++)
+      float x1, y1, z1, dz, x2, y2, z2;
+
+      dz = 100;
+
+      // printf("x0 = %f, y0 = %f, theta_reco = %f, phi_reco = %f\n", trk.x0, trk.y0, trk.theta * TMath::RadToDeg(), trk.phi * TMath::RadToDeg());
+      x2 = trk.x0 + dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
+      y2 = trk.y0 + dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
+      z2 = trk.z0 + dz;
+      x1 = trk.x0 - dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
+      y1 = trk.y0 - dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
+      z1 = trk.z0 - dz;
+      Double_t x_line[3] = {x1, trk.x0, x2};
+      Double_t y_line[3] = {y1, trk.y0, y2};
+      Double_t z_line[3] = {z1, trk.z0, z2};
+      TPolyLine3D *line_track = new TPolyLine3D(3, x_line, y_line, z_line);
+      line_track->SetLineWidth(2);
+      // if (trk.chi2 > 10)
+      //   line_track->SetLineColor(kGreen);
+      // else
+      line_track->SetLineColor(kRed);
+      line_track->Draw();
+
+      TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 0, 0, 0, 0, 0);
+      g->Draw();
+      TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 0, 0, 0, 0, 0);
+      m->Draw();
+      TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
+      f->Draw();
+
+      if (trk.chi2 > 10000.)
       {
-        double phi = 2 * TMath::Pi() * j / (N - 1); // angle
-        x_circ[j] = trk.x0 + R * TMath::Cos(phi);
-        y_circ[j] = trk.y0 + R * TMath::Sin(phi);
-        z_circ[j] = trk.z0; // circle in XY plane
-      }
+        double R = 6;      // radius of the circle
+        const int N = 100; // number of points to make circle smooth
+        Double_t x_circ[N], y_circ[N], z_circ[N];
 
-      // make polyline
-      TPolyLine3D *circle = new TPolyLine3D(N, x_circ, y_circ, z_circ);
-      circle->SetLineColor(kBlue);
-      circle->SetLineWidth(2);
-      circle->Draw();
+        for (int j = 0; j < N; j++)
+        {
+          double phi = 2 * TMath::Pi() * j / (N - 1); // angle
+          x_circ[j] = trk.x0 + R * TMath::Cos(phi);
+          y_circ[j] = trk.y0 + R * TMath::Sin(phi);
+          z_circ[j] = trk.z0; // circle in XY plane
+        }
+
+        // make polyline
+        TPolyLine3D *circle = new TPolyLine3D(N, x_circ, y_circ, z_circ);
+        circle->SetLineColor(kBlue);
+        circle->SetLineWidth(2);
+        circle->Draw();
+      }
     }
   }
 

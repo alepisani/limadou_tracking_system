@@ -42,11 +42,13 @@
 simulations::simulations()
 {
     // radius in mm
-    // simulations::gen_tracks = {1};
+    simulations::gen_tracks = {10};
     radius = {0.4};
     // simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
-    simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10};
+    // simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10};
     // radius = {2, 1.5, 1, 0.9, 0.8, 0.7, 0.65, 0.6, 0.55, 0.5, 0.47, 0.45, 0.43, 0.4, 0.37, 0.35, 0.33, 0.3, 0.27, 0.25, 0.23, 0.2, 0.15, 0.1, 0.05, 0.01, 0}; //mm
+    chi2cut = {1000, 800, 500, 400, 300, 200, 150, 100, 75, 50, 25, 10, 1};
+
 
     // simulations::gen_tracks = {100};
     // radius = {0.3};
@@ -313,7 +315,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
     // Scrivi intestazione solo se il file non esisteva prima
     if (!file_exists)
     {
-        file << "GenTrk, Raggio, Eff, err_e, Eff_real, err_er, fake_reco_trk, err_frt, GenTrk, RecoTrk, RecoReal, RealTime, CPUTime, eff3hit, eff2hit, fake3, fake2\n";
+        // file << "GenTrk, Raggio, Eff, err_e, Eff_real, err_er, fake_reco_trk, err_frt, GenTrk, RecoTrk, RecoReal, RealTime, CPUTime, eff3hit, eff2hit, fake3, fake2\n";
+        file << "GenTrk, Raggio, Eff, Eff_real, fake_reco_trk, GenTrk, RecoTrk, RecoReal, RealTime, CPUTime, eff3hit, eff2hit, fake3, fake2\n";
     }
 
     for (int i = 0; i < gen_tracks.size(); ++i)
@@ -396,8 +399,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
                 reco_real.push_back(stats::hmrtar);
                 reco_real3.push_back(stats::hmrtar3);
                 reco_real2.push_back(stats::hmrtar2);
-                // gen_trk.push_back(stats::hmgthL012 + stats::hmgth2L);
-                gen_trk.push_back(stats::hmgthL012);
+                gen_trk.push_back(stats::hmgthL012 + stats::hmgth2L);
+                // gen_trk.push_back(stats::hmgthL012);
                 fake3.push_back(stats::hmrtaf3);
                 fake2.push_back(stats::hmrtaf2);
 
@@ -455,11 +458,11 @@ void simulations::sim_trk_32L(int iteration_per_event)
             file << gen_tracks[i] << ","
                  << radius[m] << ","
                  << std::fixed << std::setprecision(6) << eff << ","
-                 << std::fixed << std::setprecision(6) << err_eff << ","
+                 // << std::fixed << std::setprecision(6) << err_eff << ","
                  << std::fixed << std::setprecision(6) << eff_real << ","
-                 << std::fixed << std::setprecision(6) << err_effreal << ","
+                 // << std::fixed << std::setprecision(6) << err_effreal << ","
                  << std::fixed << std::setprecision(6) << ineff_fake << ","
-                 << std::fixed << std::setprecision(6) << err_ineffake << ","
+                 // << std::fixed << std::setprecision(6) << err_ineffake << ","
                  << std::fixed << std::setprecision(6) << mean(gen_trk) << ","
                  << std::fixed << std::setprecision(6) << mean(reco) << ","
                  << std::fixed << std::setprecision(6) << mean(reco_real) << ","
@@ -624,7 +627,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
     h_dy_y->Draw("colz");
 
     alldistros->Write();
-    alldistros->SaveAs("../data/alldistros.png");
+    //alldistros->SaveAs("../data/alldistros.png");
 
     // finish
     f->Flush();

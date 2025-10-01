@@ -363,7 +363,7 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             stats::hmgthL2++;
             stats::hitL2 = true;
             // only if hitted the chips goes to tidy_clusters
-            pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], cls_size_x, cls_size_y, 0, i);
+            pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], cls_size_x, cls_size_y, 0, i, cls_size);
 
             tracker.tidy_clusters_lay2.try_emplace(i, pL2);
             //TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], err_cl, err_cl, 0, 0, 0);
@@ -375,7 +375,7 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
         {
             stats::hmgthL1++;
             stats::hitL1 = true;
-            mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], cls_size_x, cls_size_y, 0, i);
+            mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], cls_size_x, cls_size_y, 0, i, cls_size);
             tracker.tidy_clusters_lay1.try_emplace(i, mL1);
             //TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], err_cl, err_cl, 0, 0, 0);
             TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], 0, 0, 0, 0, 0);
@@ -386,7 +386,7 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
         {
             stats::hmgthL0++;
             stats::hitL0 = true;
-            qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], cls_size_x, cls_size_y, 0, i);
+            qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], cls_size_x, cls_size_y, 0, i, cls_size);
             tracker.tidy_clusters_lay0.try_emplace(i, qL0);
             //TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], err_cl, err_cl, 0, 0, 0);
             TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], 0, 0, 0, 0, 0);
@@ -634,19 +634,19 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             if (r == 1)
             {
                 fakehit_z = display::StaveZ[0];
-                fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, cls_size_x, cls_size_y, 0, -1);
+                fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, cls_size_x, cls_size_y, 0, -1, cls_size);
                 tracker.tidy_clusters_lay0.try_emplace(-1, fakehit);
             }
             if (r == 2)
             {
                 fakehit_z = display::StaveZ[1];
-                fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, cls_size_x, cls_size_y, 0, -1);
+                fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, cls_size_x, cls_size_y, 0, -1, cls_size);
                 tracker.tidy_clusters_lay1.try_emplace(-1, fakehit);
             }
             if (r == 3)
             {
                 fakehit_z = display::StaveZ[2];
-                fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, cls_size_x, cls_size_y, 0, -1);
+                fakehit.fill_cluster(fakehit, fakehit_x, fakehit_y, fakehit_z, cls_size_x, cls_size_y, 0, -1, cls_size);
                 tracker.tidy_clusters_lay2.try_emplace(-1, fakehit);
             }
 
@@ -663,7 +663,7 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             stats::hmgthL2++;
             stats::hitL2 = true;
             // only if hitted the chips goes to tidy_clusters
-            pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], cls_size_x, cls_size_y, 0, i);
+            pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], cls_size_x, cls_size_y, 0, i, cls_size);
             tracker.tidy_clusters_lay2.try_emplace(i, pL2);
         }
         // check if the track hitted the staves in layer 1
@@ -671,7 +671,7 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         {
             stats::hmgthL1++;
             stats::hitL1 = true;
-            mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], cls_size_x, cls_size_y, 0, i);
+            mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], cls_size_x, cls_size_y, 0, i, cls_size);
             tracker.tidy_clusters_lay1.try_emplace(i, mL1);
         }
         // check if the track hitted the staves in layer 0
@@ -679,7 +679,7 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         {
             stats::hmgthL0++;
             stats::hitL0 = true;
-            qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], cls_size_x, cls_size_y, 0, i);
+            qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], cls_size_x, cls_size_y, 0, i, cls_size);
             tracker.tidy_clusters_lay0.try_emplace(i, qL0);
         }
 

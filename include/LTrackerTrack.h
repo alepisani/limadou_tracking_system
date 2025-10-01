@@ -31,6 +31,8 @@ struct LTrackCandidate
   float dy0 = -1.;
   float dy1 = -1.;
   float dy2 = -1.;
+  float cls_size = -1;
+  float delta_clsize = -1;
 
   friend std::ostream &operator<<(std::ostream &output, const LTrackCandidate &tr)
   {
@@ -67,7 +69,7 @@ struct LTrackCandidate
 struct LCluster
 {
   LCluster();
-  void fill_cluster(LCluster &, double, double, double, double, double, double, int);
+  void fill_cluster(LCluster &, double, double, double, double, double, double, int, double);
 
   int id = -1;
   float x = -999.;
@@ -76,6 +78,7 @@ struct LCluster
   float erry = -999.;
   float z = -999.;
   float errz = 0.01;
+  float cls_size = -1;
 
   friend std::ostream &operator<<(std::ostream &output, const LCluster &cl)
   {

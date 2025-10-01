@@ -49,7 +49,6 @@ simulations::simulations()
     // radius = {2, 1.5, 1, 0.9, 0.8, 0.7, 0.65, 0.6, 0.55, 0.5, 0.47, 0.45, 0.43, 0.4, 0.37, 0.35, 0.33, 0.3, 0.27, 0.25, 0.23, 0.2, 0.15, 0.1, 0.05, 0.01, 0}; //mm
     // chi2cut = {1000, 800, 500, 400, 300, 200, 150, 100, 75, 50, 25, 10, 1};
 
-
     // simulations::gen_tracks = {100};
     // radius = {0.3};
 
@@ -251,8 +250,19 @@ void simulations::sim_trk_32L(int iteration_per_event)
     std::vector<float> alltheta;
     std::vector<float> allphi;
     float nbins = (iteration_per_event * radius.size() * gen_tracks.size());
-    
-    TH1F *hchi2 = new TH1F("hchi2", "#chi^{2};#chi^{2};counts", 50002, -2, 50000);
+
+    TH1F *hchi2 = new TH1F("hchi2", "#chi^{2};#chi^{2};counts", 500, -2, 50);
+
+    TH2D *h_chi2dx0 = new TH2D("h_chi2_dx0", "#chi^{2} dx0;dx0;#chi^{2}", 100, -2, 2, 100, 0, 50);
+    TH2D *h_chi2dx1 = new TH2D("h_chi2_dx1", "#chi^{2} dx1;dx1;#chi^{2}", 100, -2, 2, 100, 0, 50);
+    TH2D *h_chi2dx2 = new TH2D("h_chi2_dx2", "#chi^{2} dx2;dx2;#chi^{2}", 100, -2, 2, 100, 0, 50);
+    TH2D *h_chi2dy0 = new TH2D("h_chi2_dy0", "#chi^{2} dy0;dy0;#chi^{2}", 100, -2, 2, 100, 0, 50);
+    TH2D *h_chi2dy1 = new TH2D("h_chi2_dy1", "#chi^{2} dy1;dy1;#chi^{2}", 100, -2, 2, 100, 0, 50);
+    TH2D *h_chi2dy2 = new TH2D("h_chi2_dy2", "#chi^{2} dy2;dy2;#chi^{2}", 100, -2, 2, 100, 0, 50);
+    TH2D *h_chi2errx = new TH2D("h_chi2_errx", "#chi^{2} errx;errx;#chi^{2}", 100, 0, 1, 100, 0, 50);
+    TH2D *h_chi2erry = new TH2D("h_chi2_erry", "#chi^{2} erry;erry;#chi^{2}", 100, 0, 1, 100, 0, 50);
+    TH2D *h_chi2clssize = new TH2D("h_chi2_cls_size", "#chi^{2} cls_size;cls_size;#chi^{2}", 100, 0, 50, 100, 0, 50);
+    TH2D *h_chi2_delta_clsize = new TH2D("h_chi2_delta_clsize", "#chi^{2} vs deltaclsize;        deltaclsize;   #chi^{2}", 10, 0, 100, 100, 0, 100);
 
     TH1F *htheta_real = new TH1F("htheta_real", "#theta;#theta (deg);counts", 45, 0, 90);
     TH1F *htheta_reco = new TH1F("htheta_reco", "#theta;#theta (deg);counts", 45, 0, 90);
@@ -394,6 +404,18 @@ void simulations::sim_trk_32L(int iteration_per_event)
                     x_reco = ltt.tracks[g].x0;
                     y_reco = ltt.tracks[g].y0;
                     hchi2->Fill(ltt.tracks[g].chi2);
+
+                    h_chi2dx0->Fill(ltt.tracks[g].dx0, ltt.tracks[g].chi2);
+                    h_chi2dx1->Fill(ltt.tracks[g].dx1, ltt.tracks[g].chi2);
+                    h_chi2dx2->Fill(ltt.tracks[g].dx2, ltt.tracks[g].chi2);
+                    h_chi2dy0->Fill(ltt.tracks[g].dy0, ltt.tracks[g].chi2);
+                    h_chi2dy1->Fill(ltt.tracks[g].dy1, ltt.tracks[g].chi2);
+                    h_chi2dy2->Fill(ltt.tracks[g].dy2, ltt.tracks[g].chi2);
+                    h_chi2errx->Fill(ltt.tracks[g].err_x0, ltt.tracks[g].chi2);
+                    h_chi2erry->Fill(ltt.tracks[g].err_y0, ltt.tracks[g].chi2);
+                    h_chi2clssize->Fill(ltt.tracks[g].cls_size, ltt.tracks[g].chi2);
+                    h_chi2_delta_clsize->Fill(ltt.tracks[g].delta_clsize, ltt.tracks[g].chi2);
+
                 }
 
                 simu.generated_tracks.clear();
@@ -437,7 +459,6 @@ void simulations::sim_trk_32L(int iteration_per_event)
                     h_dy_phi->Fill(phi_real, dy);
                     h_dy_x->Fill(x_real, dy);
                     h_dy_y->Fill(y_real, dy);
-
                 }
 
                 printProgressBarWithETA(j + 1, iteration_per_event, start_time);
@@ -491,6 +512,17 @@ void simulations::sim_trk_32L(int iteration_per_event)
 
     // --- write your histograms individually ---
     hchi2->Write();
+
+    h_chi2dx0->Write();
+    h_chi2dx1->Write();
+    h_chi2dx2->Write();
+    h_chi2dy0->Write();
+    h_chi2dy1->Write();
+    h_chi2dy2->Write();
+    h_chi2errx->Write();
+    h_chi2erry->Write();
+    h_chi2clssize->Write();
+    h_chi2_delta_clsize->Write();
 
     htheta_reco->Write("htheta_reco", TObject::kOverwrite);
     htheta_real->Write("htheta_real", TObject::kOverwrite);
@@ -634,11 +666,10 @@ void simulations::sim_trk_32L(int iteration_per_event)
     h_dy_y->Draw("colz");
 
     alldistros->Write();
-    //alldistros->SaveAs("../data/alldistros.png");
+    // alldistros->SaveAs("../data/alldistros.png");
 
     // finish
     f->Flush();
     f->ls();
     f->Close();
-
 }

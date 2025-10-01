@@ -38,7 +38,7 @@ void LTrackerTrack::Reset()
   std::vector<int>().swap(used_clusters_lay2);
 }
 
-void LCluster::fill_cluster(LCluster &cl, double x, double y, double z, double errx, double erry, double errz, int id)
+void LCluster::fill_cluster(LCluster &cl, double x, double y, double z, double errx, double erry, double errz, int id, double cls_size)
 {
   cl.x = x;
   cl.errx = errx;
@@ -47,6 +47,7 @@ void LCluster::fill_cluster(LCluster &cl, double x, double y, double z, double e
   cl.z = z;
   cl.errz = errz;
   cl.id = id;
+  cl.cls_size = cls_size;
 }
 
 void LTrackerTrack::createTracklet(std::pair<int, LCluster> cl_l0, std::pair<int, LCluster> cl_l1, std::vector<LTracklet> &tracklet_vector, int &tracklet_counter)
@@ -637,6 +638,8 @@ void LTrackerTrack::new_algo(double radius)
           trkCand.dy0 = dy0;
           trkCand.dy1 = dy1;
           trkCand.dy2 = dy2;
+          trkCand.cls_size = clus_1.cls_size;
+          trkCand.delta_clsize = TMath::Abs(clus_0.cls_size - clus_1.cls_size) + TMath::Abs(clus_1.cls_size - clus_2.cls_size) + TMath::Abs(clus_2.cls_size - clus_0.cls_size);
           track_candidates.push_back(trkCand);
           if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id)
           {

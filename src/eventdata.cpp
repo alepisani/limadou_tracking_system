@@ -139,15 +139,18 @@ void eventdata::analize_data()
     TH2D *h_chi2_phi = new TH2D("h_chi2_phi", "#chi^2 vs #phi;          #phi (deg);     #chi^2", 30, -200, 200, 50, -2, 500);
     h_chi2_phi->SetStats(0);
 
-    TH2D *h_chi2_dx0 = new TH2D("h_chi2_dx0", "#chi^{2} vs dx0;        dx0;   #chi^{2}", 10, -1, 1, 502, -2, 500);
-    TH2D *h_chi2_dx1 = new TH2D("h_chi2_dx1", "#chi^{2} vs dx1;        dx1;   #chi^{2}", 10, -1, 1, 502, -2, 500);
-    TH2D *h_chi2_dx2 = new TH2D("h_chi2_dx2", "#chi^{2} vs dx2;        dx2;   #chi^{2}", 10, -1, 1, 502, -2, 500);
-    TH2D *h_chi2_dy0 = new TH2D("h_chi2_dy0", "#chi^{2} vs dy0;        dy0;   #chi^{2}", 10, -1, 1, 502, -2, 500);
-    TH2D *h_chi2_dy1 = new TH2D("h_chi2_dy1", "#chi^{2} vs dy1;        dy1;   #chi^{2}", 10, -1, 1, 502, -2, 500);
-    TH2D *h_chi2_dy2 = new TH2D("h_chi2_dy2", "#chi^{2} vs dy2;        dy2;   #chi^{2}", 10, -1, 1, 502, -2, 500);
+    TH2D *h_chi2_dx0 = new TH2D("h_chi2_dx0", "#chi^{2} vs dx0;        dx0;   #chi^{2}", 50, -1, 1, 502, -2, 500);
+    TH2D *h_chi2_dx1 = new TH2D("h_chi2_dx1", "#chi^{2} vs dx1;        dx1;   #chi^{2}", 50, -1, 1, 502, -2, 500);
+    TH2D *h_chi2_dx2 = new TH2D("h_chi2_dx2", "#chi^{2} vs dx2;        dx2;   #chi^{2}", 50, -1, 1, 502, -2, 500);
+    TH2D *h_chi2_dy0 = new TH2D("h_chi2_dy0", "#chi^{2} vs dy0;        dy0;   #chi^{2}", 50, -1, 1, 502, -2, 500);
+    TH2D *h_chi2_dy1 = new TH2D("h_chi2_dy1", "#chi^{2} vs dy1;        dy1;   #chi^{2}", 50, -1, 1, 502, -2, 500);
+    TH2D *h_chi2_dy2 = new TH2D("h_chi2_dy2", "#chi^{2} vs dy2;        dy2;   #chi^{2}", 50, -1, 1, 502, -2, 500);
 
     TH2D *h_chi2_errx0 = new TH2D("h_chi2_errx0", "#chi^{2} vs errx0;        errx0;   #chi^{2}", 100, 0, 0.05, 100, -2, 500);
     TH2D *h_chi2_erry0 = new TH2D("h_chi2_erry0", "#chi^{2} vs erry0;        erry0;   #chi^{2}", 100, 0, 0.05, 100, -2, 500);
+
+    TH2D *h_chi2_clsize1 = new TH2D("h_chi2_clsize1", "#chi^{2} vs clsize1;        clsize1;   #chi^{2}", 100, 0, 50, 100, -2, 500);
+    TH2D *h_chi2_delta_clsize = new TH2D("h_chi2_delta_clsize", "#chi^{2} vs deltaclsize;        deltaclsize;   #chi^{2}", 100, 0, 100, 100, -2, 500);
 
     TH2D *h_err_dx = new TH2D("herrdx", "err vs dx;        err;   dx", 100, 0, 0.05, 100, -1, 1);
 
@@ -188,6 +191,7 @@ void eventdata::analize_data()
             c.z = cl.cls_mean_z[j];
             c.errx = cl.cls_mean_err_x[j];
             c.erry = cl.cls_mean_err_y[j];
+            c.cls_size = cl.cls_size[j];
             c.id = i;
             // cout << "\n cluster: \n" << c;
             if (c.z < 36. && c.z > 30.)
@@ -258,6 +262,9 @@ void eventdata::analize_data()
                 h_chi2_erry0->Fill(ltt.tracks[m].err_y0, ltt.tracks[m].chi2);
 
                 h_err_dx->Fill(ltt.tracks[m].err_x0, ltt.tracks[m].dx0);
+                
+                h_chi2_clsize1->Fill(ltt.tracks[m].cls_size, ltt.tracks[m].chi2);
+                h_chi2_delta_clsize->Fill(ltt.tracks[m].delta_clsize, ltt.tracks[m].chi2);
             }
         }
 
@@ -375,6 +382,8 @@ void eventdata::analize_data()
         h_chi2_errx0->Write();
         h_chi2_erry0->Write();
 
+        h_chi2_clsize1->Write();
+        h_chi2_delta_clsize->Write();
         h_err_dx->Write();
 
         // Find the maximum y value among all histograms
@@ -559,6 +568,8 @@ void eventdata::from_ev_to_cluster(LTrackerCluster &cluster, eventdata &ev)
     cluster.cls_mean_z = ev.cls_mean_z;
     cluster.cls_mean_err_x = ev.cls_mean_x_err;
     cluster.cls_mean_err_y = ev.cls_mean_y_err;
+    cluster.cls_size = ev.cls_size;
+    
     cluster.cls_idx = {-1, -1, -1};
 
     // values to be discuss and maybe change

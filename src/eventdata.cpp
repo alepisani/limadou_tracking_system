@@ -120,6 +120,7 @@ void eventdata::analize_data()
     int nbins = alldata.size() / 200;
     int theta_bins = 50;
     int phi_bins = 50;
+    int chi2_bins = 5000;
     TH1F *h_dx0 = new TH1F("hdx0", "#dx0;#dx0;counts", 1000, -5, 5);
     TH1F *h_dx1 = new TH1F("hdx1", "#dx1;#dx1;counts", 1000, -5, 5);
     TH1F *h_dx2 = new TH1F("hdx2", "#dx2;#dx2;counts", 1000, -5, 5);
@@ -133,24 +134,28 @@ void eventdata::analize_data()
     TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", theta_bins, -5, 90);
     TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", phi_bins, -185, 185);
     TH2D *h = new TH2D("h_theta_vs_phi", "#theta vs #phi;#phi (deg);#theta (deg)", nbins, -185, 185, nbins, 0, 90);
-    TH1F *hchi2 = new TH1F("hchi2_newalgo", "#chi2;#chi2;counts", 500, 0, 50000);
-    TH2D *h_chi2_theta = new TH2D("h_chi2_theta", "#chi^2 vs #theta;        #theta (deg);   #chi^2", 30, 0, 90, 50, -2, 500);
+    TH1F *hchi2 = new TH1F("hchi2_newalgo", "#chi2;#chi2;counts", 500, 0, chi2_bins);
+    TH2D *h_chi2_theta = new TH2D("h_chi2_theta", "#chi^2 vs #theta;        #theta (deg);   #chi^2", 90, 0, 90, 50, -2, chi2_bins);
     h_chi2_theta->SetStats(0);
-    TH2D *h_chi2_phi = new TH2D("h_chi2_phi", "#chi^2 vs #phi;          #phi (deg);     #chi^2", 30, -200, 200, 50, -2, 500);
+    TH2D *h_chi2_phi = new TH2D("h_chi2_phi", "#chi^2 vs #phi;          #phi (deg);     #chi^2", 180, -200, 200, 50, -2, chi2_bins);
     h_chi2_phi->SetStats(0);
 
-    TH2D *h_chi2_dx0 = new TH2D("h_chi2_dx0", "#chi^{2} vs dx0;        dx0;   #chi^{2}", 50, -1, 1, 502, -2, 500);
-    TH2D *h_chi2_dx1 = new TH2D("h_chi2_dx1", "#chi^{2} vs dx1;        dx1;   #chi^{2}", 50, -1, 1, 502, -2, 500);
-    TH2D *h_chi2_dx2 = new TH2D("h_chi2_dx2", "#chi^{2} vs dx2;        dx2;   #chi^{2}", 50, -1, 1, 502, -2, 500);
-    TH2D *h_chi2_dy0 = new TH2D("h_chi2_dy0", "#chi^{2} vs dy0;        dy0;   #chi^{2}", 50, -1, 1, 502, -2, 500);
-    TH2D *h_chi2_dy1 = new TH2D("h_chi2_dy1", "#chi^{2} vs dy1;        dy1;   #chi^{2}", 50, -1, 1, 502, -2, 500);
-    TH2D *h_chi2_dy2 = new TH2D("h_chi2_dy2", "#chi^{2} vs dy2;        dy2;   #chi^{2}", 50, -1, 1, 502, -2, 500);
+    TH2D *h_chi2_dx0 = new TH2D("h_chi2_dx0", "#chi^{2} vs dx0;        dx0;   #chi^{2}", 50, -1, 1, 502, -2, chi2_bins);
+    TH2D *h_chi2_dx1 = new TH2D("h_chi2_dx1", "#chi^{2} vs dx1;        dx1;   #chi^{2}", 50, -1, 1, 502, -2, chi2_bins);
+    TH2D *h_chi2_dx2 = new TH2D("h_chi2_dx2", "#chi^{2} vs dx2;        dx2;   #chi^{2}", 50, -1, 1, 502, -2, chi2_bins);
+    TH2D *h_chi2_dy0 = new TH2D("h_chi2_dy0", "#chi^{2} vs dy0;        dy0;   #chi^{2}", 50, -1, 1, 502, -2, chi2_bins);
+    TH2D *h_chi2_dy1 = new TH2D("h_chi2_dy1", "#chi^{2} vs dy1;        dy1;   #chi^{2}", 50, -1, 1, 502, -2, chi2_bins);
+    TH2D *h_chi2_dy2 = new TH2D("h_chi2_dy2", "#chi^{2} vs dy2;        dy2;   #chi^{2}", 50, -1, 1, 502, -2, chi2_bins);
 
-    TH2D *h_chi2_errx0 = new TH2D("h_chi2_errx0", "#chi^{2} vs errx0;        errx0;   #chi^{2}", 100, 0, 0.05, 100, -2, 500);
-    TH2D *h_chi2_erry0 = new TH2D("h_chi2_erry0", "#chi^{2} vs erry0;        erry0;   #chi^{2}", 100, 0, 0.05, 100, -2, 500);
+    TH2D *h_chi2_errx0 = new TH2D("h_chi2_errx0", "#chi^{2} vs errx0;        errx0;   #chi^{2}", 100, 0, 0.05, 100, -2, chi2_bins);
+    TH2D *h_chi2_erry0 = new TH2D("h_chi2_erry0", "#chi^{2} vs erry0;        erry0;   #chi^{2}", 100, 0, 0.05, 100, -2, chi2_bins);
 
-    TH2D *h_chi2_clsize1 = new TH2D("h_chi2_clsize1", "#chi^{2} vs clsize1;        clsize1;   #chi^{2}", 100, 0, 50, 100, -2, 500);
-    TH2D *h_chi2_delta_clsize = new TH2D("h_chi2_delta_clsize", "#chi^{2} vs deltaclsize;        deltaclsize;   #chi^{2}", 100, 0, 100, 100, -2, 500);
+    TH2D *h_chi2_clsize1 = new TH2D("h_chi2_clsize1", "#chi^{2} vs clsize1;        clsize1;   #chi^{2}", 100, 0, 50, 100, -2, chi2_bins);
+    TH2D *h_chi2_delta_clsize = new TH2D("h_chi2_delta_clsize", "#chi^{2} vs deltaclsize;        deltaclsize;   #chi^{2}", 100, 0, 100, 100, -2, chi2_bins);
+
+    TH2D *h_clsize21 = new TH2D("h_clsize21", "cls_size2 vs cls_size1;        clsize1;   clsize2", 50, 0, 50, 50, 0, 50);
+    TH2D *h_clsize10 = new TH2D("h_clsize10", "cls_size1 vs cls_size0;        clsize0;   clsize1", 50, 0, 50, 50, 0, 50);
+    TH2D *h_clsize20 = new TH2D("h_clsize20", "cls_size2 vs cls_size0;        clsize0;   clsize2", 50, 0, 50, 50, 0, 50);
 
     TH2D *h_err_dx = new TH2D("herrdx", "err vs dx;        err;   dx", 100, 0, 0.05, 100, -1, 1);
 
@@ -240,7 +245,6 @@ void eventdata::analize_data()
                 h_chi2_theta->Fill(ltt.tracks[m].theta * radtodeg, ltt.tracks[m].chi2);
                 h_chi2_phi->Fill(ltt.tracks[m].phi * radtodeg, ltt.tracks[m].chi2);
 
-                // if(ltt.tracks[m].n_clus == 3){}
                 h_chi2_dx0->Fill(ltt.tracks[m].dx0, ltt.tracks[m].chi2);
                 h_chi2_dx1->Fill(ltt.tracks[m].dx1, ltt.tracks[m].chi2);
                 h_chi2_dx2->Fill(ltt.tracks[m].dx2, ltt.tracks[m].chi2);
@@ -263,8 +267,15 @@ void eventdata::analize_data()
 
                 h_err_dx->Fill(ltt.tracks[m].err_x0, ltt.tracks[m].dx0);
                 
-                h_chi2_clsize1->Fill(ltt.tracks[m].cls_size, ltt.tracks[m].chi2);
+                h_chi2_clsize1->Fill(ltt.tracks[m].cls_size1, ltt.tracks[m].chi2);
                 h_chi2_delta_clsize->Fill(ltt.tracks[m].delta_clsize, ltt.tracks[m].chi2);
+
+                h_clsize21->Fill(ltt.tracks[m].cls_size1, ltt.tracks[m].cls_size2);
+                h_clsize20->Fill(ltt.tracks[m].cls_size0, ltt.tracks[m].cls_size2);
+                h_clsize10->Fill(ltt.tracks[m].cls_size0, ltt.tracks[m].cls_size1);
+
+                //if(ltt.tracks[m].chi2 > 500.) cout << ltt.tracks[m] << endl;
+                
             }
         }
 
@@ -273,18 +284,9 @@ void eventdata::analize_data()
             ltt.printRecoTracks_new_alg(canvas);
             // ltt.print_all_tracklet(ltt);
         }
+
         sim.printProgressBarWithETA(i + 1, n, start_time, 30);
 
-        if (print_canvas)
-        {
-            for (int m = 0; m < ltt.tracks.size(); ++m)
-            {
-                if (ltt.tracks[m].chi2 > 400.)
-                {
-                    // cout << ltt.tracks[m] << endl;
-                }
-            }
-        }
     }
 
     if (!print_canvas)
@@ -384,6 +386,9 @@ void eventdata::analize_data()
 
         h_chi2_clsize1->Write();
         h_chi2_delta_clsize->Write();
+        h_clsize21->Write();
+        h_clsize10->Write();
+        h_clsize20->Write();
         h_err_dx->Write();
 
         // Find the maximum y value among all histograms

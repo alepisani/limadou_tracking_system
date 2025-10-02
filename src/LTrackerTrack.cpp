@@ -581,7 +581,7 @@ void LTrackerTrack::computeTrackCandidates()
 void LTrackerTrack::new_algo(double radius)
 {
   // 1000, 500, 400, 300, 200, 100, 75, 50, 25, 10, 5, 1
-  chi2_cut = 50000;
+  chi2_cut = 5000;
   float degtorad = TMath::DegToRad();
   float pi = TMath::Pi();
   int candidateCounter = 0;
@@ -638,7 +638,9 @@ void LTrackerTrack::new_algo(double radius)
           trkCand.dy0 = dy0;
           trkCand.dy1 = dy1;
           trkCand.dy2 = dy2;
-          trkCand.cls_size = clus_1.cls_size;
+          trkCand.cls_size2 = clus_2.cls_size;
+          trkCand.cls_size1 = clus_1.cls_size;
+          trkCand.cls_size0 = clus_0.cls_size;
           trkCand.delta_clsize = TMath::Abs(clus_0.cls_size - clus_1.cls_size) + TMath::Abs(clus_1.cls_size - clus_2.cls_size) + TMath::Abs(clus_2.cls_size - clus_0.cls_size);
           track_candidates.push_back(trkCand);
           if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id)
@@ -743,7 +745,8 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 {
   for (auto &trk : tracks)
   {
-    if (trk.chi2 > 300.)
+    //if (trk.chi2 > 300.)
+    if(1)
     {
       // cout << endl;
       // cout << trk << endl;
@@ -764,9 +767,6 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
       Double_t z_line[3] = {z1, trk.z0, z2};
       TPolyLine3D *line_track = new TPolyLine3D(3, x_line, y_line, z_line);
       line_track->SetLineWidth(2);
-      // if (trk.chi2 > 10)
-      //   line_track->SetLineColor(kGreen);
-      // else
       line_track->SetLineColor(kRed);
       line_track->Draw();
 
@@ -777,7 +777,7 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
       TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
       f->Draw();
 
-      if (trk.chi2 > 10000.)
+      if (0)
       {
         double R = 6;      // radius of the circle
         const int N = 100; // number of points to make circle smooth

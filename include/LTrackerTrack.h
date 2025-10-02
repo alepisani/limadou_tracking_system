@@ -8,6 +8,7 @@
 #include "./LTrackerCluster.h"
 #include <TCanvas.h>
 #include <TView.h>
+#include <TMath.h>
 
 struct LTrackCandidate
 {
@@ -31,7 +32,9 @@ struct LTrackCandidate
   float dy0 = -1.;
   float dy1 = -1.;
   float dy2 = -1.;
-  float cls_size = -1;
+  float cls_size0 = -1;
+  float cls_size1 = -1;
+  float cls_size2 = -1;
   float delta_clsize = -1;
 
   friend std::ostream &operator<<(std::ostream &output, const LTrackCandidate &tr)
@@ -50,8 +53,8 @@ struct LTrackCandidate
       output << p << ", ";
     }
     output << std::endl;
-    output << "theta : " << tr.theta << " +- " << tr.err_theta << std::endl;
-    output << "phi : " << tr.phi << " +- " << tr.err_phi << std::endl;
+    output << "theta : " << (tr.theta / TMath::Pi())*180 << " +- " << (tr.err_theta / TMath::Pi()) * 180 << std::endl;
+    output << "phi : " << (tr.phi / TMath::Pi()) * 180 << " +- " << (tr.err_phi / TMath::Pi()) * 180 << std::endl;
     output << "x0 : " << tr.x0 << " +- " << tr.err_x0 << std::endl;
     output << "y0 : " << tr.y0 << " +- " << tr.err_y0 << std::endl;
     output << "dx0 : " << tr.dx0 << std::endl;

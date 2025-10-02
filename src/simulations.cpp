@@ -250,19 +250,23 @@ void simulations::sim_trk_32L(int iteration_per_event)
     std::vector<float> alltheta;
     std::vector<float> allphi;
     float nbins = (iteration_per_event * radius.size() * gen_tracks.size());
+    double chi2max = 300;
+    double chi2bins = 50;
 
-    TH1F *hchi2 = new TH1F("hchi2", "#chi^{2};#chi^{2};counts", 500, -2, 50);
+    TH1F *hchi2 = new TH1F("hchi2", "#chi^{2};#chi^{2};counts", 1000, 0, chi2max);
 
-    TH2D *h_chi2dx0 = new TH2D("h_chi2_dx0", "#chi^{2} dx0;dx0;#chi^{2}", 100, -2, 2, 100, 0, 50);
-    TH2D *h_chi2dx1 = new TH2D("h_chi2_dx1", "#chi^{2} dx1;dx1;#chi^{2}", 100, -2, 2, 100, 0, 50);
-    TH2D *h_chi2dx2 = new TH2D("h_chi2_dx2", "#chi^{2} dx2;dx2;#chi^{2}", 100, -2, 2, 100, 0, 50);
-    TH2D *h_chi2dy0 = new TH2D("h_chi2_dy0", "#chi^{2} dy0;dy0;#chi^{2}", 100, -2, 2, 100, 0, 50);
-    TH2D *h_chi2dy1 = new TH2D("h_chi2_dy1", "#chi^{2} dy1;dy1;#chi^{2}", 100, -2, 2, 100, 0, 50);
-    TH2D *h_chi2dy2 = new TH2D("h_chi2_dy2", "#chi^{2} dy2;dy2;#chi^{2}", 100, -2, 2, 100, 0, 50);
-    TH2D *h_chi2errx = new TH2D("h_chi2_errx", "#chi^{2} errx;errx;#chi^{2}", 100, 0, 1, 100, 0, 50);
-    TH2D *h_chi2erry = new TH2D("h_chi2_erry", "#chi^{2} erry;erry;#chi^{2}", 100, 0, 1, 100, 0, 50);
-    TH2D *h_chi2clssize = new TH2D("h_chi2_cls_size", "#chi^{2} cls_size;cls_size;#chi^{2}", 100, 0, 50, 100, 0, 50);
-    TH2D *h_chi2_delta_clsize = new TH2D("h_chi2_delta_clsize", "#chi^{2} vs deltaclsize;        deltaclsize;   #chi^{2}", 10, 0, 100, 100, 0, 100);
+    TH2D *h_chi2theta = new TH2D("h_chi2_theta", "#chi^{2} #theta;#theta;#chi^{2}", 30, 0, 90, chi2bins, 0, chi2max);
+    TH2D *h_chi2phi = new TH2D("h_chi2_phi", "#chi^{2} #phi;#phi;#chi^{2}", 50, -180, 180, chi2bins, 0, chi2max);
+    TH2D *h_chi2dx0 = new TH2D("h_chi2_dx0", "#chi^{2} dx0;dx0;#chi^{2}", 100, -2, 2, chi2bins, 0, chi2max);
+    TH2D *h_chi2dx1 = new TH2D("h_chi2_dx1", "#chi^{2} dx1;dx1;#chi^{2}", 100, -2, 2, chi2bins, 0, chi2max);
+    TH2D *h_chi2dx2 = new TH2D("h_chi2_dx2", "#chi^{2} dx2;dx2;#chi^{2}", 100, -2, 2, chi2bins, 0, chi2max);
+    TH2D *h_chi2dy0 = new TH2D("h_chi2_dy0", "#chi^{2} dy0;dy0;#chi^{2}", 100, -2, 2, chi2bins, 0, chi2max);
+    TH2D *h_chi2dy1 = new TH2D("h_chi2_dy1", "#chi^{2} dy1;dy1;#chi^{2}", 100, -2, 2, chi2bins, 0, chi2max);
+    TH2D *h_chi2dy2 = new TH2D("h_chi2_dy2", "#chi^{2} dy2;dy2;#chi^{2}", 100, -2, 2, chi2bins, 0, chi2max);
+    TH2D *h_chi2errx = new TH2D("h_chi2_errx", "#chi^{2} errx;errx;#chi^{2}", 100, 0, 1, chi2bins, 0, chi2max);
+    TH2D *h_chi2erry = new TH2D("h_chi2_erry", "#chi^{2} erry;erry;#chi^{2}", 100, 0, 1, chi2bins, 0, chi2max);
+    TH2D *h_chi2clssize = new TH2D("h_chi2_cls_size", "#chi^{2} cls_size;cls_size;#chi^{2}", 100, 0, 50, chi2bins, 0, chi2max);
+    TH2D *h_chi2_delta_clsize = new TH2D("h_chi2_delta_clsize", "#chi^{2} vs deltaclsize;        deltaclsize;   #chi^{2}", 100, 0, 100, chi2bins, 0, chi2max);
 
     TH1F *htheta_real = new TH1F("htheta_real", "#theta;#theta (deg);counts", 45, 0, 90);
     TH1F *htheta_reco = new TH1F("htheta_reco", "#theta;#theta (deg);counts", 45, 0, 90);
@@ -413,8 +417,10 @@ void simulations::sim_trk_32L(int iteration_per_event)
                     h_chi2dy2->Fill(ltt.tracks[g].dy2, ltt.tracks[g].chi2);
                     h_chi2errx->Fill(ltt.tracks[g].err_x0, ltt.tracks[g].chi2);
                     h_chi2erry->Fill(ltt.tracks[g].err_y0, ltt.tracks[g].chi2);
-                    h_chi2clssize->Fill(ltt.tracks[g].cls_size, ltt.tracks[g].chi2);
+                    h_chi2clssize->Fill(ltt.tracks[g].cls_size1, ltt.tracks[g].chi2);
                     h_chi2_delta_clsize->Fill(ltt.tracks[g].delta_clsize, ltt.tracks[g].chi2);
+                    h_chi2theta->Fill(ltt.tracks[g].theta * radtodeg, ltt.tracks[g].chi2);
+                    h_chi2phi->Fill(ltt.tracks[g].phi * radtodeg, ltt.tracks[g].chi2);
 
                 }
 
@@ -513,6 +519,8 @@ void simulations::sim_trk_32L(int iteration_per_event)
     // --- write your histograms individually ---
     hchi2->Write();
 
+    h_chi2theta->Write();
+    h_chi2phi->Write();
     h_chi2dx0->Write();
     h_chi2dx1->Write();
     h_chi2dx2->Write();

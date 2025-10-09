@@ -158,10 +158,10 @@ double LTrackerTrack::fct(const std::vector<LCluster> &clusters, const double *p
   {
     double x_fit = x0 + (clusters[i].z - display::z_origin_shift) * TMath::Tan(theta) * TMath::Cos(phi);
     double y_fit = y0 + (clusters[i].z - display::z_origin_shift) * TMath::Tan(theta) * TMath::Sin(phi);
-    double dx = (clusters[i].x - x_fit) / clusters[i].errx;
-    double dy = (clusters[i].y - y_fit) / clusters[i].erry;
-    //double dx = clusters[i].x - x_fit;
-    //double dy = clusters[i].y - y_fit;
+    //double dx = (clusters[i].x - x_fit) / clusters[i].errx;
+    //double dy = (clusters[i].y - y_fit) / clusters[i].erry;
+    double dx = clusters[i].x - x_fit;
+    double dy = clusters[i].y - y_fit;
     chi2 += dx * dx + dy * dy;
   }
 
@@ -228,10 +228,10 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
   trkCand.z0 = display::z_origin_shift;
   trkCand.err_x0 = errors[0];
   trkCand.err_y0 = errors[1];
-  trkCand.err_theta = errors[2] * 180 / TMath::Pi();
-  trkCand.err_phi = errors[3] * 180 / TMath::Pi();
-  trkCand.theta = params[2] * 180 / TMath::Pi();
-  trkCand.phi = params[3] * 180 / TMath::Pi();
+  trkCand.err_theta = errors[2];
+  trkCand.err_phi = errors[3];
+  trkCand.theta = params[2];
+  trkCand.phi = params[3];
   trkCand.chi2 = chi2;
 }
 
@@ -653,7 +653,7 @@ void LTrackerTrack::new_algo()
       }
     }
   }
-
+  
   // Sort track candidates by descending chi2
   std::sort(track_candidates.begin(), track_candidates.end(), [](LTrackCandidate &a, LTrackCandidate &b)
             { return a.chi2 < b.chi2; });
@@ -668,8 +668,12 @@ void LTrackerTrack::new_algo()
             trk1.clus_id[1] == trk2.clus_id[1] ||
             trk1.clus_id[2] == trk2.clus_id[2]); };
 
-  track_candidates.erase(std::unique(track_candidates.begin(), track_candidates.end(), share_clusters), track_candidates.end());
+  // Remove track candidates sharing tracklet
+  auto share_tracklet = [](LTrackCandidate &trk1, LTrackCandidate &trk2)
+  { return (trk1.tracklet_id[0] == trk2.tracklet_id[0]); };
 
+  track_candidates.erase(std::unique(track_candidates.begin(), track_candidates.end(), share_tracklet), track_candidates.end());
+  
   // Record used tracklets and clusters
   std::vector<int> used_tracklets;
   std::vector<int> used_clusters;

@@ -42,7 +42,7 @@
 simulations::simulations()
 {
     // radius in mm
-    simulations::gen_tracks = {10};
+    simulations::gen_tracks = {3};
     radius = {0.4};
     // simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
     // simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10};

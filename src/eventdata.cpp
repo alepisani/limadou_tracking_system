@@ -22,11 +22,11 @@
 
 using namespace std;
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-071441-Events-00351_01656-p01_L2.root";
-std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
+// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
 
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-045249-Events-00351_01585-p01_L2.root";      // this file has weird peaks
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-002417-Events-00351_01449-p01_L2.root";
-// std::string input_filename = "../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root";
+std::string input_filename = "../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root";
 
 eventdata::eventdata() {}
 
@@ -128,7 +128,7 @@ void eventdata::analize_data()
     TH1F *h_dy1 = new TH1F("hdy1", "#dy1;#dy1;counts", 1000, -5, 5);
     TH1F *h_dy2 = new TH1F("hdy2", "#dy2;#dy2;counts", 1000, -5, 5);
 
-    TH1F *h_cls_event = new TH1F("h_cls_event", "#cls_per_event;#cls_per_event;counts", 20, 0, 20);
+    TH1F *h_cls_event = new TH1F("h_cls_event", "#cls_per_event;#cls_per_event;counts", 50, 0, 20);
 
     TH1F *h_errx0 = new TH1F("herrx0", "errx;errx;counts", 100, 0, 0.1);
     TH1F *h_erry0 = new TH1F("herry0", "erry;erry;counts", 100, 0, 0.1);
@@ -272,7 +272,7 @@ void eventdata::analize_data()
                 h_chi2_erry0->Fill(ltt.tracks[m].err_y0, ltt.tracks[m].chi2);
 
                 h_err_dx->Fill(ltt.tracks[m].err_x0, ltt.tracks[m].dx0);
-                
+
                 h_chi2_clsize1->Fill(ltt.tracks[m].cls_size1, ltt.tracks[m].chi2);
                 h_chi2_delta_clsize->Fill(ltt.tracks[m].delta_clsize, ltt.tracks[m].chi2);
 
@@ -280,12 +280,10 @@ void eventdata::analize_data()
                 h_clsize20->Fill(ltt.tracks[m].cls_size0, ltt.tracks[m].cls_size2);
                 h_clsize10->Fill(ltt.tracks[m].cls_size0, ltt.tracks[m].cls_size1);
 
-                //if(ltt.tracks[m].chi2 > 500.) cout << ltt.tracks[m] << endl;
-
-                if(ltt.tracks[m].phi * radtodeg < 120 && ltt.tracks[m].phi *radtodeg > 110){
-                    //cout << ltt.tracks[m] << endl;
+                if (ltt.tracks[m].phi * radtodeg < 120 && ltt.tracks[m].phi * radtodeg > 110)
+                {
+                    // cout << ltt.tracks[m] << endl;
                 }
-                
             }
         }
 
@@ -296,7 +294,6 @@ void eventdata::analize_data()
         }
 
         sim.printProgressBarWithETA(i + 1, n, start_time, 30);
-
     }
 
     if (!print_canvas)
@@ -371,6 +368,19 @@ void eventdata::analize_data()
 
         h_cls_event->Write();
         h_hmcls_hmrt->Write();
+
+        // count how many cls i have above the cls_per_event > 2
+        int x = 2;
+        int bin = h_cls_event->FindBin(x);
+        int nbins = h_cls_event->GetNbinsX();
+        int count = 0;
+        for (int i = bin; i <= nbins; ++i)
+        {
+            count += h_cls_event->GetBinContent(i);
+        }
+        std::cout << std::endl;
+        std::cout << "total number of cls is " << h_cls_event->GetEntries() << std::endl;
+        std::cout << "Number of counts above " << x << " is " << count << std::endl;
 
         h_theta->Write();
         h_theta_m2->Write();
@@ -587,7 +597,7 @@ void eventdata::from_ev_to_cluster(LTrackerCluster &cluster, eventdata &ev)
     cluster.cls_mean_err_x = ev.cls_mean_x_err;
     cluster.cls_mean_err_y = ev.cls_mean_y_err;
     cluster.cls_size = ev.cls_size;
-    
+
     cluster.cls_idx = {-1, -1, -1};
 
     // values to be discuss and maybe change

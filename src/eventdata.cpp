@@ -1,6 +1,6 @@
-#include <TFile.h>
 #include <TTree.h>
 #include <iostream>
+#include <TFile.h>
 #include <TApplication.h>
 #include <TCanvas.h>
 #include <TView.h>
@@ -19,14 +19,14 @@
 #include "../include/LTrackerTrack.h"
 #include "../include/simulations.h"
 #include "eventdata.h"
-using namespace std;
 
+using namespace std;
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-071441-Events-00351_01656-p01_L2.root";
-// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
+std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
 
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-045249-Events-00351_01585-p01_L2.root";      // this file has weird peaks
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-002417-Events-00351_01449-p01_L2.root";
-std::string input_filename = "../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root";
+// std::string input_filename = "../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root";
 
 eventdata::eventdata() {}
 
@@ -128,6 +128,8 @@ void eventdata::analize_data()
     TH1F *h_dy1 = new TH1F("hdy1", "#dy1;#dy1;counts", 1000, -5, 5);
     TH1F *h_dy2 = new TH1F("hdy2", "#dy2;#dy2;counts", 1000, -5, 5);
 
+    TH1F *h_cls_event = new TH1F("h_cls_event", "#cls_per_event;#cls_per_event;counts", 20, 0, 20);
+
     TH1F *h_errx0 = new TH1F("herrx0", "errx;errx;counts", 100, 0, 0.1);
     TH1F *h_erry0 = new TH1F("herry0", "erry;erry;counts", 100, 0, 0.1);
 
@@ -140,6 +142,7 @@ void eventdata::analize_data()
     TH2D *h_chi2_phi = new TH2D("h_chi2_phi", "#chi^2 vs #phi;          #phi (deg);     #chi^2", 180, -200, 200, 50, -2, chi2_bins);
     h_chi2_phi->SetStats(0);
 
+    TH2D *h_hmcls_hmrt = new TH2D("h_cls_hmrt", "cls_per_event vs hmrt;        cls_per_event;   hmrt", 15, 0, 15, 10, 0, 10);
     TH2D *h_chi2_dx0 = new TH2D("h_chi2_dx0", "#chi^{2} vs dx0;        dx0;   #chi^{2}", 50, -1, 1, 502, -2, chi2_bins);
     TH2D *h_chi2_dx1 = new TH2D("h_chi2_dx1", "#chi^{2} vs dx1;        dx1;   #chi^{2}", 50, -1, 1, 502, -2, chi2_bins);
     TH2D *h_chi2_dx2 = new TH2D("h_chi2_dx2", "#chi^{2} vs dx2;        dx2;   #chi^{2}", 50, -1, 1, 502, -2, chi2_bins);
@@ -188,6 +191,7 @@ void eventdata::analize_data()
         ev = alldata[i];
 
         ev.from_ev_to_cluster(cl, ev);
+        h_cls_event->Fill(cl.cls_mean_z.size());
         for (int j = 0; j < cl.cls_mean_z.size(); ++j)
         {
             LCluster c;
@@ -232,7 +236,9 @@ void eventdata::analize_data()
         }
 
         ltt.computeTracklets();
-        ltt.new_algo(0.4);
+        ltt.new_algo();
+
+        h_hmcls_hmrt->Fill(cl.cls_mean_z.size(), ltt.tracks.size());
 
         if (!print_canvas)
         {
@@ -275,6 +281,10 @@ void eventdata::analize_data()
                 h_clsize10->Fill(ltt.tracks[m].cls_size0, ltt.tracks[m].cls_size1);
 
                 //if(ltt.tracks[m].chi2 > 500.) cout << ltt.tracks[m] << endl;
+
+                if(ltt.tracks[m].phi * radtodeg < 120 && ltt.tracks[m].phi *radtodeg > 110){
+                    //cout << ltt.tracks[m] << endl;
+                }
                 
             }
         }
@@ -358,6 +368,9 @@ void eventdata::analize_data()
         h_phi->Scale(1.0 / h_phi->Integral("width"));
         h_phi_m2->Scale(1.0 / h_phi_m2->Integral("width"));
         hphi->Scale(1.0 / hphi->Integral("width"));
+
+        h_cls_event->Write();
+        h_hmcls_hmrt->Write();
 
         h_theta->Write();
         h_theta_m2->Write();

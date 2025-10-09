@@ -160,6 +160,8 @@ double LTrackerTrack::fct(const std::vector<LCluster> &clusters, const double *p
     double y_fit = y0 + (clusters[i].z - display::z_origin_shift) * TMath::Tan(theta) * TMath::Sin(phi);
     double dx = (clusters[i].x - x_fit) / clusters[i].errx;
     double dy = (clusters[i].y - y_fit) / clusters[i].erry;
+    //double dx = clusters[i].x - x_fit;
+    //double dy = clusters[i].y - y_fit;
     chi2 += dx * dx + dy * dy;
   }
 
@@ -220,16 +222,17 @@ void LTrackerTrack::fitStraightLine(const std::vector<LCluster> &clusters, LTrac
     std::tie(params, errors, chi2) = minimize(refined_vars, step_fine, "fine");
   }
 
+  // attention! the theta and phi output are in degree!
   trkCand.x0 = params[0];
   trkCand.y0 = params[1];
   trkCand.z0 = display::z_origin_shift;
   trkCand.err_x0 = errors[0];
   trkCand.err_y0 = errors[1];
-  trkCand.err_theta = errors[2];
-  trkCand.err_phi = errors[3];
+  trkCand.err_theta = errors[2] * 180 / TMath::Pi();
+  trkCand.err_phi = errors[3] * 180 / TMath::Pi();
+  trkCand.theta = params[2] * 180 / TMath::Pi();
+  trkCand.phi = params[3] * 180 / TMath::Pi();
   trkCand.chi2 = chi2;
-  trkCand.theta = params[2];
-  trkCand.phi = params[3];
 }
 
 // Add unused tracklets to without used clusters to final tracks (chi2 = 1 by definition)
@@ -310,7 +313,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     }
     auto cls_lay0 = tidy_clusters_lay0[trkl01.firstClusterId];
     auto cls_lay1 = tidy_clusters_lay1[trkl01.secondClusterId];
-    // t.print_tracklet(cls_lay0, cls_lay1);
+
     double delta_y = (double)cls_lay1.y - (double)cls_lay0.y;
     double delta_x = (double)cls_lay1.x - (double)cls_lay0.x;
     double delta_z = (double)cls_lay1.z - (double)cls_lay0.z;
@@ -326,8 +329,6 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.clus_id.push_back(cls_lay0.id);
     spurious.clus_id.push_back(cls_lay1.id);
     spurious.tracklet_id.push_back(trkl01.id);
-    // spurious.theta = theta * 180 / TMath::Pi();
-    // spurious.phi = phi * 180 / TMath::Pi();
     spurious.theta = theta;
     spurious.phi = phi;
     spurious.err_x0 = -1.;
@@ -339,7 +340,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     double x1 = (double)cls_lay0.x + display::dist_z * TMath::Tan(theta) * TMath::Cos(phi);
     double y1 = (double)cls_lay0.y + display::dist_z * TMath::Tan(theta) * TMath::Sin(phi);
 
-    if (!display::is_inside_the_layers(&x2, &y2) && t.track_hit_TR(x1, y1, theta, phi))
+    if (!display::is_inside_the_layers(x2, y2) && t.track_hit_TR(x1, y1, theta, phi))
     {
       spurious.x0 = cls_lay1.x;
       spurious.y0 = cls_lay1.y;
@@ -352,7 +353,6 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
       else
         stats::hmrtaf2++;
       stats::hmrt++;
-      // cout << "010101010100101" << endl;
       tracks.push_back(spurious);
       used_tracklets.push_back(trkl01.id);
       used_clusters.push_back(cls_lay0.id);
@@ -393,8 +393,6 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.clus_id.push_back(cls_lay1.id);
     spurious.clus_id.push_back(cls_lay2.id);
     spurious.tracklet_id.push_back(trkl12.id);
-    // spurious.theta = theta * 180 / TMath::Pi();
-    // spurious.phi = phi * 180 / TMath::Pi();
     spurious.theta = theta;
     spurious.phi = phi;
     spurious.err_x0 = -1.;
@@ -403,7 +401,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.err_phi = -1.;
     spurious.chi2 = -1.;
 
-    if (!display::is_inside_the_layers(&x0, &y0) && t.track_hit_TR(cls_lay1.x, cls_lay1.y, theta, phi))
+    if (!display::is_inside_the_layers(x0, y0) && t.track_hit_TR(cls_lay1.x, cls_lay1.y, theta, phi))
     {
       spurious.x0 = cls_lay1.x;
       spurious.y0 = cls_lay1.y;
@@ -416,7 +414,6 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
       else
         stats::hmrtaf2++;
       stats::hmrt++;
-      // cout << "212121212121221122121" << endl;
       tracks.push_back(spurious);
       used_tracklets.push_back(trkl12.id);
       used_clusters.push_back(cls_lay1.id);
@@ -457,8 +454,6 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.clus_id.push_back(cls_lay0.id);
     spurious.clus_id.push_back(cls_lay2.id);
     spurious.tracklet_id.push_back(trkl02.id);
-    // spurious.theta = theta * 180 / TMath::Pi();
-    // spurious.phi = phi * 180 / TMath::Pi();
     spurious.theta = theta;
     spurious.phi = phi;
     spurious.err_x0 = -1.;
@@ -467,7 +462,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.err_phi = -1.;
     spurious.chi2 = -1.;
 
-    if (!display::is_inside_the_layers(&x1, &y1) && t.track_hit_TR(x1, y1, theta, phi))
+    if (!display::is_inside_the_layers(x1, y1) && t.track_hit_TR(x1, y1, theta, phi))
     {
       spurious.x0 = x1;
       spurious.y0 = y1;
@@ -480,7 +475,6 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
       else
         stats::hmrtaf2++;
       stats::hmrt++;
-      // cout << "020202020200202" << endl;
       tracks.push_back(spurious);
       used_tracklets.push_back(trkl02.id);
       used_clusters.push_back(cls_lay0.id);
@@ -578,10 +572,9 @@ void LTrackerTrack::computeTrackCandidates()
   stats::hmrt = tracks.size();
 }
 
-void LTrackerTrack::new_algo(double radius)
+void LTrackerTrack::new_algo()
 {
-  // 1000, 500, 400, 300, 200, 100, 75, 50, 25, 10, 5, 1
-  chi2_cut = 5000;
+  double radius = 0.4; // mm
   float degtorad = TMath::DegToRad();
   float pi = TMath::Pi();
   int candidateCounter = 0;
@@ -625,7 +618,12 @@ void LTrackerTrack::new_algo(double radius)
         // check if recotrk passa dai trigger
         if (t.track_hit_TR((double)trkCand.x0, (double)trkCand.y0, trkCand.theta, trkCand.phi) && trkCand.chi2 < chi2_cut)
         {
+          
           double dx0, dx1, dx2, dy0, dy1, dy2;
+          trkCand.x_1 = trkCand.x0 - display::dist_z * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi);
+          trkCand.x1 = trkCand.x0 + display::dist_z * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi);
+          trkCand.y_1 = trkCand.x0 - display::dist_z * TMath::Tan(trkCand.theta) * TMath::Sin(trkCand.phi);
+          trkCand.y1 = trkCand.x0 + display::dist_z * TMath::Tan(trkCand.theta) * TMath::Sin(trkCand.phi);
           dx0 = clus_0.x - (trkCand.x0 - display::dist_z * TMath::Tan(trkCand.theta) * TMath::Cos(trkCand.phi));
           dy0 = clus_0.y - (trkCand.y0 - display::dist_z * TMath::Tan(trkCand.theta) * TMath::Sin(trkCand.phi));
           dx1 = clus_1.x - trkCand.x0;
@@ -642,6 +640,7 @@ void LTrackerTrack::new_algo(double radius)
           trkCand.cls_size1 = clus_1.cls_size;
           trkCand.cls_size0 = clus_0.cls_size;
           trkCand.delta_clsize = TMath::Abs(clus_0.cls_size - clus_1.cls_size) + TMath::Abs(clus_1.cls_size - clus_2.cls_size) + TMath::Abs(clus_2.cls_size - clus_0.cls_size);
+          
           track_candidates.push_back(trkCand);
           if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id)
           {
@@ -651,18 +650,25 @@ void LTrackerTrack::new_algo(double radius)
           else
             stats::hmrtaf3++;
         }
-
-        // compute residuals (dtheta01,12 / dx, dy)
-
-        //vector_dx0.push_back(dx0);
-        //vector_dx1.push_back(dx1);
-        //vector_dx2.push_back(dx2);
-        //vector_dy0.push_back(dy0);
-        //vector_dy1.push_back(dy1);
-        //vector_dy2.push_back(dy2);
       }
     }
   }
+
+  // Sort track candidates by descending chi2
+  std::sort(track_candidates.begin(), track_candidates.end(), [](LTrackCandidate &a, LTrackCandidate &b)
+            { return a.chi2 < b.chi2; });
+  // Remove candidates with large chi2
+  auto new_end = std::remove_if(track_candidates.begin(), track_candidates.end(), [&](LTrackCandidate &trk)
+                                { return trk.chi2 > chi2_cut; });
+  track_candidates.erase(new_end, track_candidates.end());
+
+  // Remove track candidates sharing clusters
+  auto share_clusters = [](LTrackCandidate &trk1, LTrackCandidate &trk2)
+  { return (trk1.clus_id[0] == trk2.clus_id[0] ||
+            trk1.clus_id[1] == trk2.clus_id[1] ||
+            trk1.clus_id[2] == trk2.clus_id[2]); };
+
+  track_candidates.erase(std::unique(track_candidates.begin(), track_candidates.end(), share_clusters), track_candidates.end());
 
   // Record used tracklets and clusters
   std::vector<int> used_tracklets;
@@ -685,12 +691,10 @@ void LTrackerTrack::new_algo(double radius)
     tracks[i].id = i;
     // printf("chi2: %f\n", tracks[i].chi2);
   }
-
   stats::hmrt = tracks.size();
-  // printf("tracks %ld\n", tracks.size());
 }
 
-bool LTrackerTrack::track_hit_TR(double x1, double y1, double theta, double phi)
+bool LTrackerTrack::track_hit_TR(const double &x1, const double &y1, const double &theta, const double &phi)
 {
   //  +----------+   xTR2t, yTR2t
   //  |   TR2    |
@@ -745,8 +749,8 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 {
   for (auto &trk : tracks)
   {
-    //if (trk.chi2 > 300.)
-    if(1)
+    // if (trk.chi2 > 300.)
+    if (1)
     {
       // cout << endl;
       // cout << trk << endl;

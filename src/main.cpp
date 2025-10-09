@@ -53,7 +53,7 @@ void run(int *events)
     t.Start();
     tracker.computeTracklets();
     // tracker.computeTrackCandidates();
-    tracker.new_algo(0.4);
+    tracker.new_algo();
     tracker.print_all_tracklet(tracker);
     t.Stop();
 

@@ -146,7 +146,7 @@ void simulations::sim_only_trk_3L(int iteration_per_event)
                 TStopwatch t;
                 t.Start();
                 ltt.computeTracklets();
-                ltt.new_algo(radius[m]);
+                ltt.new_algo();
                 t.Stop();
 
                 r_time.push_back(t.RealTime());
@@ -390,7 +390,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
                 TStopwatch t;
                 t.Start();
                 ltt.computeTracklets();
-                ltt.new_algo(radius[m]);
+                ltt.new_algo();
                 t.Stop();
 
                 for (int g = 0; g < ltt.tracks.size(); ++g)

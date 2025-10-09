@@ -7,6 +7,8 @@
 #include "TLine.h"
 #include "TRandom3.h"
 #include "TMath.h"
+#include "TLegend.h"
+#include <TMultiGraph.h>
 #include <cmath>
 #include "TGraphErrors.h"
 #include <algorithm>
@@ -17,6 +19,7 @@
 
 std::vector<double> r = {500.0, 450.0, 400.0, 350.0, 300.0, 250.0, 230.0, 210.0, 190.0, 170.0, 150.0, 130.0, 110.0, 90.0, 70.0, 50.0, 30.0, 10.0};
 
+/*
 std::vector<double> fake1 = {0.000771605, 0, 0, 0, 0, 0, 0.001564945, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 std::vector<double> fake2 = {0, 0, 0, 0, 0, 0, 0, 0.000509165, 0, 0, 0, 0, 0, 0, 0.000768344, 0, 0, 0};
 std::vector<double> fake3 = {0, 0, 0, 0.000388048, 0, 0, 0.000382995, 0, 0, 0, 0, 0, 0, 0, 0.001216915, 0.00122737, 0.000623636, 0.000605877};
@@ -53,7 +56,7 @@ std::vector<double> eff15 = {0.986, 0.986, 0.986, 0.983, 0.981, 0.974, 0.972, 0.
 std::vector<double> eff16 = {0.986, 0.985, 0.984, 0.983, 0.981, 0.974, 0.973, 0.969, 0.963, 0.953, 0.934, 0.911, 0.867, 0.813, 0.714, 0.548, 0.322, 0.044};
 std::vector<double> eff17 = {0.986, 0.987, 0.985, 0.983, 0.98, 0.976, 0.972, 0.968, 0.964, 0.952, 0.936, 0.911, 0.872, 0.813, 0.708, 0.554, 0.316, 0.045};
 std::vector<double> eff18 = {0.987, 0.985, 0.984, 0.982, 0.981, 0.977, 0.973, 0.967, 0.962, 0.953, 0.936, 0.912, 0.869, 0.812, 0.711, 0.55, 0.318, 0.048};
-
+*/
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // data 3+2
@@ -95,9 +98,15 @@ std::vector<double> eff16 = {0.968, 0.971, 0.970, 0.970, 0.971, 0.969, 0.971, 0.
 std::vector<double> eff17 = {0.964, 0.963, 0.966, 0.964, 0.966, 0.966, 0.966, 0.966, 0.965, 0.967, 0.966, 0.968, 0.965, 0.963, 0.958, 0.952, 0.919, 0.815};
 std::vector<double> eff18 = {0.957, 0.957, 0.957, 0.961, 0.961, 0.962, 0.960, 0.961, 0.961, 0.963, 0.962, 0.961, 0.961, 0.959, 0.957, 0.945, 0.914, 0.812}; */
 
-std::vector<vector<double>> v_eff = {eff1, eff2, eff3, eff4, eff5, eff6, eff7, eff8, eff9, eff10, eff11, eff12, eff13, eff14, eff15, eff16, eff17, eff18};
-std::vector<vector<double>> v_fake = {fake1, fake2, fake3, fake4, fake5, fake6, fake7, fake8, fake9, fake10, fake11, fake12, fake13, fake14, fake15, fake16, fake17, fake18};
-std::vector<int> gen_trk = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
+//std::vector<vector<double>> v_eff = {eff1, eff2, eff3, eff4, eff5, eff6, eff7, eff8, eff9, eff10, eff11, eff12, eff13, eff14, eff15, eff16, eff17, eff18};
+//std::vector<vector<double>> v_fake = {fake1, fake2, fake3, fake4, fake5, fake6, fake7, fake8, fake9, fake10, fake11, fake12, fake13, fake14, fake15, fake16, fake17, fake18};
+//std::vector<int> gen_trk = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
+std::vector<int> gen_trk = {2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+std::vector<double> cpu_old = {0.0020, 0.0036, 0.0068, 0.0137, 0.0232, 0.0333, 0.0485, 0.0628, 0.0972};
+std::vector<double> cpu_new = {0.0005, 0.0006, 0.0008, 0.0010, 0.0015, 0.0017, 0.0016, 0.0018, 0.0019};
+
+
 
 std::vector<double> chi2 = {1000, 500, 400, 300, 200, 100, 75, 50, 25, 10, 5, 1};
 std::vector<double> eff = {0.982839, 0.984086, 0.983522, 0.984508, 0.987161, 0.985966, 0.984766, 0.985019, 0.980284, 0.984591, 0.983944, 0.79149};
@@ -168,66 +177,61 @@ void raggio()
     c1->SaveAs(Form("%d.png", gen_trk[i]));
 }
 */
-void raggio()
-{
-    int npoints = 12;
-    //int i = 10;
-    //std::vector<double> eff = v_eff[i];
-    //std::vector<double> fake = v_fake[i];
+int raggio() {
+    // Example data
+    std::vector<double> x       = {2, 3, 4, 5, 6, 7, 8, 9, 10};
+    std::vector<double> cpu_old = {0.0020, 0.0036, 0.0068, 0.0137, 0.0232, 0.0333, 0.0485, 0.0628, 0.0972};
+    std::vector<double> cpu_new = {0.0005, 0.0006, 0.0008, 0.0010, 0.0015, 0.0017, 0.0016, 0.0018, 0.0019};
+    std::vector<double> eff_old = {0.830, 0.777, 0.780, 0.794, 0.784, 0.792, 0.787, 0.785, 0.782};
+    std::vector<double> eff_new = {0.9844, 0.9853, 0.9874, 0.9860, 0.9867, 0.9903, 0.9913, 0.9868, 0.9893};
+    std::vector<double> cpui_old;
+    std::vector<double> cpui_new;
+    std::vector<double> effi_old;
+    std::vector<double> effi_new;
+    for(int i = 0; i < cpu_old.size(); ++i){
+        cpui_old.push_back(cpu_old[i] / x[i]);
+        cpui_new.push_back(cpu_new[i] / x[i]);
+        effi_old.push_back(eff_old[i] / x[i]);
+        effi_new.push_back(eff_new[i] / x[i]);        
+    }
 
-    TCanvas *c1 = new TCanvas("c1", "eff", 200, 10, 700, 500);
+
+
+    // Create graphs
+    TGraph *g_old = new TGraph(x.size(), x.data(), cpui_old.data());
+    g_old->SetLineColor(kRed);
+    g_old->SetLineWidth(2);
+    g_old->SetMarkerStyle(20);
+
+    TGraph *g_new = new TGraph(x.size(), x.data(), cpui_new.data());
+    g_new->SetLineColor(kBlue);
+    g_new->SetLineWidth(2);
+    g_new->SetMarkerStyle(21);
+
+    // Create multigraph
+    TMultiGraph *mg = new TMultiGraph();
+    mg->Add(g_old, "LP");  // L=line, P=points
+    mg->Add(g_new, "LP");
+
+    // Draw everything
+    TCanvas *c1 = new TCanvas("c1", "MultiGraph Example", 800, 600);
     c1->SetGrid();
-    TPad *pad1 = new TPad("pad1", "", 0, 0, 1, 1);
-    TPad *pad1fake = new TPad("pad2", "", 0, 0, 1, 1);
-    pad1fake->SetFillStyle(4000); // will be transparent
-    pad1->SetGrid();
-    pad1->Draw();
-    pad1->cd();
+    mg->SetTitle("CpuTime comparison;Track per event;CpuTime / track_per_evento");
+    mg->Draw("A");  // "A" forces to draw axis
 
-    TGraphErrors *h1 = new TGraphErrors(npoints, chi2.data(), eff.data(), 0, 0);
-    TGraphErrors *h1fake = new TGraphErrors(npoints, chi2.data(), fake.data(), 0, 0);
-    h1->SetMarkerStyle(22);
-    h1->SetMarkerColor(kBlue);
-    h1->SetMarkerSize(0.9);
-    h1->SetMinimum(0.8);
-    h1->SetMaximum(1.0);
-    h1->GetXaxis()->SetTitle("#chi2");
-    h1->GetYaxis()->SetTitle("reco_real_trk/gen");
-    h1->SetTitle("#chi2 estimation on MC model");
-    h1->Draw("APL");
-    pad1->Update();
+    // Legend
+    TLegend *leg = new TLegend(0.7, 0.7, 0.9, 0.85);
+    leg->AddEntry(g_old, "old_algo", "lp");
+    leg->AddEntry(g_new, "new_algo", "lp");
+    leg->Draw();
 
-    c1->cd();
+    //c1->BuildLegend();
+    c1->Update();
 
-    Double_t ymin1 = 0.;
-    Double_t ymax1 = 0.03;
-    Double_t xmin1 = 0.;
-    Double_t xmax1 = 1100.;
-    Double_t dy1 = (ymax1 - ymin1) / 0.8;
-    Double_t dx1 = (xmax1 - xmin1) / 0.8;
-    pad1fake->Range(xmin1 - 0.1 * dx1, ymin1 - 0.1 * dy1, xmax1 + 0.1 * dx1, ymax1 + 0.1 * dy1);
-    pad1fake->Draw();
-    pad1fake->cd();
-    h1fake->SetMarkerStyle(20);
-    h1fake->SetMarkerSize(1);
-    h1fake->SetMarkerColor(kRed);
-    h1fake->Draw("PL");
-    pad1fake->Update();
-
-    // draw axis on the right side of the pad
-    TGaxis *axis1 = new TGaxis(xmax1, ymin1, xmax1, ymax1, ymin1, ymax1, 50510, "+L");
-    axis1->SetLabelColor(kRed);
-    axis1->SetTitle("fake_trk/gen");
-    axis1->SetTitleColor(kRed);
-    axis1->Draw();
-    pad1fake->Update();
-
-    pad1->Update();
-    //c1->SaveAs(Form("%d.png", gen_trk[i]));
+    return 0;
 }
 
-
-
+/*
 void raggio_all()
 {
     const int npoints = r.size();
@@ -307,3 +311,4 @@ void raggio_all()
         delete c1;
     }
 }
+    */

@@ -99,23 +99,51 @@ void display::draw_TR12(TCanvas *geom)
     geom->Update();
 }
 
-bool display::is_inside_the_layers(double *x, double *y)
+bool display::is_inside_the_layers(const double &x, const double &y)
 {
-    if ((*x < ChipSizeX * 2.5 + ChipDistanceX && *x > -(ChipSizeX * 2.5 + ChipDistanceX)) &&
-        ((*y < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && *y > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
-         (*y < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && *y > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
-         (*y < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && *y > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
-         (*y < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && *y > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
-         (*y < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && *y > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
-         (*y > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && *y < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
-         (*y > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && *y < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
-         (*y > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && *y < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
-         (*y > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && *y < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
-         (*y > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && *y < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))))
+    
+    bool insideX = false;
+    bool insideY = false;
+    
+    if((x < ChipSizeX * 2.5 + ChipDistanceX * 2 && x > ChipSizeX * 1.5  + ChipDistanceX * 2) ||
+       (x < ChipSizeX * 1.5 + ChipDistanceX * 1 && x > ChipSizeX * 0.5  + ChipDistanceX * 1) ||
+       (x < ChipSizeX * 0.5 + ChipDistanceX * 0 && x > -(ChipSizeX * 0.5  + ChipDistanceX * 0)) ||
+       (x < -(ChipSizeX * 1.5 + ChipDistanceX * 1) && x > -(ChipSizeX * 0.5  + ChipDistanceX * 1)) ||
+       (x < -(ChipSizeX * 2.5 + ChipDistanceX * 2) && x > -(ChipSizeX * 1.5  + ChipDistanceX * 2))){
+        insideX = true;
+    }
+    
+    if((y < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && y > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
+         (y < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && y > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
+         (y < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && y > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
+         (y < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && y > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
+         (y < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && y > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
+         (y > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && y < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
+         (y > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && y < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
+         (y > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && y < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
+         (y > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && y < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
+         (y > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && y < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))){
+            insideY = true;
+         }
+
+    return insideX && insideY;   
+    /*
+    if ((x < ChipSizeX * 2.5 + ChipDistanceX * 2 && x > -(ChipSizeX * 2.5 + ChipDistanceX * 2)) &&
+        ((y < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && y > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
+         (y < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && y > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
+         (y < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && y > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
+         (y < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && y > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
+         (y < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && y > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
+         (y > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && y < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
+         (y > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && y < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
+         (y > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && y < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
+         (y > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && y < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
+         (y > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && y < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))))
     {
         return true;
     }
     return false;
+    */
 }
 
 void display::take_distributions(){
@@ -358,7 +386,7 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
         LCluster mL1;
         LCluster qL0;
         // check if the track hitted the staves in layer 2
-        if (is_inside_the_layers(&xL2, &yL2))
+        if (is_inside_the_layers(xL2, yL2))
         {
             stats::hmgthL2++;
             stats::hitL2 = true;
@@ -371,7 +399,7 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             p->Draw();
         }
         // check if the track hitted the staves in layer 1
-        if (is_inside_the_layers(&xL1, &yL1))
+        if (is_inside_the_layers(xL1, yL1))
         {
             stats::hmgthL1++;
             stats::hitL1 = true;
@@ -382,7 +410,7 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             m->Draw();
         }
         // check if the track hitted the staves in layer 0
-        if (is_inside_the_layers(&xL0, &yL0))
+        if (is_inside_the_layers(xL0, yL0))
         {
             stats::hmgthL0++;
             stats::hitL0 = true;
@@ -658,7 +686,7 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         LCluster qL0;
 
         // check if the track hitted the staves in layer 2
-        if (is_inside_the_layers(&xL2, &yL2))
+        if (is_inside_the_layers(xL2, yL2))
         {
             stats::hmgthL2++;
             stats::hitL2 = true;
@@ -667,7 +695,7 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             tracker.tidy_clusters_lay2.try_emplace(i, pL2);
         }
         // check if the track hitted the staves in layer 1
-        if (is_inside_the_layers(&xL1, &yL1))
+        if (is_inside_the_layers(xL1, yL1))
         {
             stats::hmgthL1++;
             stats::hitL1 = true;
@@ -675,7 +703,7 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             tracker.tidy_clusters_lay1.try_emplace(i, mL1);
         }
         // check if the track hitted the staves in layer 0
-        if (is_inside_the_layers(&xL0, &yL0))
+        if (is_inside_the_layers(xL0, yL0))
         {
             stats::hmgthL0++;
             stats::hitL0 = true;

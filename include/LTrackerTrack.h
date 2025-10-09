@@ -21,6 +21,10 @@ struct LTrackCandidate
   float x0 = -999.;
   float y0 = -999.;
   float z0 = -999.;
+  float x_1 = -999.;
+  float y_1 = -999.;
+  float x1 = -999.;
+  float y1 = -999.;
   float err_theta = -1.;
   float err_phi = -1.;
   float err_x0 = -1.;
@@ -55,14 +59,18 @@ struct LTrackCandidate
     output << std::endl;
     output << "theta : " << (tr.theta / TMath::Pi())*180 << " +- " << (tr.err_theta / TMath::Pi()) * 180 << std::endl;
     output << "phi : " << (tr.phi / TMath::Pi()) * 180 << " +- " << (tr.err_phi / TMath::Pi()) * 180 << std::endl;
-    output << "x0 : " << tr.x0 << " +- " << tr.err_x0 << std::endl;
-    output << "y0 : " << tr.y0 << " +- " << tr.err_y0 << std::endl;
-    output << "dx0 : " << tr.dx0 << std::endl;
-    output << "dx1 : " << tr.dx1 << std::endl;
-    output << "dx2 : " << tr.dx2 << std::endl;
-    output << "dy0 : " << tr.dy0 << std::endl;
-    output << "dy1 : " << tr.dy1 << std::endl;
-    output << "dy2 : " << tr.dy2 << std::endl;
+    output << "x2 : " << tr.x1 << std::endl;
+    output << "y2 : " << tr.y1 << std::endl;
+    output << "x1 : " << tr.x0 << " +- " << tr.err_x0 << std::endl;
+    output << "y1 : " << tr.y0 << " +- " << tr.err_y0 << std::endl;
+    output << "x0 : " << tr.x_1 << std::endl;
+    output << "y0 : " << tr.y_1 << std::endl;
+    //output << "dx0 : " << tr.dx0 << std::endl;
+    //output << "dx1 : " << tr.dx1 << std::endl;
+    //output << "dx2 : " << tr.dx2 << std::endl;
+    //output << "dy0 : " << tr.dy0 << std::endl;
+    //output << "dy1 : " << tr.dy1 << std::endl;
+    //output << "dy2 : " << tr.dy2 << std::endl;
     output << "z0 : " << tr.z0 << std::endl;
     output << "chi2: " << tr.chi2 << std::endl;
     return output;
@@ -125,8 +133,8 @@ public:
   void addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters, std::vector<LTracklet> &tracklets, std::unordered_map<int, LCluster> &cluster_map_first_layer, std::unordered_map<int, LCluster> &cluster_map_second_layer);
   void New_addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters);
   void computeTrackCandidates();
-  void new_algo(double);
-  bool track_hit_TR(double, double, double, double);
+  void new_algo();
+  bool track_hit_TR(const double&, const double&, const double&, const double&);
   void printRecoTracks_new_alg(TCanvas *reco);
   friend std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker);
 

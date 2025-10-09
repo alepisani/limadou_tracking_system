@@ -90,7 +90,7 @@ public:
     void tracks(int*, LTrackerTrack&, TCanvas* geom);   //true p-q  //false p-theta-phi
     void tracks_no_print_hist(int, LTrackerTrack&);
     void take_distributions();
-    static bool is_inside_the_layers(double*, double*);
+    static bool is_inside_the_layers(const double&, const double&);
     
 
     display();

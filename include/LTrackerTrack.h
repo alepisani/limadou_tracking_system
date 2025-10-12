@@ -40,6 +40,7 @@ struct LTrackCandidate
   float cls_size1 = -1;
   float cls_size2 = -1;
   float delta_clsize = -1;
+  bool is_triplet = false;
 
   friend std::ostream &operator<<(std::ostream &output, const LTrackCandidate &tr)
   {

@@ -294,7 +294,6 @@ void LTrackerTrack::addSpuriousTracks(std::vector<int> &used_tracklets, std::vec
 void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std::vector<int> &used_clusters)
 {
   computeTracklets();
-  LTrackerTrack t;
   tracks.reserve(tracklet_lay01.size() + tracklet_lay02.size() + tracklet_lay12.size());
 
   for (auto &trkl01 : tracklet_lay01)
@@ -340,11 +339,13 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     double x1 = (double)cls_lay0.x + display::dist_z * TMath::Tan(theta) * TMath::Cos(phi);
     double y1 = (double)cls_lay0.y + display::dist_z * TMath::Tan(theta) * TMath::Sin(phi);
 
-    if (!display::is_inside_the_layers(x2, y2) && t.track_hit_TR(x1, y1, theta, phi))
+    if (!display::is_inside_the_layers(x2, y2) && LTrackerTrack::track_hit_TR(x1, y1, theta, phi))
     {
       spurious.x0 = cls_lay1.x;
       spurious.y0 = cls_lay1.y;
       spurious.z0 = cls_lay1.z;
+      spurious.x_1 = cls_lay0.x;
+      spurious.y_1 = cls_lay0.y;
       if (cls_lay0.id == cls_lay1.id)
       {
         stats::hmrtar++;
@@ -401,11 +402,13 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.err_phi = -1.;
     spurious.chi2 = -1.;
 
-    if (!display::is_inside_the_layers(x0, y0) && t.track_hit_TR(cls_lay1.x, cls_lay1.y, theta, phi))
+    if (!display::is_inside_the_layers(x0, y0) && LTrackerTrack::track_hit_TR(cls_lay1.x, cls_lay1.y, theta, phi))
     {
       spurious.x0 = cls_lay1.x;
       spurious.y0 = cls_lay1.y;
       spurious.z0 = cls_lay1.z;
+      spurious.x1 = cls_lay2.x;
+      spurious.y1 = cls_lay2.y;
       if (cls_lay1.id == cls_lay2.id)
       {
         stats::hmrtar++;
@@ -462,7 +465,7 @@ void LTrackerTrack::New_addSpuriousTracks(std::vector<int> &used_tracklets, std:
     spurious.err_phi = -1.;
     spurious.chi2 = -1.;
 
-    if (!display::is_inside_the_layers(x1, y1) && t.track_hit_TR(x1, y1, theta, phi))
+    if (!display::is_inside_the_layers(x1, y1) && LTrackerTrack::track_hit_TR(x1, y1, theta, phi))
     {
       spurious.x0 = x1;
       spurious.y0 = y1;
@@ -579,6 +582,7 @@ void LTrackerTrack::new_algo()
   float pi = TMath::Pi();
   int candidateCounter = 0;
   std::vector<LCluster> clus_vec;
+  chi2_cut = 500000;
   clus_vec.reserve(3);
   track_candidates.clear();
   tracks.clear();
@@ -640,7 +644,8 @@ void LTrackerTrack::new_algo()
           trkCand.cls_size1 = clus_1.cls_size;
           trkCand.cls_size0 = clus_0.cls_size;
           trkCand.delta_clsize = TMath::Abs(clus_0.cls_size - clus_1.cls_size) + TMath::Abs(clus_1.cls_size - clus_2.cls_size) + TMath::Abs(clus_2.cls_size - clus_0.cls_size);
-          
+          trkCand.is_triplet = true;
+
           track_candidates.push_back(trkCand);
           if (clus_0.id == clus_1.id && clus_1.id == clus_2.id && clus_0.id == clus_2.id)
           {
@@ -653,7 +658,7 @@ void LTrackerTrack::new_algo()
       }
     }
   }
-  
+
   // Sort track candidates by descending chi2
   std::sort(track_candidates.begin(), track_candidates.end(), [](LTrackCandidate &a, LTrackCandidate &b)
             { return a.chi2 < b.chi2; });
@@ -785,9 +790,9 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
       TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
       f->Draw();
 
-      if (0)
+      if (1)
       {
-        double R = 6;      // radius of the circle
+        double R = 0.4;      // radius of the circle
         const int N = 100; // number of points to make circle smooth
         Double_t x_circ[N], y_circ[N], z_circ[N];
 

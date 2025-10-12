@@ -134,7 +134,11 @@ void eventdata::analize_data()
     TH1F *h_erry0 = new TH1F("herry0", "erry;erry;counts", 100, 0, 0.1);
 
     TH1F *htheta = new TH1F("htheta", "#theta;#theta;counts", theta_bins, -5, 90);
+    TH1F *htheta_triplet = new TH1F("htheta_3", "#theta;#theta;counts", theta_bins, -5, 90);
+    TH1F *htheta_doublet = new TH1F("htheta_2", "#theta;#theta;counts", theta_bins, -5, 90);
     TH1F *hphi = new TH1F("hphi", "#phi;#phi;counts", phi_bins, -185, 185);
+    TH1F *hphi_triplet = new TH1F("hphi_3", "#phi;#phi;counts", phi_bins, -185, 185);
+    TH1F *hphi_doublet = new TH1F("hphi_2", "#phi;#phi;counts", phi_bins, -185, 185);
     TH2D *h = new TH2D("h_theta_vs_phi", "#theta vs #phi;#phi (deg);#theta (deg)", nbins, -185, 185, nbins, 0, 90);
     TH1F *hchi2 = new TH1F("hchi2_newalgo", "#chi2;#chi2;counts", 500, 0, chi2_bins);
     TH2D *h_chi2_theta = new TH2D("h_chi2_theta", "#chi^2 vs #theta;        #theta (deg);   #chi^2", 90, 0, 90, 50, -2, chi2_bins);
@@ -178,11 +182,13 @@ void eventdata::analize_data()
     }
 
     // selecting with the index the event you want to make the reco
+    // 1638
     int n;
     if (!print_canvas)
         n = alldata.size();
     if (print_canvas)
-        n = 1000;
+        // n = alldata.size();
+        n = 1640;
     for (int i = 0; i < n; ++i)
     {
         LTrackerTrack ltt;
@@ -240,12 +246,27 @@ void eventdata::analize_data()
 
         h_hmcls_hmrt->Fill(cl.cls_mean_z.size(), ltt.tracks.size());
 
+        for (int j = 0; j < ltt.tracks.size(); ++j)
+        {
+            // cout << ltt.tracks[j] << endl;
+        }
+
         if (!print_canvas)
         {
             for (int m = 0; m < ltt.tracks.size(); ++m)
             {
                 htheta->Fill(ltt.tracks[m].theta * radtodeg);
                 hphi->Fill(ltt.tracks[m].phi * radtodeg);
+                if (ltt.tracks[m].is_triplet)
+                {
+                    htheta_triplet->Fill(ltt.tracks[m].theta * radtodeg);
+                    hphi_triplet->Fill(ltt.tracks[m].phi * radtodeg);
+                }
+                else
+                {
+                    htheta_doublet->Fill(ltt.tracks[m].theta * radtodeg);
+                    hphi_doublet->Fill(ltt.tracks[m].phi * radtodeg);
+                }
                 hchi2->Fill(ltt.tracks[m].chi2);
                 h->Fill(ltt.tracks[m].phi * radtodeg, ltt.tracks[m].theta * radtodeg);
                 h_chi2_theta->Fill(ltt.tracks[m].theta * radtodeg, ltt.tracks[m].chi2);
@@ -362,9 +383,13 @@ void eventdata::analize_data()
         h_theta->Scale(1.0 / h_theta->Integral("width"));
         h_theta_m2->Scale(1.0 / h_theta_m2->Integral("width"));
         htheta->Scale(1.0 / htheta->Integral("width"));
+        //htheta_triplet->Scale(1.0 / htheta_triplet->Integral("width"));
+        //htheta_doublet->Scale(1.0 / htheta_doublet->Integral("width"));
         h_phi->Scale(1.0 / h_phi->Integral("width"));
         h_phi_m2->Scale(1.0 / h_phi_m2->Integral("width"));
         hphi->Scale(1.0 / hphi->Integral("width"));
+        //hphi_triplet->Scale(1.0 / hphi_triplet->Integral("width"));
+        //hphi_doublet->Scale(1.0 / hphi_doublet->Integral("width"));
 
         h_cls_event->Write();
         h_hmcls_hmrt->Write();
@@ -385,9 +410,13 @@ void eventdata::analize_data()
         h_theta->Write();
         h_theta_m2->Write();
         htheta->Write();
+        htheta_triplet->Write();
+        htheta_doublet->Write();
         h_phi->Write();
         h_phi_m2->Write();
         hphi->Write();
+        hphi_triplet->Write();
+        hphi_doublet->Write();
         h_chi2->Write();
         h_chi2_m2->Write();
         hchi2->Write();

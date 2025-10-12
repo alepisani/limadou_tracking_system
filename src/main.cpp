@@ -54,7 +54,7 @@ void run(int *events)
     tracker.computeTracklets();
     // tracker.computeTrackCandidates();
     tracker.new_algo();
-    tracker.print_all_tracklet(tracker);
+    //tracker.print_all_tracklet(tracker);
     t.Stop();
 
     tracker.printRecoTracks_new_alg(real_tracks);
@@ -73,10 +73,10 @@ int main(int argc, char **argv)
     TH1::AddDirectory(false);
 
     // track simulation
-    //int *events;
-    //int ev = 10;
-    //events = &ev;
-    //run(events);
+    // int *events;
+    // int ev = 5;
+    // events = &ev;
+    // run(events);
 
     // simulations sim;
     // sim.sim_only_trk_3L(1000);

@@ -101,55 +101,41 @@ void display::draw_TR12(TCanvas *geom)
 
 bool display::is_inside_the_layers(const double &x, const double &y)
 {
-    
+
     bool insideX = false;
     bool insideY = false;
-    
-    if((x < ChipSizeX * 2.5 + ChipDistanceX * 2 && x > ChipSizeX * 1.5  + ChipDistanceX * 2) ||
-       (x < ChipSizeX * 1.5 + ChipDistanceX * 1 && x > ChipSizeX * 0.5  + ChipDistanceX * 1) ||
-       (x < ChipSizeX * 0.5 + ChipDistanceX * 0 && x > -(ChipSizeX * 0.5  + ChipDistanceX * 0)) ||
-       (x < -(ChipSizeX * 1.5 + ChipDistanceX * 1) && x > -(ChipSizeX * 0.5  + ChipDistanceX * 1)) ||
-       (x < -(ChipSizeX * 2.5 + ChipDistanceX * 2) && x > -(ChipSizeX * 1.5  + ChipDistanceX * 2))){
+
+    if ((x < ChipSizeX * 2.5 + ChipDistanceX * 2 && x > ChipSizeX * 1.5 + ChipDistanceX * 2) ||
+        (x < ChipSizeX * 1.5 + ChipDistanceX * 1 && x > ChipSizeX * 0.5 + ChipDistanceX * 1) ||
+        (x < ChipSizeX * 0.5 + ChipDistanceX * 0 && x > -(ChipSizeX * 0.5 + ChipDistanceX * 0)) ||
+        (x > -(ChipSizeX * 1.5 + ChipDistanceX * 1) && x < -(ChipSizeX * 0.5 + ChipDistanceX * 1)) ||
+        (x > -(ChipSizeX * 2.5 + ChipDistanceX * 2) && x < -(ChipSizeX * 1.5 + ChipDistanceX * 2)))
+    {
         insideX = true;
     }
-    
-    if((y < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && y > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
-         (y < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && y > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
-         (y < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && y > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
-         (y < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && y > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
-         (y < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && y > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
-         (y > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && y < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
-         (y > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && y < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
-         (y > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && y < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
-         (y > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && y < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
-         (y > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && y < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))){
-            insideY = true;
-         }
 
-    return insideX && insideY;   
-    /*
-    if ((x < ChipSizeX * 2.5 + ChipDistanceX * 2 && x > -(ChipSizeX * 2.5 + ChipDistanceX * 2)) &&
-        ((y < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && y > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
-         (y < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && y > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
-         (y < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && y > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
-         (y < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && y > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
-         (y < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && y > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
-         (y > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && y < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
-         (y > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && y < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
-         (y > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && y < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
-         (y > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && y < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
-         (y > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && y < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5))))
+    if ((y < ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5 && y > ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) ||
+        (y < ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5 && y > ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) ||
+        (y < ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5 && y > ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) ||
+        (y < ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5 && y > ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) ||
+        (y < ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5 && y > ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) ||
+        (y > -(ChipSizeY * 1 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5) && y < -(ChipSizeY * 0 + ChipStaveDistanceY * 0 + ChipDistanceY * 0.5)) ||
+        (y > -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5) && y < -(ChipSizeY * 1 + ChipStaveDistanceY * 1 + ChipDistanceY * 0.5)) ||
+        (y > -(ChipSizeY * 3 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5) && y < -(ChipSizeY * 2 + ChipStaveDistanceY * 1 + ChipDistanceY * 1.5)) ||
+        (y > -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5) && y < -(ChipSizeY * 3 + ChipStaveDistanceY * 2 + ChipDistanceY * 1.5)) ||
+        (y > -(ChipSizeY * 5 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5) && y < -(ChipSizeY * 4 + ChipStaveDistanceY * 2 + ChipDistanceY * 2.5)))
     {
-        return true;
+        insideY = true;
     }
-    return false;
-    */
+
+    return insideX && insideY;
 }
 
-void display::take_distributions(){
+void display::take_distributions()
+{
 
     TFile *file = TFile::Open("../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root");
-    //TFile *file = TFile::Open("../../../../data/apisani/muons/TEST_MUONS.root");
+    // TFile *file = TFile::Open("../../../../data/apisani/muons/TEST_MUONS.root");
     if (!file || file->IsZombie())
     {
         std::cerr << "Errore nell'aprire il file ROOT\n";
@@ -192,14 +178,14 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
      */
 
     TRandom3 *rnd = new TRandom3(0);
-    //TRandom3 *rnd = new TRandom3(43278);  
+    // TRandom3 *rnd = new TRandom3(43278);
 
     if (allTheta.empty() || allPhi.empty() || all_cls_size.empty())
     {
         std::cerr << "Errore: allTheta, allPhi o all_cls_size sono vuoti!" << std::endl;
         return;
     }
-    
+
     int *nbins;
     nbins = events;
     stats::hmgt = *events;
@@ -376,11 +362,10 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
         Double_t z_line[2] = {zTR2, zTR1};
         TPolyLine3D *line_track = new TPolyLine3D(2, x_line, y_line, z_line);
         line_track->SetLineColor(kBlue);
-        //line_track->SetLineWidth(4);
+        // line_track->SetLineWidth(4);
         line_track->SetLineWidth(3);
         geom->cd();
         line_track->Draw();
-
 
         LCluster pL2;
         LCluster mL1;
@@ -394,7 +379,7 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             pL2.fill_cluster(pL2, xL2, yL2, StaveZ[2], cls_size_x, cls_size_y, 0, i, cls_size);
 
             tracker.tidy_clusters_lay2.try_emplace(i, pL2);
-            //TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], err_cl, err_cl, 0, 0, 0);
+            // TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], err_cl, err_cl, 0, 0, 0);
             TMarker3DBox *p = new TMarker3DBox(xL2, yL2, StaveZ[2], 0, 0, 0, 0, 0);
             p->Draw();
         }
@@ -405,7 +390,7 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             stats::hitL1 = true;
             mL1.fill_cluster(mL1, xL1, yL1, StaveZ[1], cls_size_x, cls_size_y, 0, i, cls_size);
             tracker.tidy_clusters_lay1.try_emplace(i, mL1);
-            //TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], err_cl, err_cl, 0, 0, 0);
+            // TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], err_cl, err_cl, 0, 0, 0);
             TMarker3DBox *m = new TMarker3DBox(xL1, yL1, StaveZ[1], 0, 0, 0, 0, 0);
             m->Draw();
         }
@@ -416,7 +401,7 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
             stats::hitL0 = true;
             qL0.fill_cluster(qL0, xL0, yL0, StaveZ[0], cls_size_x, cls_size_y, 0, i, cls_size);
             tracker.tidy_clusters_lay0.try_emplace(i, qL0);
-            //TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], err_cl, err_cl, 0, 0, 0);
+            // TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], err_cl, err_cl, 0, 0, 0);
             TMarker3DBox *q = new TMarker3DBox(xL0, yL0, StaveZ[0], 0, 0, 0, 0, 0);
             q->Draw();
         }
@@ -525,9 +510,9 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
      * is only use during simulations
      */
     TRandom3 *rnd = new TRandom3(0);
-    //TH1F *htheta_real = new TH1F("htheta_real", "#theta;#theta;counts", 180, -5, 95);
-    //TH1F *hphi_real = new TH1F("hphi_real", "#phi;#phi;counts", 720, -190, 190);
-    //TH2D *h_real = new TH2D("h_theta_phi_real","#theta vs #phi;#phi (deg);#theta (deg)",720, -185, 185, 180, 0, 90);
+    // TH1F *htheta_real = new TH1F("htheta_real", "#theta;#theta;counts", 180, -5, 95);
+    // TH1F *hphi_real = new TH1F("hphi_real", "#phi;#phi;counts", 720, -190, 190);
+    // TH2D *h_real = new TH2D("h_theta_phi_real","#theta vs #phi;#phi (deg);#theta (deg)",720, -185, 185, 180, 0, 90);
     double radtodeg = TMath::RadToDeg();
 
     // MC
@@ -580,11 +565,11 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             int ind_phi = rnd->Uniform(0, allPhi.size() - 1);
             int ind_cls_size = rnd->Uniform(0, all_cls_size.size() - 1);
             theta = (allTheta[ind_theta] / 180) * TMath::Pi();
-            //theta = rnd->Uniform(0, 3.14);
+            // theta = rnd->Uniform(0, 3.14);
             phi = (allPhi[ind_phi] / 180) * TMath::Pi();
             cls_size = (all_cls_size[ind_cls_size]) * TMath::Cos(theta);
             cls_size_x = cls_size * PixelSizeRows;
-            cls_size_y = cls_size * PixelSizeCols;  
+            cls_size_y = cls_size * PixelSizeCols;
 
             xL2 = xTR2 - (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Cos(phi));
             yL2 = yTR2 - (zTR2 - StaveZ[2]) * (TMath::Tan(theta)) * (TMath::Sin(phi));
@@ -609,7 +594,7 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
 
             xTR1 = xTR2 - (zTR2 - TR1CenterZ) * (TMath::Tan(theta)) * (TMath::Cos(phi));
             yTR1 = yTR2 - (zTR2 - TR1CenterZ) * (TMath::Tan(theta)) * (TMath::Sin(phi));
-            
+
         } while (!(xTR1 < TR1Size[0] / 2 && xTR1 > -TR1Size[0] / 2 &&
                    ((yTR1 < (2.5 * TR1Size[1] + 2 * TR1GapY) && yTR1 > (1.5 * TR1Size[1] + 2 * TR1GapY)) ||
                     (yTR1 < (1.5 * TR1Size[1] + 1 * TR1GapY) && yTR1 > (0.5 * TR1Size[1] + 1 * TR1GapY)) ||
@@ -627,10 +612,10 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
             stats::hmgthTR1++;
         }
 
-        //fill the histograms
-        //htheta_real->Fill(theta * radtodeg);
-        //hphi_real->Fill(phi * radtodeg);
-        //h_real->Fill(theta * radtodeg, phi * radtodeg);
+        // fill the histograms
+        // htheta_real->Fill(theta * radtodeg);
+        // hphi_real->Fill(phi * radtodeg);
+        // h_real->Fill(theta * radtodeg, phi * radtodeg);
 
         // fake hit rate (rate = 10^-6 per event)
         double rate = rnd->Uniform(0, 1);
@@ -744,17 +729,13 @@ void display::tracks_no_print_hist(int events, LTrackerTrack &tracker)
         real_track.theta = theta;
         real_track.phi = phi;
         generated_tracks.push_back(real_track);
-        
-
     }
-    
-    //char file[200];
-    //sprintf(file, "../data/simulations_angle_reco.root");
-    //TFile f(file, "RECREATE");
-    //htheta_real->Write();
-    //hphi_real->Write();
-    //h_real->Write();
-    //f.Close();
 
-
+    // char file[200];
+    // sprintf(file, "../data/simulations_angle_reco.root");
+    // TFile f(file, "RECREATE");
+    // htheta_real->Write();
+    // hphi_real->Write();
+    // h_real->Write();
+    // f.Close();
 }

@@ -320,17 +320,11 @@ void eventdata::analize_data()
     if (!print_canvas)
     {
         TH1F *h_theta = new TH1F("h_theta", "h_theta", theta_bins, -5, 90);
-        h_theta->SetStats(0);
         TH1F *h_theta_m2 = new TH1F("h_theta_m2", "h_theta_m2", theta_bins, -5, 90);
-        h_theta_m2->SetStats(0);
         TH1F *h_phi = new TH1F("h_phi", "h_phi", phi_bins, -185, 185);
-        h_phi->SetStats(0);
         TH1F *h_phi_m2 = new TH1F("h_phi_m2", "h_phi_m2", phi_bins, -185, 185);
-        h_phi_m2->SetStats(0);
         TH1F *h_chi2 = new TH1F("h_chi2", "#chi2;#chi2;counts", 500, 0, 500);
-        h_chi2->SetStats(0);
         TH1F *h_chi2_m2 = new TH1F("h_chi2_m2", "#chi2;#chi2;counts", 500, 0, 500);
-        h_chi2_m2->SetStats(0);
 
         TFile *fIn = new TFile(input_filename.c_str());
         TTree *oldTree = (TTree *)fIn->Get("L2");
@@ -380,16 +374,18 @@ void eventdata::analize_data()
                 }
             }
         }
+        /*
         h_theta->Scale(1.0 / h_theta->Integral("width"));
         h_theta_m2->Scale(1.0 / h_theta_m2->Integral("width"));
         htheta->Scale(1.0 / htheta->Integral("width"));
-        //htheta_triplet->Scale(1.0 / htheta_triplet->Integral("width"));
-        //htheta_doublet->Scale(1.0 / htheta_doublet->Integral("width"));
+        htheta_triplet->Scale(1.0 / htheta_triplet->Integral("width"));
+        htheta_doublet->Scale(1.0 / htheta_doublet->Integral("width"));
         h_phi->Scale(1.0 / h_phi->Integral("width"));
         h_phi_m2->Scale(1.0 / h_phi_m2->Integral("width"));
         hphi->Scale(1.0 / hphi->Integral("width"));
-        //hphi_triplet->Scale(1.0 / hphi_triplet->Integral("width"));
-        //hphi_doublet->Scale(1.0 / hphi_doublet->Integral("width"));
+        hphi_triplet->Scale(1.0 / hphi_triplet->Integral("width"));
+        hphi_doublet->Scale(1.0 / hphi_doublet->Integral("width"));
+        */
 
         h_cls_event->Write();
         h_hmcls_hmrt->Write();
@@ -454,11 +450,11 @@ void eventdata::analize_data()
             maxY = maxY3;
 
         // Set the y-axis range with 10% padding
-        h_theta->GetYaxis()->SetRangeUser(0, maxY * 1.1);
-        TCanvas *c_theta = new TCanvas("c_theta_overlay", "compare_theta", 800, 600);
+        TCanvas *c_theta = new TCanvas("c_theta_overlay", "compare_theta_algo", 800, 600);
         h_theta->SetTitle("#theta comparison");
         h_theta->GetXaxis()->SetTitle("#theta (deg)");
         h_theta->GetYaxis()->SetTitle("Counts");
+        //h_theta->GetYaxis()->SetRangeUser(0, maxY * 1.1);
         h_theta->SetLineColor(kBlue);
         h_theta_m2->SetLineColor(kRed);
         htheta->SetLineColor(kBlack);
@@ -504,6 +500,42 @@ void eventdata::analize_data()
         leg2->AddEntry(hphi, Form("new_algo (N=%.0f)", hphi->GetEntries()), "l");
         leg2->Draw();
         c_phi->Write();
+
+        TCanvas *c_theta32 = new TCanvas("c_theta32", "compare_theta", 800, 600);
+        htheta->SetTitle("#theta comparison");
+        htheta->GetXaxis()->SetTitle("#theta (deg)");
+        htheta->GetYaxis()->SetTitle("Counts");
+        htheta->GetYaxis()->SetRangeUser(0, maxY * 1.1);
+        htheta->SetLineColor(kBlue);
+        htheta_triplet->SetLineColor(kRed);
+        htheta_doublet->SetLineColor(kBlack);
+        htheta->Draw("HIST");
+        htheta_triplet->Draw("HISTSAME");
+        htheta_doublet->Draw("HISTSAME");
+        htheta->GetXaxis()->SetTitle("Theta [rad]");
+        htheta->GetYaxis()->SetTitle("Counts");
+
+        TCanvas *c_phi32 = new TCanvas("c_phi32", "compare_phi", 800, 600);
+        hphi->SetTitle("#phi comparison");
+        hphi->GetXaxis()->SetTitle("#phi (deg)");
+        hphi->GetYaxis()->SetTitle("Counts");
+        hphi->GetYaxis()->SetRangeUser(0, maxY * 1.1);
+        hphi->SetLineColor(kBlue);
+        hphi_triplet->SetLineColor(kRed);
+        hphi_doublet->SetLineColor(kBlack);
+        hphi->Draw("HIST");
+        hphi_triplet->Draw("HISTSAME");
+        hphi_doublet->Draw("HISTSAME");
+        hphi->GetXaxis()->SetTitle("phi [rad]");
+        hphi->GetYaxis()->SetTitle("Counts");
+
+        //TLegend *leg1 = new TLegend(0.6, 0.7, 0.9, 0.9);
+        //leg1->AddEntry(h_theta, Form("hough transform (N=%.0f)", h_theta->GetEntries()), "l");
+        //leg1->AddEntry(h_theta_m2, Form("old_algo (N=%.0f)", h_theta_m2->GetEntries()), "l");
+        //leg1->AddEntry(htheta, Form("new_algo (N=%.0f)", htheta->GetEntries()), "l");
+        //leg1->Draw();
+        c_theta32->Write();
+        c_phi32->Write();
 
         h_dx0->Write();
         h_dx1->Write();

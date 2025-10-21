@@ -1,7 +1,7 @@
-CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o: \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/LTrackerCluster.cpp \
+CMakeFiles/sim_MC.dir/src/LTrack.cpp.o: \
+ /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/LTrack.cpp \
  /usr/include/stdc-predef.h \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/LTrackerCluster.h \
+ /mnt/c/Users/user/Desktop/stageINFN/sim_mc/include/LTrack.h \
  /usr/include/c++/11/vector /usr/include/c++/11/bits/stl_algobase.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
@@ -45,7 +45,20 @@ CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o: \
  /usr/include/c++/11/bits/range_access.h \
  /usr/include/c++/11/bits/vector.tcc /usr/include/c++/11/cstddef \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h \
- /usr/include/c++/11/iostream /usr/include/c++/11/ostream \
+ /mnt/c/Users/user/Desktop/stageINFN/sim_mc/include/./LTrackerTrack.h \
+ /usr/include/c++/11/unordered_map \
+ /usr/include/c++/11/ext/aligned_buffer.h \
+ /usr/include/c++/11/bits/stl_function.h \
+ /usr/include/c++/11/backward/binders.h \
+ /usr/include/c++/11/bits/hashtable.h \
+ /usr/include/c++/11/bits/hashtable_policy.h /usr/include/c++/11/tuple \
+ /usr/include/c++/11/utility /usr/include/c++/11/bits/stl_relops.h \
+ /usr/include/c++/11/array /usr/include/c++/11/bits/uses_allocator.h \
+ /usr/include/c++/11/bits/invoke.h \
+ /usr/include/c++/11/bits/enable_special_members.h \
+ /usr/include/c++/11/bits/node_handle.h \
+ /usr/include/c++/11/bits/unordered_map.h \
+ /usr/include/c++/11/bits/erase_if.h /usr/include/c++/11/ostream \
  /usr/include/c++/11/ios /usr/include/c++/11/iosfwd \
  /usr/include/c++/11/bits/stringfwd.h /usr/include/c++/11/bits/postypes.h \
  /usr/include/c++/11/cwchar /usr/include/wchar.h \
@@ -109,8 +122,6 @@ CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o: \
  /usr/include/c++/11/bits/locale_classes.h /usr/include/c++/11/string \
  /usr/include/c++/11/bits/ostream_insert.h \
  /usr/include/c++/11/bits/cxxabi_forced.h \
- /usr/include/c++/11/bits/stl_function.h \
- /usr/include/c++/11/backward/binders.h \
  /usr/include/c++/11/bits/basic_string.h /usr/include/c++/11/string_view \
  /usr/include/c++/11/bits/string_view.tcc \
  /usr/include/c++/11/ext/string_conversions.h /usr/include/c++/11/cstdlib \
@@ -149,15 +160,36 @@ CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o: \
  /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_inline.h \
  /usr/include/c++/11/bits/locale_facets.tcc \
  /usr/include/c++/11/bits/basic_ios.tcc \
- /usr/include/c++/11/bits/ostream.tcc /usr/include/c++/11/istream \
- /usr/include/c++/11/bits/istream.tcc /usr/local/root/include/TMath.h \
- /usr/local/root/include/TMathBase.h /usr/local/root/include/RtypesCore.h \
+ /usr/include/c++/11/bits/ostream.tcc /usr/local/root/include/TObject.h \
+ /usr/local/root/include/Rtypes.h /usr/local/root/include/RtypesCore.h \
  /usr/local/root/include/ROOT/RConfig.hxx \
  /usr/local/root/include/ROOT/../RVersion.h \
  /usr/local/root/include/ROOT/../ROOT/RVersion.hxx \
  /usr/local/root/include/RConfigure.h /usr/local/root/include/DllImport.h \
- /usr/include/c++/11/cmath /usr/include/math.h \
- /usr/include/x86_64-linux-gnu/bits/math-vector.h \
+ /usr/local/root/include/strtok.h /usr/include/c++/11/cstring \
+ /usr/include/string.h /usr/include/strings.h \
+ /usr/local/root/include/strlcpy.h /usr/include/unistd.h \
+ /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
+ /usr/include/x86_64-linux-gnu/bits/environments.h \
+ /usr/include/x86_64-linux-gnu/bits/confname.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
+ /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
+ /usr/include/linux/close_range.h /usr/local/root/include/snprintf.h \
+ /usr/include/c++/11/atomic /usr/include/c++/11/bits/atomic_base.h \
+ /usr/include/c++/11/bits/atomic_lockfree_defines.h \
+ /usr/local/root/include/TGenericClassInfo.h \
+ /usr/local/root/include/TSchemaHelper.h \
+ /usr/local/root/include/TIsAProxy.h \
+ /usr/local/root/include/TVirtualIsAProxy.h \
+ /usr/local/root/include/TStorage.h \
+ /usr/local/root/include/TVersionCheck.h \
+ /usr/local/root/include/RVersion.h \
+ /mnt/c/Users/user/Desktop/stageINFN/sim_mc/include/././LTrackerCluster.h \
+ /usr/include/c++/11/iostream /usr/include/c++/11/istream \
+ /usr/include/c++/11/bits/istream.tcc /usr/local/root/include/TMath.h \
+ /usr/local/root/include/TMathBase.h /usr/include/c++/11/cmath \
+ /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
@@ -179,58 +211,28 @@ CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o: \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc /usr/include/c++/11/algorithm \
- /usr/include/c++/11/utility /usr/include/c++/11/bits/stl_relops.h \
  /usr/include/c++/11/bits/stl_algo.h \
  /usr/include/c++/11/bits/algorithmfwd.h \
  /usr/include/c++/11/bits/stl_heap.h \
  /usr/include/c++/11/bits/stl_tempbuf.h \
  /usr/include/c++/11/bits/uniform_int_dist.h \
  /usr/include/c++/11/pstl/glue_algorithm_defs.h \
- /usr/include/c++/11/functional /usr/include/c++/11/tuple \
- /usr/include/c++/11/array /usr/include/c++/11/bits/uses_allocator.h \
- /usr/include/c++/11/bits/invoke.h /usr/include/c++/11/bits/refwrap.h \
+ /usr/include/c++/11/functional /usr/include/c++/11/bits/refwrap.h \
  /usr/include/c++/11/bits/std_function.h \
- /usr/include/c++/11/unordered_map \
- /usr/include/c++/11/ext/aligned_buffer.h \
- /usr/include/c++/11/bits/hashtable.h \
- /usr/include/c++/11/bits/hashtable_policy.h \
- /usr/include/c++/11/bits/enable_special_members.h \
- /usr/include/c++/11/bits/node_handle.h \
- /usr/include/c++/11/bits/unordered_map.h \
- /usr/include/c++/11/bits/erase_if.h \
  /usr/include/c++/11/pstl/execution_defs.h \
  /usr/local/root/include/TError.h /usr/local/root/include/DllImport.h \
  /usr/include/c++/11/cstdarg \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/float.h \
  /usr/include/c++/11/math.h \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/./eventdata.h \
+ /mnt/c/Users/user/Desktop/stageINFN/sim_mc/include/./././eventdata.h \
  /usr/include/c++/11/map /usr/include/c++/11/bits/stl_tree.h \
  /usr/include/c++/11/bits/stl_map.h \
  /usr/include/c++/11/bits/stl_multimap.h \
  /usr/local/root/include/TCanvas.h /usr/local/root/include/TPad.h \
  /usr/local/root/include/TVirtualPad.h /usr/local/root/include/TObject.h \
- /usr/local/root/include/Rtypes.h /usr/local/root/include/strtok.h \
- /usr/include/c++/11/cstring /usr/include/string.h /usr/include/strings.h \
- /usr/local/root/include/strlcpy.h /usr/include/unistd.h \
- /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
- /usr/include/x86_64-linux-gnu/bits/environments.h \
- /usr/include/x86_64-linux-gnu/bits/confname.h \
- /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
- /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
- /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
- /usr/include/linux/close_range.h /usr/local/root/include/snprintf.h \
- /usr/include/c++/11/atomic /usr/include/c++/11/bits/atomic_base.h \
- /usr/include/c++/11/bits/atomic_lockfree_defines.h \
- /usr/local/root/include/TGenericClassInfo.h \
- /usr/local/root/include/TSchemaHelper.h \
- /usr/local/root/include/TIsAProxy.h \
- /usr/local/root/include/TVirtualIsAProxy.h \
- /usr/local/root/include/TStorage.h \
- /usr/local/root/include/TVersionCheck.h \
- /usr/local/root/include/RVersion.h /usr/local/root/include/TAttLine.h \
- /usr/local/root/include/TAttFill.h /usr/local/root/include/TAttPad.h \
- /usr/local/root/include/TQObject.h /usr/local/root/include/TList.h \
- /usr/local/root/include/TSeqCollection.h \
+ /usr/local/root/include/TAttLine.h /usr/local/root/include/TAttFill.h \
+ /usr/local/root/include/TAttPad.h /usr/local/root/include/TQObject.h \
+ /usr/local/root/include/TList.h /usr/local/root/include/TSeqCollection.h \
  /usr/local/root/include/TCollection.h \
  /usr/local/root/include/TIterator.h /usr/local/root/include/TString.h \
  /usr/local/root/include/ROOT/RStringView.hxx \
@@ -268,13 +270,10 @@ CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
  /usr/local/root/include/Buttons.h /usr/local/root/include/TAttBBox2D.h \
  /usr/local/root/include/TAttCanvas.h /usr/local/root/include/TView.h \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/LTrackerTrack.h \
- /usr/local/root/include/TObject.h \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/./LTrackerCluster.h \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/eventdata.h \
- /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/../include/stats.h \
  /usr/include/c++/11/random /usr/include/c++/11/bits/random.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h \
  /usr/include/c++/11/bits/random.tcc /usr/include/c++/11/numeric \
  /usr/include/c++/11/bits/stl_numeric.h \
- /usr/include/c++/11/pstl/glue_numeric_defs.h
+ /usr/include/c++/11/pstl/glue_numeric_defs.h /usr/include/c++/11/chrono \
+ /usr/include/c++/11/ratio /usr/include/c++/11/ctime \
+ /usr/include/c++/11/bits/parse_numbers.h

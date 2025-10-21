@@ -1,4 +1,5 @@
 #include "../include/LTrackerCluster.h"
+#include "../include/LTrackerTrack.h"
 #include "../include/eventdata.h"
 #include "../include/stats.h"
 #include <random>
@@ -44,6 +45,55 @@ std::ostream &operator<<(std::ostream &output, const LTrackerCluster &cluster) {
     }
     return output;
 } 
+
+void LTrackerCluster::from_ltt_to_cluster(const LTrackerTrack &ltt){
+    
+    //vector<int, LCluster> tidy_cls_lay012 --> vector<float> cluster di LTrackerTrack
+    for(auto trkl0 : ltt.tidy_clusters_lay0){
+        LCluster &cl = trkl0.second;
+        cls_mean_x.push_back(cl.x);
+        cls_mean_y.push_back(cl.y);
+        cls_mean_z.push_back(cl.z);
+        cls_size.push_back(cl.cls_size);
+        cls_track_idx.push_back(cl.id);  //just to try
+        cls_idx.push_back(cl.id);
+        cls_mean_err_x.push_back(0.1f);
+        cls_mean_err_y.push_back(0.1f);
+        cls_chip_id.push_back(-1);
+    }
+    for(auto trkl1 : ltt.tidy_clusters_lay1){
+        LCluster &cl = trkl1.second;
+        cls_mean_x.push_back(cl.x);
+        cls_mean_y.push_back(cl.y);
+        cls_mean_z.push_back(cl.z);
+        cls_size.push_back(cl.cls_size);
+        cls_track_idx.push_back(cl.id); //just to try
+        cls_idx.push_back(cl.id);
+        cls_mean_err_x.push_back(0.1f);
+        cls_mean_err_y.push_back(0.1f);
+        cls_chip_id.push_back(-1);
+    }
+    for(auto trkl2 : ltt.tidy_clusters_lay2){
+        LCluster &cl = trkl2.second;
+        cls_mean_x.push_back(cl.x);
+        cls_mean_y.push_back(cl.y);
+        cls_mean_z.push_back(cl.z);
+        cls_size.push_back(cl.cls_size);
+        cls_track_idx.push_back(cl.id); //just to try
+        cls_idx.push_back(cl.id);
+        cls_mean_err_x.push_back(0.1f);
+        cls_mean_err_y.push_back(0.1f);
+        cls_chip_id.push_back(-1);
+    }
+
+
+}
+
+
+
+
+
+
 
 //sostituisci signal con i dati presi da eventdata
 /* void LTrackerCluster::CalculateClusterPosition(eventdata ev) {

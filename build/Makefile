@@ -129,6 +129,54 @@ sim_MC/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/build
 .PHONY : sim_MC/fast
 
+src/LTrack.o: src/LTrack.cpp.o
+.PHONY : src/LTrack.o
+
+# target to build an object file
+src/LTrack.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/LTrack.cpp.o
+.PHONY : src/LTrack.cpp.o
+
+src/LTrack.i: src/LTrack.cpp.i
+.PHONY : src/LTrack.i
+
+# target to preprocess a source file
+src/LTrack.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/LTrack.cpp.i
+.PHONY : src/LTrack.cpp.i
+
+src/LTrack.s: src/LTrack.cpp.s
+.PHONY : src/LTrack.s
+
+# target to generate assembly for a file
+src/LTrack.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/LTrack.cpp.s
+.PHONY : src/LTrack.cpp.s
+
+src/LTrackFittingTools.o: src/LTrackFittingTools.cpp.o
+.PHONY : src/LTrackFittingTools.o
+
+# target to build an object file
+src/LTrackFittingTools.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.o
+.PHONY : src/LTrackFittingTools.cpp.o
+
+src/LTrackFittingTools.i: src/LTrackFittingTools.cpp.i
+.PHONY : src/LTrackFittingTools.i
+
+# target to preprocess a source file
+src/LTrackFittingTools.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.i
+.PHONY : src/LTrackFittingTools.cpp.i
+
+src/LTrackFittingTools.s: src/LTrackFittingTools.cpp.s
+.PHONY : src/LTrackFittingTools.s
+
+# target to generate assembly for a file
+src/LTrackFittingTools.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sim_MC.dir/build.make CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.s
+.PHONY : src/LTrackFittingTools.cpp.s
+
 src/LTrackerCluster.o: src/LTrackerCluster.cpp.o
 .PHONY : src/LTrackerCluster.o
 
@@ -330,6 +378,12 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... sim_MC"
+	@echo "... src/LTrack.o"
+	@echo "... src/LTrack.i"
+	@echo "... src/LTrack.s"
+	@echo "... src/LTrackFittingTools.o"
+	@echo "... src/LTrackFittingTools.i"
+	@echo "... src/LTrackFittingTools.s"
 	@echo "... src/LTrackerCluster.o"
 	@echo "... src/LTrackerCluster.i"
 	@echo "... src/LTrackerCluster.s"

@@ -25,8 +25,8 @@ using namespace std;
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
 
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-045249-Events-00351_01585-p01_L2.root";      // this file has weird peaks
-// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-002417-Events-00351_01449-p01_L2.root";
-std::string input_filename = "../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root";
+std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-002417-Events-00351_01449-p01_L2.root";
+// std::string input_filename = "../../data_beam_test/TEST_MUONS_m_MAIN_1000.0MeV_-999.0deg_-0.05V_boot207_run510_L2.root";
 
 eventdata::eventdata() {}
 
@@ -146,6 +146,8 @@ void eventdata::analize_data()
     TH2D *h_chi2_phi = new TH2D("h_chi2_phi", "#chi^2 vs #phi;          #phi (deg);     #chi^2", 180, -200, 200, 50, -2, chi2_bins);
     h_chi2_phi->SetStats(0);
 
+    TH2D *h_phi_theta = new TH2D("h_phi_theta", "#phi vs #theta; #phi (deg); #theta (deg)", phi_bins, -185, 185, theta_bins, -5, 90);
+
     TH2D *h_hmcls_hmrt = new TH2D("h_cls_hmrt", "cls_per_event vs hmrt;        cls_per_event;   hmrt", 15, 0, 15, 10, 0, 10);
     TH2D *h_chi2_dx0 = new TH2D("h_chi2_dx0", "#chi^{2} vs dx0;        dx0;   #chi^{2}", 50, -1, 1, 502, -2, chi2_bins);
     TH2D *h_chi2_dx1 = new TH2D("h_chi2_dx1", "#chi^{2} vs dx1;        dx1;   #chi^{2}", 50, -1, 1, 502, -2, chi2_bins);
@@ -187,8 +189,8 @@ void eventdata::analize_data()
     if (!print_canvas)
         n = alldata.size();
     if (print_canvas)
-        // n = alldata.size();
-        n = 1640;
+        n = alldata.size();
+    // n = 1640;
     for (int i = 0; i < n; ++i)
     {
         LTrackerTrack ltt;
@@ -272,6 +274,8 @@ void eventdata::analize_data()
                 h_chi2_theta->Fill(ltt.tracks[m].theta * radtodeg, ltt.tracks[m].chi2);
                 h_chi2_phi->Fill(ltt.tracks[m].phi * radtodeg, ltt.tracks[m].chi2);
 
+                h_phi_theta->Fill(ltt.tracks[m].phi * radtodeg, ltt.tracks[m].theta * radtodeg);
+
                 h_chi2_dx0->Fill(ltt.tracks[m].dx0, ltt.tracks[m].chi2);
                 h_chi2_dx1->Fill(ltt.tracks[m].dx1, ltt.tracks[m].chi2);
                 h_chi2_dx2->Fill(ltt.tracks[m].dx2, ltt.tracks[m].chi2);
@@ -310,7 +314,12 @@ void eventdata::analize_data()
 
         if (print_canvas)
         {
-            ltt.printRecoTracks_new_alg(canvas);
+            for (int i = 0; i < ltt.tracks.size(); ++i)
+            {
+                if (ltt.tracks[i].phi * radtodeg < 112. && ltt.tracks[i].phi * radtodeg > 110.)
+                    ltt.printRecoTracks_new_alg(canvas);
+            }
+
             // ltt.print_all_tracklet(ltt);
         }
 
@@ -374,21 +383,43 @@ void eventdata::analize_data()
                 }
             }
         }
-        /*
+
+        // clone the hist i need
+        TH1D *htheta_notnorm = (TH1D *)htheta->Clone("htheta_notnorm");
+        TH1D *hphi_notnorm = (TH1D *)hphi->Clone("hphi_notnorm");
+
         h_theta->Scale(1.0 / h_theta->Integral("width"));
         h_theta_m2->Scale(1.0 / h_theta_m2->Integral("width"));
         htheta->Scale(1.0 / htheta->Integral("width"));
-        htheta_triplet->Scale(1.0 / htheta_triplet->Integral("width"));
-        htheta_doublet->Scale(1.0 / htheta_doublet->Integral("width"));
+        // htheta_triplet->Scale(1.0 / htheta_triplet->Integral("width"));
+        // htheta_doublet->Scale(1.0 / htheta_doublet->Integral("width"));
         h_phi->Scale(1.0 / h_phi->Integral("width"));
         h_phi_m2->Scale(1.0 / h_phi_m2->Integral("width"));
         hphi->Scale(1.0 / hphi->Integral("width"));
-        hphi_triplet->Scale(1.0 / hphi_triplet->Integral("width"));
-        hphi_doublet->Scale(1.0 / hphi_doublet->Integral("width"));
-        */
+        // hphi_triplet->Scale(1.0 / hphi_triplet->Integral("width"));
+        // hphi_doublet->Scale(1.0 / hphi_doublet->Integral("width"));
+
+
+        // Define theta range: 0° to 20°
+        int ybin_min = h_phi_theta->GetYaxis()->FindBin(60.0);
+        int ybin_max = h_phi_theta->GetYaxis()->FindBin(80.0);
+        // Project on X (phi) for this theta range
+        TH1D *h_phi_slice = h_phi_theta->ProjectionX("h_phi_slice", ybin_min, ybin_max);
+        // Draw the results
+        TCanvas *c = new TCanvas("c", "ProjectionX", 800, 400);
+        c->Divide(2, 1);
+        c->cd(1);
+        h_phi_theta->Draw("COLZ");
+        c->cd(2);
+        h_phi_slice->SetLineColor(kBlue);
+        h_phi_slice->SetTitle("#phi distribution for 60 < #theta < 80; #phi (deg); Counts");
+        h_phi_slice->Draw();
+        c->Write();
+
 
         h_cls_event->Write();
         h_hmcls_hmrt->Write();
+        h_phi_theta->Write();
 
         // count how many cls i have above the cls_per_event > 2
         int x = 2;
@@ -454,7 +485,7 @@ void eventdata::analize_data()
         h_theta->SetTitle("#theta comparison");
         h_theta->GetXaxis()->SetTitle("#theta (deg)");
         h_theta->GetYaxis()->SetTitle("Counts");
-        //h_theta->GetYaxis()->SetRangeUser(0, maxY * 1.1);
+        // h_theta->GetYaxis()->SetRangeUser(0, maxY * 1.1);
         h_theta->SetLineColor(kBlue);
         h_theta_m2->SetLineColor(kRed);
         htheta->SetLineColor(kBlack);
@@ -502,38 +533,50 @@ void eventdata::analize_data()
         c_phi->Write();
 
         TCanvas *c_theta32 = new TCanvas("c_theta32", "compare_theta", 800, 600);
-        htheta->SetTitle("#theta comparison");
-        htheta->GetXaxis()->SetTitle("#theta (deg)");
-        htheta->GetYaxis()->SetTitle("Counts");
-        htheta->GetYaxis()->SetRangeUser(0, maxY * 1.1);
-        htheta->SetLineColor(kBlue);
+        htheta_notnorm->SetTitle("#theta comparison");
+        htheta_notnorm->GetXaxis()->SetTitle("#theta (deg)");
+        htheta_notnorm->GetYaxis()->SetTitle("Counts");
+        // htheta_notnorm->GetYaxis()->SetRangeUser(0, maxY * 1.1);
+        htheta_notnorm->SetLineColor(kBlue);
         htheta_triplet->SetLineColor(kRed);
         htheta_doublet->SetLineColor(kBlack);
-        htheta->Draw("HIST");
+        htheta_notnorm->Draw("HIST");
         htheta_triplet->Draw("HISTSAME");
         htheta_doublet->Draw("HISTSAME");
-        htheta->GetXaxis()->SetTitle("Theta [rad]");
-        htheta->GetYaxis()->SetTitle("Counts");
+        htheta_notnorm->GetXaxis()->SetTitle("Theta [rad]");
+        htheta_notnorm->GetYaxis()->SetTitle("Counts");
+
+        TLegend *legt = new TLegend(0.6, 0.7, 0.9, 0.9);
+        legt->AddEntry(htheta, Form("total #theta distribution (N=%0.f)", htheta->GetEntries()), "l");
+        legt->AddEntry(htheta_triplet, Form("only 3 layer #theta (N=%0.f)", htheta_triplet->GetEntries()), "l");
+        legt->AddEntry(htheta_doublet, Form("only 2 layer #theta (N=%0.f)", htheta_doublet->GetEntries()), "l");
+        legt->Draw();
 
         TCanvas *c_phi32 = new TCanvas("c_phi32", "compare_phi", 800, 600);
-        hphi->SetTitle("#phi comparison");
-        hphi->GetXaxis()->SetTitle("#phi (deg)");
-        hphi->GetYaxis()->SetTitle("Counts");
-        hphi->GetYaxis()->SetRangeUser(0, maxY * 1.1);
-        hphi->SetLineColor(kBlue);
+        hphi_notnorm->SetTitle("#phi comparison");
+        hphi_notnorm->GetXaxis()->SetTitle("#phi (deg)");
+        hphi_notnorm->GetYaxis()->SetTitle("Counts");
+        // hphi_notnorm->GetYaxis()->SetRangeUser(0, maxY * 1.1);
+        hphi_notnorm->SetLineColor(kBlue);
         hphi_triplet->SetLineColor(kRed);
         hphi_doublet->SetLineColor(kBlack);
-        hphi->Draw("HIST");
+        hphi_notnorm->Draw("HIST");
         hphi_triplet->Draw("HISTSAME");
         hphi_doublet->Draw("HISTSAME");
-        hphi->GetXaxis()->SetTitle("phi [rad]");
-        hphi->GetYaxis()->SetTitle("Counts");
+        hphi_notnorm->GetXaxis()->SetTitle("phi [rad]");
+        hphi_notnorm->GetYaxis()->SetTitle("Counts");
 
-        //TLegend *leg1 = new TLegend(0.6, 0.7, 0.9, 0.9);
-        //leg1->AddEntry(h_theta, Form("hough transform (N=%.0f)", h_theta->GetEntries()), "l");
-        //leg1->AddEntry(h_theta_m2, Form("old_algo (N=%.0f)", h_theta_m2->GetEntries()), "l");
-        //leg1->AddEntry(htheta, Form("new_algo (N=%.0f)", htheta->GetEntries()), "l");
-        //leg1->Draw();
+        TLegend *legp = new TLegend(0.6, 0.7, 0.9, 0.9);
+        legp->AddEntry(hphi, Form("total #phi distribution (N=%0.f)", hphi->GetEntries()), "l");
+        legp->AddEntry(hphi_triplet, Form("only 3 layer #phi (N=%0.f)", hphi_triplet->GetEntries()), "l");
+        legp->AddEntry(hphi_doublet, Form("only 2 layer #phi (N=%0.f)", hphi_doublet->GetEntries()), "l");
+        legp->Draw();
+
+        // TLegend *leg1 = new TLegend(0.6, 0.7, 0.9, 0.9);
+        // leg1->AddEntry(h_theta, Form("hough transform (N=%.0f)", h_theta->GetEntries()), "l");
+        // leg1->AddEntry(h_theta_m2, Form("old_algo (N=%.0f)", h_theta_m2->GetEntries()), "l");
+        // leg1->AddEntry(htheta, Form("new_algo (N=%.0f)", htheta->GetEntries()), "l");
+        // leg1->Draw();
         c_theta32->Write();
         c_phi32->Write();
 

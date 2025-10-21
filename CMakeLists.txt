@@ -25,6 +25,8 @@ set(SOURCES
     src/eventdata.cpp
     src/LTrackerCluster.cpp
     src/simulations.cpp
+    src/LTrackFittingTools.cpp
+    src/LTrack.cpp
 )
 
 # Aggiungi la directory include
@@ -35,6 +37,10 @@ find_package(ROOT REQUIRED COMPONENTS Hist Graf Graf3d MathCore RIO)
 include_directories(${ROOT_INCLUDE_DIRS})
 link_directories(${ROOT_LIBRARY_DIRS})
 add_definitions(${ROOT_CXX_FLAGS})
+
+# Linka le librerie EIGEN
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
 
 # Crea l'eseguibile
 add_executable(sim_MC ${SOURCES})

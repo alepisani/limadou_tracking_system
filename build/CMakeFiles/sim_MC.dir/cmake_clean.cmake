@@ -1,4 +1,8 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/sim_MC.dir/src/LTrack.cpp.o"
+  "CMakeFiles/sim_MC.dir/src/LTrack.cpp.o.d"
+  "CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.o"
+  "CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.o.d"
   "CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o"
   "CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o.d"
   "CMakeFiles/sim_MC.dir/src/LTrackerTrack.cpp.o"

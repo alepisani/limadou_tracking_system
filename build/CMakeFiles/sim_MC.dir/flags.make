@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/mnt/c/Users/user/Desktop/stageINFN/sim_mc/include -I/usr/local/root/include
+CXX_INCLUDES = -I/mnt/c/Users/user/Desktop/stageINFN/sim_mc/include -I/usr/local/root/include -I/usr/include/eigen3
 
 CXX_FLAGS =    -std=c++17 -pipe -fsigned-char -pthread
 

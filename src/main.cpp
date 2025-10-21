@@ -5,6 +5,8 @@
 #include "../include/LTrackerCluster.h"
 #include "../include/eventdata.h"
 #include "../include/simulations.h"
+#include "../include/LTrack.h"
+#include "../include/LTrackFittingTools.h"
 #include <string>
 #include <array>
 #include <map>
@@ -52,9 +54,29 @@ void run(int *events)
     TStopwatch t;
     t.Start();
     tracker.computeTracklets();
-    // tracker.computeTrackCandidates();
-    tracker.new_algo();
+    //old combinatorial algo
+    //tracker.computeTrackCandidates();
     //tracker.print_all_tracklet(tracker);
+    
+    //new combinatorial algo
+    //tracker.new_algo();
+
+    //hough trasform
+    LTrack track;
+    LTrackerCluster cluster;
+    cluster.from_ltt_to_cluster(tracker);
+    
+    HoughTransform3D(cluster, track);
+    track.from_LTrack_to_TrackCand(track, tracker); 
+    cout << "quanti cls? " << cluster.cls_mean_x.size() << endl;
+    cout << "quante tracce ricostrutite? " << tracker.tracks.size() << endl;
+
+    //cls_track_idx = cluster.GetClsTrackIdx();
+    //trk_npoints = track.GetNPoints();
+    //CalculateResiduals(cluster, track);
+
+
+
     t.Stop();
 
     tracker.printRecoTracks_new_alg(real_tracks);
@@ -67,25 +89,26 @@ void run(int *events)
     // cout << "stats \n" << s << endl;
 }
 
+
 int main(int argc, char **argv)
 {
     TApplication app("ROOT Application", &argc, argv);
     TH1::AddDirectory(false);
 
     // track simulation
-    // int *events;
-    // int ev = 5;
-    // events = &ev;
-    // run(events);
+    int *events;
+    int ev = 3;
+    events = &ev;
+    run(events);
 
-    // simulations sim;
+    //simulations sim;
     // sim.sim_only_trk_3L(1000);
     // sim.sim_old_algo(100);
-    // sim.sim_trk_32L(10000);
+    //sim.sim_trk_32L(100);
 
     // reco from MUONS
-    eventdata e;
-    e.analize_data();
+    //eventdata e;
+    //e.analize_data();
 
     /*
     //compute theta max

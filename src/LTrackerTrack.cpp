@@ -758,6 +758,8 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 {
   for (auto &trk : tracks)
   {
+    cout << "-----------------------------------" << endl;
+    cout << trk << endl;
     // if (trk.chi2 > 300.)
     if (1)
     {
@@ -783,11 +785,11 @@ void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
       line_track->SetLineColor(kRed);
       line_track->Draw();
 
-      TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 0, 0, 0, 0, 0);
+      TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 1, 1, 0, 0, 0);
       g->Draw();
-      TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 0, 0, 0, 0, 0);
+      TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 1, 1, 0, 0, 0);
       m->Draw();
-      TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
+      TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 1, 1, 0, 0, 0);
       f->Draw();
 
       if (1)
@@ -870,3 +872,5 @@ std::ostream &operator<<(std::ostream &output, const LTrackerTrack &tracker)
     */
   return output;
 }
+
+

@@ -181,6 +181,34 @@ CMakeFiles/sim_MC.dir/src/simulations.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/sim_MC.dir/src/simulations.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/simulations.cpp -o CMakeFiles/sim_MC.dir/src/simulations.cpp.s
 
+CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.o: CMakeFiles/sim_MC.dir/flags.make
+CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.o: ../src/LTrackFittingTools.cpp
+CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.o: CMakeFiles/sim_MC.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/user/Desktop/stageINFN/sim_mc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.o -MF CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.o.d -o CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.o -c /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/LTrackFittingTools.cpp
+
+CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/LTrackFittingTools.cpp > CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.i
+
+CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/LTrackFittingTools.cpp -o CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.s
+
+CMakeFiles/sim_MC.dir/src/LTrack.cpp.o: CMakeFiles/sim_MC.dir/flags.make
+CMakeFiles/sim_MC.dir/src/LTrack.cpp.o: ../src/LTrack.cpp
+CMakeFiles/sim_MC.dir/src/LTrack.cpp.o: CMakeFiles/sim_MC.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/user/Desktop/stageINFN/sim_mc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/sim_MC.dir/src/LTrack.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/sim_MC.dir/src/LTrack.cpp.o -MF CMakeFiles/sim_MC.dir/src/LTrack.cpp.o.d -o CMakeFiles/sim_MC.dir/src/LTrack.cpp.o -c /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/LTrack.cpp
+
+CMakeFiles/sim_MC.dir/src/LTrack.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/sim_MC.dir/src/LTrack.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/LTrack.cpp > CMakeFiles/sim_MC.dir/src/LTrack.cpp.i
+
+CMakeFiles/sim_MC.dir/src/LTrack.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/sim_MC.dir/src/LTrack.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/user/Desktop/stageINFN/sim_mc/src/LTrack.cpp -o CMakeFiles/sim_MC.dir/src/LTrack.cpp.s
+
 # Object files for target sim_MC
 sim_MC_OBJECTS = \
 "CMakeFiles/sim_MC.dir/src/LTrackerTrack.cpp.o" \
@@ -190,7 +218,9 @@ sim_MC_OBJECTS = \
 "CMakeFiles/sim_MC.dir/src/main.cpp.o" \
 "CMakeFiles/sim_MC.dir/src/eventdata.cpp.o" \
 "CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o" \
-"CMakeFiles/sim_MC.dir/src/simulations.cpp.o"
+"CMakeFiles/sim_MC.dir/src/simulations.cpp.o" \
+"CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.o" \
+"CMakeFiles/sim_MC.dir/src/LTrack.cpp.o"
 
 # External object files for target sim_MC
 sim_MC_EXTERNAL_OBJECTS =
@@ -203,6 +233,8 @@ sim_MC: CMakeFiles/sim_MC.dir/src/main.cpp.o
 sim_MC: CMakeFiles/sim_MC.dir/src/eventdata.cpp.o
 sim_MC: CMakeFiles/sim_MC.dir/src/LTrackerCluster.cpp.o
 sim_MC: CMakeFiles/sim_MC.dir/src/simulations.cpp.o
+sim_MC: CMakeFiles/sim_MC.dir/src/LTrackFittingTools.cpp.o
+sim_MC: CMakeFiles/sim_MC.dir/src/LTrack.cpp.o
 sim_MC: CMakeFiles/sim_MC.dir/build.make
 sim_MC: /usr/local/root/lib/libCore.so
 sim_MC: /usr/local/root/lib/libImt.so
@@ -224,7 +256,7 @@ sim_MC: /usr/local/root/lib/libThread.so
 sim_MC: /usr/local/root/lib/libMultiProc.so
 sim_MC: /usr/local/root/lib/libROOTVecOps.so
 sim_MC: CMakeFiles/sim_MC.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/user/Desktop/stageINFN/sim_mc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable sim_MC"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/user/Desktop/stageINFN/sim_mc/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable sim_MC"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/sim_MC.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

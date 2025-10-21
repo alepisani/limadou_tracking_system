@@ -78,7 +78,8 @@
         "raggio.C": "cpp",
         "computeAcceptanceCosmics.C": "cpp",
         "raggio_copy.C": "cpp",
-        "ioexample.C": "cpp"
+        "ioexample.C": "cpp",
+        "LTrackerFittingTools.C": "cpp"
     },
     "C_Cpp.default.compilerPath": ""
 }

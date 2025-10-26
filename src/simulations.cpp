@@ -42,7 +42,7 @@
 simulations::simulations()
 {
     // radius in mm
-    simulations::gen_tracks = {3};
+    simulations::gen_tracks = {2,3,4,5,6,7,8,9,10};
     radius = {0.4};
     // simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50};
     // simulations::gen_tracks = {2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -192,7 +192,7 @@ void simulations::sim_old_algo(int iteration_per_event)
 
     std::string path = "../data/limadou_sim_oldalgo.csv";
     std::ofstream file(path, std::ios::out);
-    file << "GenTrk,Efficiency,Gen3L,RecoTrk,RecoReal,Tracklet,RealTime,CPUTime\n";
+    file << "GenTrk,Efficiency,Gen3L,RecoTrk,RecoReal,Tracklet,RealTime,CPUTime, errCPUTime\n";
 
     for (int i = 0; i < gen_tracks.size(); ++i)
     {
@@ -224,6 +224,11 @@ void simulations::sim_old_algo(int iteration_per_event)
             printProgressBarWithETA(j + 1, iteration_per_event, start_time);
         }
 
+        double errc_time = TMath::RMS(c_time.begin(), c_time.end()) / TMath::Sqrt(iteration_per_event);
+        double err_reco_real = TMath::RMS(reco_real.begin(), reco_real.end()) / TMath::Sqrt(iteration_per_event);
+        double err_gen_trk = TMath::RMS(gen_tr3L.begin(), gen_tr3L.end()) / TMath::Sqrt(iteration_per_event);
+        double err_effreal = TMath::Sqrt(pow(err_reco_real / mean(gen_tr3L), 2) + pow((mean(reco_real) * err_gen_trk) / (pow(mean(gen_tr3L), 2)), 2));
+
         // Scrivi una riga per ogni combinazione GenTrack-Raggio
         file << gen_tracks[i] << ","
              << std::fixed << std::setprecision(3) << mean(reco_real) / mean(gen_tr3L) << ","
@@ -232,7 +237,9 @@ void simulations::sim_old_algo(int iteration_per_event)
              << std::fixed << std::setprecision(3) << mean(reco_real) << ","
              << std::fixed << std::setprecision(3) << mean(trkl) << ","
              << std::fixed << std::setprecision(6) << mean(r_time) << ","
-             << std::fixed << std::setprecision(6) << mean(c_time) << "\n";
+             << std::fixed << std::setprecision(6) << mean(c_time) << ","
+             << std::fixed << std::setprecision(6) << errc_time << ","
+             << std::fixed << std::setprecision(6) << err_effreal << "\n";
 
         std::cout << std::endl;
         // std::cout << *this << std::endl;
@@ -333,7 +340,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
     if (!file_exists)
     {
         // file << "GenTrk, Raggio, Eff, err_e, Eff_real, err_er, fake_reco_trk, err_frt, GenTrk, RecoTrk, RecoReal, RealTime, CPUTime, eff3hit, eff2hit, fake3, fake2\n";
-        file << "GenTrk, Raggio, Eff, Eff_real, fake_reco_trk, GenTrk, RecoTrk, RecoReal, RealTime, CPUTime, eff3hit, eff2hit, fake3, fake2\n";
+        file << "GenTrk, Raggio, Eff, Eff_real, erreffreal,fake_reco_trk, GenTrk, RecoTrk, RecoReal, RealTime, CPUTime, err_cputime ,eff3hit, eff2hit, fake3, fake2\n";
     }
 
     for (int i = 0; i < gen_tracks.size(); ++i)
@@ -481,6 +488,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
             double err_reco = TMath::RMS(reco.begin(), reco.end()) / TMath::Sqrt(iteration_per_event);
             double err_reco_real = TMath::RMS(reco_real.begin(), reco_real.end()) / TMath::Sqrt(iteration_per_event);
             double err_gen_trk = TMath::RMS(gen_trk.begin(), gen_trk.end()) / TMath::Sqrt(iteration_per_event);
+            double err_cputime = TMath::RMS(c_time.begin(), c_time.end()) / TMath::Sqrt(iteration_per_event);
             // propagazione errori
             double err_eff = TMath::Sqrt(pow(err_reco / mean(gen_trk), 2) + pow((mean(reco) * err_gen_trk) / (pow(mean(gen_trk), 2)), 2));
             double err_effreal = TMath::Sqrt(pow(err_reco_real / mean(gen_trk), 2) + pow((mean(reco_real) * err_gen_trk) / (pow(mean(gen_trk), 2)), 2));
@@ -492,7 +500,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
                  << std::fixed << std::setprecision(6) << eff << ","
                  // << std::fixed << std::setprecision(6) << err_eff << ","
                  << std::fixed << std::setprecision(6) << eff_real << ","
-                 // << std::fixed << std::setprecision(6) << err_effreal << ","
+                 << std::fixed << std::setprecision(6) << err_effreal << ","
                  << std::fixed << std::setprecision(6) << ineff_fake << ","
                  // << std::fixed << std::setprecision(6) << err_ineffake << ","
                  << std::fixed << std::setprecision(6) << mean(gen_trk) << ","
@@ -500,6 +508,7 @@ void simulations::sim_trk_32L(int iteration_per_event)
                  << std::fixed << std::setprecision(6) << mean(reco_real) << ","
                  << std::fixed << std::setprecision(6) << mean(r_time) << ","
                  << std::fixed << std::setprecision(6) << mean(c_time) << ","
+                 << std::fixed << std::setprecision(6) << err_cputime << ","
                  << std::fixed << std::setprecision(6) << eff3hit << ","
                  << std::fixed << std::setprecision(6) << eff2hit << ","
                  << std::fixed << std::setprecision(6) << ineff_fake3 << ","

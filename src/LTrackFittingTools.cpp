@@ -347,6 +347,8 @@ void CalculateResiduals(LTrackerCluster &cluster, LTrack &track){
 }
 
 void HoughTransform3D(LTrackerCluster &cluster, LTrack &track) {
+    const int min_number_of_point_track = 3;
+
     std::vector<std::vector<float>> pointsxy, pointsxz, pointsyz;
     std::vector<int> noise_cls_idx;
     std::vector<int> cls_idx;
@@ -384,7 +386,7 @@ void HoughTransform3D(LTrackerCluster &cluster, LTrack &track) {
 
 
 
-    if (pointsxy.size() < 2) {
+    if (pointsxy.size() < min_number_of_point_track) {
         for (int i = 0; i < cls_trk_idx.size(); ++i) {
             cls_trk_idx[i] = -1;
         }
@@ -410,7 +412,6 @@ void HoughTransform3D(LTrackerCluster &cluster, LTrack &track) {
     std::vector<int> unique_trk_nr;
     for (const std::vector<float>& point : best_ht) {
         if (point.at(4) == -1) {
-            cout << "A" << endl;
             continue;
         }
         if (std::find(unique_trk_nr.begin(), unique_trk_nr.end(), point.at(4)) == unique_trk_nr.end()) {

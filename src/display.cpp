@@ -25,6 +25,7 @@ display::display() {}
 
 void display::reset()
 {
+    /*
     if (theta)
     {
         delete theta;
@@ -51,6 +52,8 @@ void display::reset()
     std::vector<std::vector<LCluster>>().swap(track_2layer);
     std::vector<std::vector<LCluster>>().swap(track_1layer);
     std::vector<LTrackCandidate>().swap(generated_tracks);
+    */
+    generated_tracks.clear();
 }
 
 void display::draw_TR12(TCanvas *geom)

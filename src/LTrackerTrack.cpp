@@ -116,7 +116,7 @@ void LTrackerTrack::print_tracklet(const LCluster cl_0, const LCluster cl_2)
   Double_t z_line[2] = {z0, z2};
   TPolyLine3D *trk = new TPolyLine3D(2, x_line, y_line, z_line);
   trk->SetLineWidth(1);
-  trk->SetLineColor(kBlue);
+  trk->SetLineColor(kGreen);
   trk->Draw();
 }
 
@@ -757,62 +757,55 @@ bool LTrackerTrack::track_hit_TR(const double &x1, const double &y1, const doubl
 void LTrackerTrack::printRecoTracks_new_alg(TCanvas *reco)
 {
   for (auto &trk : tracks)
-  {
-    cout << "-----------------------------------" << endl;
-    cout << trk << endl;
-    // if (trk.chi2 > 300.)
-    if (1)
+  {    
+
+    float x1, y1, z1, dz, x2, y2, z2;
+
+    dz = 100;
+
+    // printf("x0 = %f, y0 = %f, theta_reco = %f, phi_reco = %f\n", trk.x0, trk.y0, trk.theta * TMath::RadToDeg(), trk.phi * TMath::RadToDeg());
+    x2 = trk.x0 + dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
+    y2 = trk.y0 + dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
+    z2 = trk.z0 + dz;
+    x1 = trk.x0 - dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
+    y1 = trk.y0 - dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
+    z1 = trk.z0 - dz;
+    Double_t x_line[3] = {x1, trk.x0, x2};
+    Double_t y_line[3] = {y1, trk.y0, y2};
+    Double_t z_line[3] = {z1, trk.z0, z2};
+    TPolyLine3D *line_track = new TPolyLine3D(3, x_line, y_line, z_line);
+    line_track->SetLineWidth(2);
+    line_track->SetLineColor(kRed);
+    line_track->Draw();
+
+    TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 0, 0, 0, 0, 0);
+    g->Draw();
+    TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 0, 0, 0, 0, 0);
+    m->Draw();
+    TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 0, 0, 0, 0, 0);
+    f->Draw();
+
+    if (true)
     {
-      // cout << endl;
-      // cout << trk << endl;
+      double R = 6;      // radius of the circle
+      const int N = 100; // number of points to make circle smooth
+      Double_t x_circ[N], y_circ[N], z_circ[N];
 
-      float x1, y1, z1, dz, x2, y2, z2;
-
-      dz = 100;
-
-      // printf("x0 = %f, y0 = %f, theta_reco = %f, phi_reco = %f\n", trk.x0, trk.y0, trk.theta * TMath::RadToDeg(), trk.phi * TMath::RadToDeg());
-      x2 = trk.x0 + dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
-      y2 = trk.y0 + dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
-      z2 = trk.z0 + dz;
-      x1 = trk.x0 - dz * (TMath::Tan(trk.theta)) * (TMath::Cos(trk.phi));
-      y1 = trk.y0 - dz * (TMath::Tan(trk.theta)) * (TMath::Sin(trk.phi));
-      z1 = trk.z0 - dz;
-      Double_t x_line[3] = {x1, trk.x0, x2};
-      Double_t y_line[3] = {y1, trk.y0, y2};
-      Double_t z_line[3] = {z1, trk.z0, z2};
-      TPolyLine3D *line_track = new TPolyLine3D(3, x_line, y_line, z_line);
-      line_track->SetLineWidth(2);
-      line_track->SetLineColor(kRed);
-      line_track->Draw();
-
-      TMarker3DBox *g = new TMarker3DBox(x2, y2, z2, 1, 1, 0, 0, 0);
-      g->Draw();
-      TMarker3DBox *m = new TMarker3DBox(trk.x0, trk.y0, trk.z0, 1, 1, 0, 0, 0);
-      m->Draw();
-      TMarker3DBox *f = new TMarker3DBox(x1, y1, z1, 1, 1, 0, 0, 0);
-      f->Draw();
-
-      if (1)
+      for (int j = 0; j < N; j++)
       {
-        double R = 0.4;      // radius of the circle
-        const int N = 100; // number of points to make circle smooth
-        Double_t x_circ[N], y_circ[N], z_circ[N];
-
-        for (int j = 0; j < N; j++)
-        {
-          double phi = 2 * TMath::Pi() * j / (N - 1); // angle
-          x_circ[j] = trk.x0 + R * TMath::Cos(phi);
-          y_circ[j] = trk.y0 + R * TMath::Sin(phi);
-          z_circ[j] = trk.z0; // circle in XY plane
-        }
-
-        // make polyline
-        TPolyLine3D *circle = new TPolyLine3D(N, x_circ, y_circ, z_circ);
-        circle->SetLineColor(kBlue);
-        circle->SetLineWidth(2);
-        circle->Draw();
+        double phi = 2 * TMath::Pi() * j / (N - 1); // angle
+        x_circ[j] = trk.x0 + R * TMath::Cos(phi);
+        y_circ[j] = trk.y0 + R * TMath::Sin(phi);
+        z_circ[j] = trk.z0; // circle in XY plane
       }
+
+      // make polyline
+      TPolyLine3D *circle = new TPolyLine3D(N, x_circ, y_circ, z_circ);
+      circle->SetLineColor(kBlue);
+      circle->SetLineWidth(2);
+      circle->Draw();
     }
+  
   }
 
   reco->Update();

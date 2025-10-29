@@ -22,7 +22,7 @@
 
 using namespace std;
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-071441-Events-00351_01656-p01_L2.root";
-// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";
+// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";      //tesi
 
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-045249-Events-00351_01585-p01_L2.root";      // this file has weird peaks
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-002417-Events-00351_01449-p01_L2.root";
@@ -247,6 +247,7 @@ void eventdata::analize_data()
 
         ltt.computeTracklets();
         ltt.new_algo();
+
 
         h_hmcls_hmrt->Fill(cl.cls_mean_z.size(), ltt.tracks.size());
 
@@ -484,10 +485,11 @@ void eventdata::analize_data()
 
         // Set the y-axis range with 10% padding
         TCanvas *c_theta = new TCanvas("c_theta_overlay", "compare_theta_algo", 800, 600);
+        h_theta->SetStats(0);
         h_theta->SetTitle("#theta comparison");
         h_theta->GetXaxis()->SetTitle("#theta (deg)");
         h_theta->GetYaxis()->SetTitle("Counts");
-        // h_theta->GetYaxis()->SetRangeUser(0, maxY * 1.1);
+        h_theta->GetYaxis()->SetRangeUser(0, maxY * 1.1);
         h_theta->SetLineColor(kBlue);
         h_theta_m2->SetLineColor(kRed);
         htheta->SetLineColor(kBlack);
@@ -497,10 +499,10 @@ void eventdata::analize_data()
         h->GetXaxis()->SetTitle("Theta [rad]");
         h->GetYaxis()->SetTitle("Counts");
 
-        TLegend *leg1 = new TLegend(0.6, 0.7, 0.9, 0.9);
-        leg1->AddEntry(h_theta, Form("hough transform (N=%.0f)", h_theta->GetEntries()), "l");
-        leg1->AddEntry(h_theta_m2, Form("old_algo (N=%.0f)", h_theta_m2->GetEntries()), "l");
-        leg1->AddEntry(htheta, Form("new_algo (N=%.0f)", htheta->GetEntries()), "l");
+        TLegend *leg1 = new TLegend(0.65, 0.65, 0.9, 0.85);
+        leg1->AddEntry(h_theta, Form("Metodo 1 (N=%.0f)", h_theta->GetEntries()), "l");
+        leg1->AddEntry(h_theta_m2, Form("Metodo 2 (N=%.0f)", h_theta_m2->GetEntries()), "l");
+        leg1->AddEntry(htheta, Form("Metodo 3 (N=%.0f)", htheta->GetEntries()), "l");
         leg1->Draw();
         c_theta->Write();
 
@@ -518,6 +520,7 @@ void eventdata::analize_data()
         h_phi->GetYaxis()->SetRangeUser(0, maxYphi * 1.1);
 
         TCanvas *c_phi = new TCanvas("c_phi_overlay", "compare_phi", 800, 600);
+        h_phi->SetStats(0);
         h_phi->SetTitle("#phi comparison");
         h_phi->GetXaxis()->SetTitle("#phi (deg)");
         h_phi->GetYaxis()->SetTitle("Counts");
@@ -527,26 +530,25 @@ void eventdata::analize_data()
         h_phi->Draw("HIST");
         h_phi_m2->Draw("HISTSAME");
         hphi->Draw("HISTSAME");
-        TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9);
-        leg2->AddEntry(h_phi, Form("hough transform (N=%.0f)", h_phi->GetEntries()), "l");
-        leg2->AddEntry(h_phi_m2, Form("old_algo (N=%.0f)", h_phi_m2->GetEntries()), "l");
-        leg2->AddEntry(hphi, Form("new_algo (N=%.0f)", hphi->GetEntries()), "l");
+        TLegend *leg2 = new TLegend(0.65, 0.65, 0.9, 0.85);
+        leg2->AddEntry(h_phi, Form("Metodo 1 (N=%.0f)", h_phi->GetEntries()), "l");
+        leg2->AddEntry(h_phi_m2, Form("Metodo 2 (N=%.0f)", h_phi_m2->GetEntries()), "l");
+        leg2->AddEntry(hphi, Form("Metodo 3 (N=%.0f)", hphi->GetEntries()), "l");
         leg2->Draw();
         c_phi->Write();
 
         TCanvas *c_theta32 = new TCanvas("c_theta32", "compare_theta", 800, 600);
+        htheta_notnorm->SetStats(0);
         htheta_notnorm->SetTitle("#theta comparison");
         htheta_notnorm->GetXaxis()->SetTitle("#theta (deg)");
         htheta_notnorm->GetYaxis()->SetTitle("Counts");
-        // htheta_notnorm->GetYaxis()->SetRangeUser(0, maxY * 1.1);
+        //htheta_notnorm->GetYaxis()->SetRangeUser(0, maxY * 1.1);
         htheta_notnorm->SetLineColor(kBlue);
         htheta_triplet->SetLineColor(kRed);
         htheta_doublet->SetLineColor(kBlack);
         htheta_notnorm->Draw("HIST");
         htheta_triplet->Draw("HISTSAME");
         htheta_doublet->Draw("HISTSAME");
-        htheta_notnorm->GetXaxis()->SetTitle("Theta [rad]");
-        htheta_notnorm->GetYaxis()->SetTitle("Counts");
 
         TLegend *legt = new TLegend(0.6, 0.7, 0.9, 0.9);
         legt->AddEntry(htheta, Form("total #theta distribution (N=%0.f)", htheta->GetEntries()), "l");
@@ -555,6 +557,7 @@ void eventdata::analize_data()
         legt->Draw();
 
         TCanvas *c_phi32 = new TCanvas("c_phi32", "compare_phi", 800, 600);
+        hphi_notnorm->SetStats(0);
         hphi_notnorm->SetTitle("#phi comparison");
         hphi_notnorm->GetXaxis()->SetTitle("#phi (deg)");
         hphi_notnorm->GetYaxis()->SetTitle("Counts");
@@ -565,8 +568,7 @@ void eventdata::analize_data()
         hphi_notnorm->Draw("HIST");
         hphi_triplet->Draw("HISTSAME");
         hphi_doublet->Draw("HISTSAME");
-        hphi_notnorm->GetXaxis()->SetTitle("phi [rad]");
-        hphi_notnorm->GetYaxis()->SetTitle("Counts");
+
 
         TLegend *legp = new TLegend(0.6, 0.7, 0.9, 0.9);
         legp->AddEntry(hphi, Form("total #phi distribution (N=%0.f)", hphi->GetEntries()), "l");
@@ -588,6 +590,10 @@ void eventdata::analize_data()
         h_dy0->Write();
         h_dy1->Write();
         h_dy2->Write();
+
+        //htheta_notnorm->Save("theta32.png");
+        //hphi_notnorm->Save("phi32.png");
+
 
         fOut->Close();
         fIn->Close();

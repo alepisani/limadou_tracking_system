@@ -76,7 +76,7 @@ void IterativeHoughTransform(std::vector<std::vector<float>>& points, int i_ev, 
     int iterations = 0;
     int df_size = df_ev.size();
     std::vector<double> theta_tot, rho_tot;
-    while ((df_ev.size() >= 2) && (iterations < 5 )) {
+    while ((df_ev.size() >= 2) && (iterations < 5)) {
         iterations ++;
         theta_tot.clear();
         rho_tot.clear();
@@ -291,6 +291,104 @@ std::vector<std::vector<float>> RemoveHorizontal(std::vector<std::vector<float>>
     return points;
 }
 
+void HoughTransform3D(LTrackerCluster &cluster, LTrack &track) {
+    const int min_number_of_point_track = 2;
+    std::vector<std::vector<float>> pointsxy, pointsxz, pointsyz;
+    std::vector<int> noise_cls_idx;
+    std::vector<int> cls_idx;
+    std::vector<float> cls_x_pos, cls_y_pos, cls_z_pos;
+    cls_x_pos = cluster.GetClusterMeanX();
+    cls_y_pos = cluster.GetClusterMeanY();
+    cls_z_pos = cluster.GetClusterMeanZ();
+    cls_idx = cluster.GetClusterIdx();
+    std::vector<int> cls_trk_idx(cls_idx.size(), -1);
+
+    int counter = 0;
+    for (int i = 0; i < cls_x_pos.size(); ++i) {
+        std::vector<float> point; // Create separate vectors in each iteration
+        if (cls_idx[i] == -999) {
+            cls_trk_idx[i] = -999;
+            continue;
+        }
+        point.push_back(cls_x_pos[i]); // cls x
+        point.push_back(cls_y_pos[i]); // cls y
+        point.push_back(cls_z_pos[i]); // cls z
+        point.push_back(counter); // cls idx
+        point.push_back(-1); // track idx
+        point.push_back(i); // old order
+
+        pointsxy.push_back(point);
+        pointsxz.push_back(point);
+        pointsyz.push_back(point);
+
+        counter ++;
+    }
+
+    if (pointsxy.size() < min_number_of_point_track) {
+        for (int i = 0; i < cls_trk_idx.size(); ++i) {
+            cls_trk_idx[i] = -1;
+        }
+        cluster.AddTrackIdx(cls_trk_idx);
+        return;
+    }
+
+    IterativeHoughTransform(pointsxy, 0, "x_pos", "y_pos");
+    pointsxy = RemoveHorizontal(pointsxy);
+    IterativeHoughTransform(pointsxz, 0, "x_pos", "z_pos");
+    pointsxz = RemoveHorizontal(pointsxz);
+    IterativeHoughTransform(pointsyz, 0, "y_pos", "z_pos");
+    pointsyz = RemoveHorizontal(pointsyz);
+    std::vector<std::vector<float>> best_ht = ChooseBestHough(pointsxy, pointsxz, pointsyz);
+    std::vector<int> point_track_nr;
+    // loop over ordered 
+    for (const std::vector<float>& point : best_ht) {
+        point_track_nr.push_back(point.at(4));
+    }
+
+    std::vector<int> unique_trk_nr;
+    for (const std::vector<float>& point : best_ht) {
+        if (point.at(4) == -1) {
+            continue;
+        }
+        if (std::find(unique_trk_nr.begin(), unique_trk_nr.end(), point.at(4)) == unique_trk_nr.end()) {
+            unique_trk_nr.push_back(point.at(4));
+        }
+    }
+    int counter_trk = 0;
+    for (int i = 0; i < unique_trk_nr.size(); ++i) {
+        std::vector<std::vector<float>> track_points;
+        std::vector<int> point_track_order;
+        for (const std::vector<float>& point : best_ht) {
+            if (point.at(4) == unique_trk_nr[i]) {
+                track_points.push_back(point);
+                point_track_order.push_back(point.at(5));
+            }
+        }
+        if (track_points.size() < min_number_of_point_track) {
+            for (int j = 0; j < point_track_order.size(); ++j) {
+                cls_trk_idx[point_track_order[j]] = -1;
+            }
+        }
+        else{
+            for (int j = 0; j < point_track_order.size(); ++j) {
+                cls_trk_idx[point_track_order[j]] = i;
+            }
+        }
+        //fill points in Vector3D
+        std::vector<Vector3d> points3d;
+        int npoints_trk = 0;
+        for (const std::vector<float>& point : track_points) {
+            points3d.push_back(Vector3d(point.at(0), point.at(1), point.at(2)));
+            npoints_trk ++;
+        }
+        std::pair < Vector3d, Vector3d > best_fiteigen = best_line_from_points(points3d);
+        track.AddTrack(counter_trk,npoints_trk,best_fiteigen.first.x(), best_fiteigen.first.y(), best_fiteigen.first.z(), std::acos(best_fiteigen.second.z()) * 180/TMath::Pi(), std::atan2(best_fiteigen.second.y(),best_fiteigen.second.x())*180/TMath::Pi());
+        counter_trk ++;
+    }
+    cluster.AddTrackIdx(cls_trk_idx);
+}
+
+/*
 void CalculateResiduals(LTrackerCluster &cluster, LTrack &track){
     std::vector<float> res_x_vec, res_y_vec;
     std::vector<float> chi2;
@@ -305,8 +403,8 @@ void CalculateResiduals(LTrackerCluster &cluster, LTrack &track){
     std::vector<float> x0 = track.GetX0();
     std::vector<float> y0 = track.GetY0();
     std::vector<float> z0 = track.GetZ0();
-    std::vector<float> theta = track.GetTheta();     //degree
-    std::vector<float> phi = track.GetPhi();         //degree
+    std::vector<float> theta = track.GetTheta();
+    std::vector<float> phi = track.GetPhi();
 
     for (int i = 0; i < cls_trk_idx.size(); ++i) {
         if (cls_trk_idx[i] < 0){
@@ -345,111 +443,4 @@ void CalculateResiduals(LTrackerCluster &cluster, LTrack &track){
     cluster.AddResiduals(res_x_vec, res_y_vec);
     track.AddChi2(chi2);
 }
-
-void HoughTransform3D(LTrackerCluster &cluster, LTrack &track) {
-    const int min_number_of_point_track = 3;
-
-    std::vector<std::vector<float>> pointsxy, pointsxz, pointsyz;
-    std::vector<int> noise_cls_idx;
-    std::vector<int> cls_idx;
-    std::vector<float> cls_x_pos, cls_y_pos, cls_z_pos;
-    cls_x_pos = cluster.GetClusterMeanX();
-    cls_y_pos = cluster.GetClusterMeanY();
-    cls_z_pos = cluster.GetClusterMeanZ();
-    cls_idx = cluster.GetClusterIdx();
-    std::vector<int> cls_trk_idx(cls_idx.size(), -1);
-
-    int counter = 0;
-    for (int i = 0; i < cls_x_pos.size(); ++i) {
-        std::vector<float> point; // Create separate vectors in each iteration
-        if (cls_idx[i] == -999) {
-            cls_trk_idx[i] = -999;
-            continue;
-        }
-        point.push_back(cls_x_pos[i]); // cls x
-        point.push_back(cls_y_pos[i]); // cls y
-        point.push_back(cls_z_pos[i]); // cls z
-        point.push_back(counter); // cls idx
-        point.push_back(-1); // track idx
-        point.push_back(i); // old order
-
-        pointsxy.push_back(point);
-        pointsxz.push_back(point);
-        pointsyz.push_back(point);
-
-        counter ++;
-    }
-
-    //cout << pointsxy.size() << endl;
-    //cout << pointsxz.size() << endl;
-    //cout << pointsyz.size() << endl;
-
-
-
-    if (pointsxy.size() < min_number_of_point_track) {
-        for (int i = 0; i < cls_trk_idx.size(); ++i) {
-            cls_trk_idx[i] = -1;
-        }
-        cluster.AddTrackIdx(cls_trk_idx);
-        return;
-    }
-
-    IterativeHoughTransform(pointsxy, 0, "x_pos", "y_pos");
-    pointsxy = RemoveHorizontal(pointsxy);
-    IterativeHoughTransform(pointsxz, 0, "x_pos", "z_pos");
-    pointsxz = RemoveHorizontal(pointsxz);
-    IterativeHoughTransform(pointsyz, 0, "y_pos", "z_pos");
-    pointsyz = RemoveHorizontal(pointsyz);
-    std::vector<std::vector<float>> best_ht = ChooseBestHough(pointsxy, pointsxz, pointsyz);
-    std::vector<int> point_track_nr;
-    // loop over ordered 
-    cout << "quante best_ht? " << best_ht.size() << endl;
-    for (const std::vector<float>& point : best_ht) {
-        point_track_nr.push_back(point.at(4));
-    }
-    
-
-    std::vector<int> unique_trk_nr;
-    for (const std::vector<float>& point : best_ht) {
-        if (point.at(4) == -1) {
-            continue;
-        }
-        if (std::find(unique_trk_nr.begin(), unique_trk_nr.end(), point.at(4)) == unique_trk_nr.end()) {
-            unique_trk_nr.push_back(point.at(4));
-        }
-    }
-    int counter_trk = 0;
-    for (int i = 0; i < unique_trk_nr.size(); ++i) {
-        std::vector<std::vector<float>> track_points;
-        std::vector<int> point_track_order;
-        for (const std::vector<float>& point : best_ht) {
-            if (point.at(4) == unique_trk_nr[i]) {
-                track_points.push_back(point);
-                point_track_order.push_back(point.at(5));
-            }
-        }
-        if (track_points.size() < 2) {
-            for (int j = 0; j < point_track_order.size(); ++j) {
-                cls_trk_idx[point_track_order[j]] = -1;
-            }
-        }
-        else{
-            for (int j = 0; j < point_track_order.size(); ++j) {
-                cls_trk_idx[point_track_order[j]] = i;
-            }
-        }
-        //fill points in Vector3D
-        std::vector<Vector3d> points3d;
-        int npoints_trk = 0;
-        for (const std::vector<float>& point : track_points) {
-            points3d.push_back(Vector3d(point.at(0), point.at(1), point.at(2)));
-            npoints_trk ++;
-        }
-        std::pair < Vector3d, Vector3d > best_fiteigen = best_line_from_points(points3d);
-        track.AddTrack(counter_trk,npoints_trk,best_fiteigen.first.x(), best_fiteigen.first.y(), best_fiteigen.first.z(), std::acos(best_fiteigen.second.z()) * 180/TMath::Pi(), std::atan2(best_fiteigen.second.y(),best_fiteigen.second.x())*180/TMath::Pi());
-        cout << "z_hough? " << best_fiteigen.first.z() << endl;
-        LTrackerTrack ltt;
-        counter_trk ++;
-    }
-    //cluster.AddTrackIdx(cls_trk_idx);
-}
+*/

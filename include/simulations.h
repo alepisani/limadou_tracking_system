@@ -43,9 +43,9 @@ public:
     void sim_only_trk_3L(int);
     void sim_old_algo(int);
     void sim_trk_32L(int);
+    void comp_algos(int);
     void printProgressBarWithETA(int, int, std::chrono::steady_clock::time_point, int);
-      
-
+    bool match_tracks(const LTrackCandidate&, const LTrackCandidate&, double, double);
 };
 
 

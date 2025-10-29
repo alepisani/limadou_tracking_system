@@ -55,7 +55,7 @@ void LTrack::from_LTrack_to_TrackCand(LTrack &track, LTrackerTrack &ltt){
     trkCand.x0 = track.x0[i];
     trkCand.y0 = track.y0[i];
     trkCand.z0 = track.z0[i];
-    cout << "z_trkcand? " << trkCand.z0 << endl;
+    //cout << "z_trkcand? " << trkCand.z0 << endl;
     trkCand.theta = track.theta[i] * TMath::Pi() / 180;
     trkCand.phi = track.phi[i] * TMath::Pi() / 180;
     ltt.tracks.push_back(trkCand);

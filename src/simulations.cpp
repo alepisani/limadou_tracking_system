@@ -1,3 +1,4 @@
+
 #include <TFile.h>
 #include <TTree.h>
 #include <iostream>
@@ -24,6 +25,8 @@
 #include "../include/LTrackerCluster.h"
 #include "../include/LTrackerTrack.h"
 #include "../include/simulations.h"
+#include "../include/LTrack.h"
+#include "../include/LTrackFittingTools.h"
 #include "simulations.h"
 #include <cmath>
 #include <cstdint>
@@ -689,4 +692,114 @@ void simulations::sim_trk_32L(int iteration_per_event)
     f->Flush();
     f->ls();
     f->Close();
+}
+
+// Add this helper function to simulations class
+bool simulations::match_tracks(const LTrackCandidate& reco_track, const LTrackCandidate& gen_track, 
+                             double theta_tol = 0.1, double phi_tol = 0.1) {
+    // Compare angles within tolerance (in radians)
+    bool theta_match = std::abs(reco_track.theta - gen_track.theta) < theta_tol;
+    bool phi_match = std::abs(reco_track.phi - gen_track.phi) < phi_tol;
+    
+    return theta_match && phi_match;
+}
+
+void simulations::comp_algos(int iteration_per_event){
+
+    /**
+     * comfronto metodi:
+     *   metodo 1
+     * dati da raccogliere;
+     *  gentrack = 2,3,4,5,6,7,8,9,10;
+     *      eff + err_eff
+     *      cpu + err_cpu 
+     */
+
+    auto start_time = std::chrono::steady_clock::now();
+    display simu;
+    LTrackerTrack ltt;
+    stats stats;
+    chips cc;
+    LTrackerCluster cluster;
+    LTrack track;
+
+    simu.take_distributions();
+
+    std::string path = "../data/limadou_sim_hough.csv";
+    std::ofstream file(path, std::ios::out);
+    
+    file << "GenTrk, gentr3L, eff_real, err_eff, CPUTime, errCPUTime \n";
+
+    for (int i = 0; i < gen_tracks.size(); ++i)
+    {
+        std::cout << "==== GenTracks = " << gen_tracks[i] << " ====" << std::endl;
+
+        std::vector<double> c_time, reco_real, gen_tr3L;
+        stats.reset();
+        ltt.Reset();
+        track.Reset();
+        simu.reset();
+
+        for (int j = 0; j < iteration_per_event; ++j)
+        {
+            stats.reset();
+            ltt.Reset();
+            track.Reset();
+            simu.reset();
+            cluster.Reset();
+            simu.tracks_no_print_hist(gen_tracks[i], ltt);
+            
+            TStopwatch t;
+            cluster.from_ltt_to_cluster(ltt);
+            t.Start();
+            HoughTransform3D(cluster, track);
+            t.Stop();
+            track.from_LTrack_to_TrackCand(track, ltt); 
+
+            // Count matched and unmatched tracks
+            int matched_tracks = 0;
+            std::vector<bool> gen_track_matched(simu.generated_tracks.size(), false);
+            
+            for (const auto& reco_track : ltt.tracks) {
+                bool found_match = false;
+                for (size_t k = 0; k < simu.generated_tracks.size(); k++) {
+                    if (!gen_track_matched[k] && match_tracks(reco_track, simu.generated_tracks[k])) {
+                        matched_tracks++;
+                        //cout << matched_tracks << endl;
+                        gen_track_matched[k] = true;
+                        found_match = true;
+                        break;
+                    }
+                }
+            }
+
+            // Store statistics
+            gen_tr3L.push_back(stats::hmgthL012 + stats::hmgth2L);
+            reco_real.push_back(matched_tracks);
+            c_time.push_back(t.CpuTime());
+            stats::hmrtar = 0;
+            
+            printProgressBarWithETA(j + 1, iteration_per_event, start_time);
+        }
+
+        double errc_time = TMath::RMS(c_time.begin(), c_time.end()) / TMath::Sqrt(iteration_per_event);
+        double err_reco_real = TMath::RMS(reco_real.begin(), reco_real.end()) / TMath::Sqrt(iteration_per_event);
+        double err_gen_trk = TMath::RMS(gen_tr3L.begin(), gen_tr3L.end()) / TMath::Sqrt(iteration_per_event);
+        double err_effreal = TMath::Sqrt(pow(err_reco_real / mean(gen_tr3L), 2) + pow((mean(reco_real) * err_gen_trk) / (pow(mean(gen_tr3L), 2)), 2));
+
+        // Scrivi una riga per ogni combinazione GenTrack-Raggio
+        file << gen_tracks[i] << ","
+             << std::fixed << std::setprecision(3) << mean(gen_tr3L) << ","
+             << std::fixed << std::setprecision(3) << mean(reco_real) / mean(gen_tr3L) << ","
+             << std::fixed << std::setprecision(6) << mean(c_time) << ","
+             << std::fixed << std::setprecision(6) << errc_time << ","
+             << std::fixed << std::setprecision(6) << err_effreal << "\n";
+
+        std::cout << std::endl;
+        // std::cout << *this << std::endl;
+    }
+
+    file.close();
+    std::cout << "File CSV scritto correttamente in: " << path << "\n";
+
 }

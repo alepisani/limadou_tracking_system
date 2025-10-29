@@ -59,17 +59,17 @@ void run(int *events)
     //tracker.print_all_tracklet(tracker);
     
     //new combinatorial algo
-    //tracker.new_algo();
+    tracker.new_algo();
 
     //hough trasform
     LTrack track;
     LTrackerCluster cluster;
-    cluster.from_ltt_to_cluster(tracker);
-    
-    HoughTransform3D(cluster, track);
-    track.from_LTrack_to_TrackCand(track, tracker); 
+    //cluster.from_ltt_to_cluster(tracker);
+    //HoughTransform3D(cluster, track);
+    //track.from_LTrack_to_TrackCand(track, tracker); 
     cout << "quanti cls? " << cluster.cls_mean_x.size() << endl;
     cout << "quante tracce ricostrutite? " << tracker.tracks.size() << endl;
+    
 
     //cls_track_idx = cluster.GetClsTrackIdx();
     //trk_npoints = track.GetNPoints();
@@ -96,15 +96,16 @@ int main(int argc, char **argv)
     TH1::AddDirectory(false);
 
     // track simulation
-    int *events;
-    int ev = 4;
-    events = &ev;
-    run(events);
+    //int *events;
+    //int ev = 5;
+    //events = &ev;
+    //run(events);
 
     //simulations sim;
     // sim.sim_only_trk_3L(1000);
     //sim.sim_old_algo(300);
     //sim.sim_trk_32L(1000);
+    sim.comp_algos(100);
 
     // reco from MUONS
     // eventdata e;

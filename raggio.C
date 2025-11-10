@@ -144,7 +144,7 @@ void raggio()
         h1->SetMaximum(1.);
         h1->GetXaxis()->SetLimits(0., 2020.);
         h1->GetXaxis()->SetTitle("Raggio [#mum]");
-        h1->GetYaxis()->SetTitle("#eta");
+        h1->GetYaxis()->SetTitle("#epsilon");
         h1->GetYaxis()->SetTitleColor(kBlue);
         h1->GetYaxis()->SetLabelColor(kBlue);
         h1->SetTitle(Form("Track per evento: %d", gen_trk[i]));
@@ -171,7 +171,7 @@ void raggio()
         // draw axis on the right side of the pad
         TGaxis *axis1 = new TGaxis(xmax1, ymin1, xmax1, ymax1, ymin1, ymax1, 510, "+L");
         axis1->SetLabelColor(kRed);
-        axis1->SetTitle("#bar{#eta}");
+        axis1->SetTitle("#bar{#epsilon}");
         axis1->SetTitleColor(kRed);
         axis1->Draw();
         pad1fake->Update();
@@ -187,49 +187,61 @@ int raggio() {
     std::vector<double> x       = {2, 3, 4, 5, 6, 7, 8, 9, 10};
     std::vector<double> err_cpuold = {0.000748,0.000478,0.000678,0.000642,0.001141,0.001021,0.001341,0.001962,0.002284};
     std::vector<double> err_cpunew = {0.000095, 0.000078, 0.000089, 0.000097, 0.000106, 0.00011, 0.000119, 0.000122, 0.000124};
-    std::vector<double> err_cpuhough = {0.0040831, 0.0049763, 0.0037833, 0.0016884, 0.0006171, 0, 0, 0, 0};
+    //std::vector<double> err_cpuhough = {0.014754, 0.014706, 0.011585, 0.006398, 0.002551, 0.00064, 0.000702, 0, 0};
+    std::vector<double> err_cpuhough = {0.000332, 0.000479, 0.000502, 0.00046, 0.000505, 0.000534, 0.000538, 0.000575, 0.000718};
     std::vector<double> cpu_old = {0.0020, 0.0036, 0.0068, 0.0137, 0.0232, 0.0333, 0.0485, 0.0628, 0.0972};
     std::vector<double> cpu_new = {0.0005, 0.0006, 0.0008, 0.0010, 0.0015, 0.0017, 0.0016, 0.0018, 0.0019};
-    std::vector<double> cpu_hough = {0.001452, 0.00318, 0.001454, 0.001533, 0.001159, 0.001457, 0.001609, 0.002232, 0.00225};
+    //std::vector<double> cpu_hough = {0.000354, 0.000486, 0.000537, 0.000478, 0.000505, 0.000534, 0.000558, 0.000577, 0.000693};
+    std::vector<double> cpu_hough = {0.03078, 0.05077, 0.07448, 0.09086, 0.10422, 0.11783, 0.13149, 0.13706, 0.15275};
 
     std::vector<double> err_effold = {0.029892, 0.02269, 0.019562, 0.016936, 0.016925, 0.014759, 0.013638, 0.013432, 0.012119};
     std::vector<double> err_effnew = {0.013234, 0.011985, 0.010075, 0.009518, 0.008403, 0.007916, 0.007261, 0.007001, 0.006638};
-    std::vector<double> err_effhough = {0.0385, 0.0649, 0.0681, 0.0818, 0., 0., 0., 0., 0.};
+    std::vector<double> err_effhough = {0.014659, 0.014417, 0.011659, 0.00551, 0.002511, 0.000728, 0.000565, 0, 0};
     std::vector<double> eff_old = {0.830, 0.777, 0.780, 0.794, 0.784, 0.792, 0.787, 0.785, 0.782};
     std::vector<double> eff_new = {0.9844, 0.9853, 0.9874, 0.9860, 0.9867, 0.9903, 0.9913, 0.9868, 0.9893};
-    std::vector<double> eff_hough = {0.976, 0.813, 0.314, 0.056, 0.008, 0, 0, 0, 0};
+    std::vector<double> eff_hough = {0.965, 0.815, 0.292, 0.081, 0.015, 0.001, 0.001, 0, 0};
 
     // Create graphs
-    TGraphErrors *g_old = new TGraphErrors(x.size(), x.data(), cpu_old.data(), 0, err_cpuold.data());
-    g_old->SetLineColor(kRed);
-    g_old->SetLineWidth(2);
-    g_old->SetMarkerStyle(20);
-
-    TGraphErrors *g_new = new TGraphErrors(x.size(), x.data(), cpu_new.data(), 0, err_cpunew.data());
-    g_new->SetLineColor(kBlue);
-    g_new->SetLineWidth(2);
-    g_new->SetMarkerStyle(21);
-
-    TGraphErrors *g_hough = new TGraphErrors(x.size(), x.data(), cpu_hough.data(), 0, err_cpuhough.data());
-    g_hough->SetLineColor(kMagenta);
-    g_hough->SetLineWidth(2);
+    TGraphErrors *g_hough = new TGraphErrors(x.size(), x.data(), eff_hough.data(), 0, err_effhough.data());
+    //g_hough->SetLineColor(kMagenta);
+    //g_hough->SetLineWidth(2);
     g_hough->SetMarkerStyle(22);
+    g_hough->SetMarkerSize(2);
+    g_hough->SetMarkerColor(kMagenta);
+    
+    TGraphErrors *g_old = new TGraphErrors(x.size(), x.data(), eff_old.data(), 0, err_effold.data());
+    //g_old->SetLineColor(kGreen+2);
+    //g_old->SetLineWidth(2);
+    g_old->SetMarkerStyle(20);
+    g_old->SetMarkerSize(2);
+    g_old->SetMarkerColor(kGreen+1);
 
+    TGraphErrors *g_new = new TGraphErrors(x.size(), x.data(), eff_new.data(), 0, err_effnew.data());
+    //g_new->SetLineColor(kAzure+2);
+    //g_new->SetLineWidth(2);
+    g_new->SetMarkerStyle(21);
+    g_new->SetMarkerSize(2);
+    g_new->SetMarkerColor(kAzure+2);
+
+
+    
+    // Draw everything
+    TCanvas *c1 = new TCanvas("c1", "MultiGraph Example", 800, 600);
+    c1->SetGrid();
+    //c1->SetLogy(); // <- imposta scala logaritmica sull'asse y per tutto il canvas
+    
     // Create multigraph
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(g_old, "LP");  // L=line, P=points
     mg->Add(g_new, "LP");
     mg->Add(g_hough, "LP");
-    //mg->GetYaxis()->SetRangeUser(0.7, 1.05);
-
-    // Draw everything
-    TCanvas *c1 = new TCanvas("c1", "MultiGraph Example", 800, 600);
-    c1->SetGrid();
-    c1->SetLogy(); // <- imposta scala logaritmica sull'asse y per tutto il canvas
-
-    mg->SetTitle("Confronto CpuTime tra metodi di tracciamento;Track per event;CpuTime (s)");
+    //mg->SetTitle("Confronto CpuTime tra metodi di tracciamento;Track per event;CpuTime (s)");
+    mg->SetTitle("Confronto #epsilon tra metodi di tracciamento;Track per event;#epsilon");
     mg->Draw("A");  // "A" forces to draw axis
-
+    mg->GetYaxis()->SetRangeUser(-0.05, 1.05);
+    c1->Modified();
+    c1->Update();
+    
     // Legend
     TLegend *leg = new TLegend(0.65, 0.65, 0.9, 0.85);
     leg->AddEntry(g_hough, "Metodo 1", "lp");

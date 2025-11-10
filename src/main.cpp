@@ -56,10 +56,10 @@ void run(int *events)
     tracker.computeTracklets();
     //old combinatorial algo
     //tracker.computeTrackCandidates();
-    //tracker.print_all_tracklet(tracker);
+    tracker.print_all_tracklet(tracker);
     
     //new combinatorial algo
-    tracker.new_algo();
+    //tracker.new_algo();
 
     //hough trasform
     LTrack track;
@@ -96,20 +96,20 @@ int main(int argc, char **argv)
     TH1::AddDirectory(false);
 
     // track simulation
-    //int *events;
-    //int ev = 5;
-    //events = &ev;
-    //run(events);
+    int *events;
+    int ev = 2;
+    events = &ev;
+    run(events);
 
     //simulations sim;
     // sim.sim_only_trk_3L(1000);
     //sim.sim_old_algo(300);
     //sim.sim_trk_32L(1000);
-    sim.comp_algos(100);
+    // sim.comp_algos(100);
 
     // reco from MUONS
-    // eventdata e;
-    // e.analize_data();
+    //eventdata e;
+    //e.analize_data();
 
     /*
     //compute theta max

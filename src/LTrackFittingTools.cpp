@@ -332,8 +332,8 @@ void HoughTransform3D(LTrackerCluster &cluster, LTrack &track) {
         return;
     }
 
-    IterativeHoughTransform(pointsxy, 0, "x_pos", "y_pos");
     pointsxy = RemoveHorizontal(pointsxy);
+    IterativeHoughTransform(pointsxy, 0, "x_pos", "y_pos");
     IterativeHoughTransform(pointsxz, 0, "x_pos", "z_pos");
     pointsxz = RemoveHorizontal(pointsxz);
     IterativeHoughTransform(pointsyz, 0, "y_pos", "z_pos");

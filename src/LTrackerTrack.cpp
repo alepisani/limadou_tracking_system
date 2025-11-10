@@ -115,8 +115,8 @@ void LTrackerTrack::print_tracklet(const LCluster cl_0, const LCluster cl_2)
   Double_t y_line[2] = {y0, y2};
   Double_t z_line[2] = {z0, z2};
   TPolyLine3D *trk = new TPolyLine3D(2, x_line, y_line, z_line);
-  trk->SetLineWidth(1);
-  trk->SetLineColor(kGreen);
+  trk->SetLineWidth(2);
+  trk->SetLineColor(kBlack);
   trk->Draw();
 }
 

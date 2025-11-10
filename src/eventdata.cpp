@@ -22,7 +22,7 @@
 
 using namespace std;
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-071441-Events-00351_01656-p01_L2.root";
-// std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";      //tesi
+//std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-000001-Events-00351_01437-p01_L2.root";      //tesi
 
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-045249-Events-00351_01585-p01_L2.root";      // this file has weird peaks
 // std::string input_filename = "../data/HEPD02-FM_m-Exp-20250907-002417-Events-00351_01449-p01_L2.root";
@@ -78,6 +78,7 @@ void eventdata::takedata()
     std::vector<float> *cls_mean_z = nullptr;
     std::vector<float> *cls_mean_x_err = nullptr;
     std::vector<float> *cls_mean_y_err = nullptr;
+    //Bool_t trig_conf_flag[6];
 
     tree->SetBranchAddress("cls_size", &cls_size); // in pixel
     tree->SetBranchAddress("cls_mean_x", &cls_mean_x);
@@ -85,12 +86,14 @@ void eventdata::takedata()
     tree->SetBranchAddress("cls_mean_z", &cls_mean_z);
     tree->SetBranchAddress("cls_mean_x_err", &cls_mean_x_err);
     tree->SetBranchAddress("cls_mean_y_err", &cls_mean_y_err);
+    //tree->SetBranchAddress("trig_conf_flag", trig_conf_flag);
 
     Long64_t nEntries = tree->GetEntries();
 
     for (Long64_t i = 0; i < nEntries; ++i)
     {
         tree->GetEntry(i);
+        //if((trig_conf_flag)[5]){}
         eventdata ev;
         ev.cls_size = *cls_size;
         ev.cls_mean_x = *cls_mean_x;
@@ -99,6 +102,7 @@ void eventdata::takedata()
         ev.cls_mean_x_err = *cls_mean_x_err;
         ev.cls_mean_y_err = *cls_mean_y_err;
         alldata[i] = ev;
+        
     }
 
     file->Close();
@@ -368,7 +372,8 @@ void eventdata::analize_data()
                 for (size_t j = 0; j < theta->size(); ++j)
                 {
                     // mask for passing throgh the triggers
-                    if (theta->at(j) < 75.3)
+                    //if (theta->at(j) < 75.3)
+                    if (theta->at(j) < 175.3)
                     {
                         h_theta->Fill(theta->at(j));
                         h_phi->Fill(phi->at(j));
@@ -377,7 +382,8 @@ void eventdata::analize_data()
                 }
                 for (size_t j = 0; j < theta_m2->size(); ++j)
                 {
-                    if (theta_m2->at(j) < 75.3)
+                    //if (theta_m2->at(j) < 75.3)
+                    if (theta_m2->at(j) < 175.3)
                     {
                         h_theta_m2->Fill(theta_m2->at(j));
                         h_phi_m2->Fill(phi_m2->at(j));
@@ -490,9 +496,9 @@ void eventdata::analize_data()
         h_theta->GetXaxis()->SetTitle("#theta (deg)");
         h_theta->GetYaxis()->SetTitle("Counts");
         h_theta->GetYaxis()->SetRangeUser(0, maxY * 1.1);
-        h_theta->SetLineColor(kBlue);
-        h_theta_m2->SetLineColor(kRed);
-        htheta->SetLineColor(kBlack);
+        h_theta->SetLineColor(kMagenta);
+        h_theta_m2->SetLineColor(kGreen+1);
+        htheta->SetLineColor(kAzure+2);
         h_theta->Draw("HIST");
         h_theta_m2->Draw("HISTSAME");
         htheta->Draw("HISTSAME");
@@ -524,9 +530,9 @@ void eventdata::analize_data()
         h_phi->SetTitle("#phi comparison");
         h_phi->GetXaxis()->SetTitle("#phi (deg)");
         h_phi->GetYaxis()->SetTitle("Counts");
-        h_phi->SetLineColor(kBlue);
-        h_phi_m2->SetLineColor(kRed);
-        hphi->SetLineColor(kBlack);
+        h_phi->SetLineColor(kMagenta);
+        h_phi_m2->SetLineColor(kGreen+1);
+        hphi->SetLineColor(kAzure+2);
         h_phi->Draw("HIST");
         h_phi_m2->Draw("HISTSAME");
         hphi->Draw("HISTSAME");
@@ -543,7 +549,7 @@ void eventdata::analize_data()
         htheta_notnorm->GetXaxis()->SetTitle("#theta (deg)");
         htheta_notnorm->GetYaxis()->SetTitle("Counts");
         //htheta_notnorm->GetYaxis()->SetRangeUser(0, maxY * 1.1);
-        htheta_notnorm->SetLineColor(kBlue);
+        htheta_notnorm->SetLineColor(kAzure+2);
         htheta_triplet->SetLineColor(kRed);
         htheta_doublet->SetLineColor(kBlack);
         htheta_notnorm->Draw("HIST");
@@ -551,7 +557,7 @@ void eventdata::analize_data()
         htheta_doublet->Draw("HISTSAME");
 
         TLegend *legt = new TLegend(0.6, 0.7, 0.9, 0.9);
-        legt->AddEntry(htheta, Form("total #theta distribution (N=%0.f)", htheta->GetEntries()), "l");
+        legt->AddEntry(htheta_notnorm, Form("total #theta distribution (N=%0.f)", htheta_notnorm->GetEntries()), "l");
         legt->AddEntry(htheta_triplet, Form("only 3 layer #theta (N=%0.f)", htheta_triplet->GetEntries()), "l");
         legt->AddEntry(htheta_doublet, Form("only 2 layer #theta (N=%0.f)", htheta_doublet->GetEntries()), "l");
         legt->Draw();
@@ -562,7 +568,7 @@ void eventdata::analize_data()
         hphi_notnorm->GetXaxis()->SetTitle("#phi (deg)");
         hphi_notnorm->GetYaxis()->SetTitle("Counts");
         // hphi_notnorm->GetYaxis()->SetRangeUser(0, maxY * 1.1);
-        hphi_notnorm->SetLineColor(kBlue);
+        hphi_notnorm->SetLineColor(kAzure+2);
         hphi_triplet->SetLineColor(kRed);
         hphi_doublet->SetLineColor(kBlack);
         hphi_notnorm->Draw("HIST");
@@ -571,7 +577,7 @@ void eventdata::analize_data()
 
 
         TLegend *legp = new TLegend(0.6, 0.7, 0.9, 0.9);
-        legp->AddEntry(hphi, Form("total #phi distribution (N=%0.f)", hphi->GetEntries()), "l");
+        legp->AddEntry(hphi_notnorm, Form("total #phi distribution (N=%0.f)", hphi_notnorm->GetEntries()), "l");
         legp->AddEntry(hphi_triplet, Form("only 3 layer #phi (N=%0.f)", hphi_triplet->GetEntries()), "l");
         legp->AddEntry(hphi_doublet, Form("only 2 layer #phi (N=%0.f)", hphi_doublet->GetEntries()), "l");
         legp->Draw();

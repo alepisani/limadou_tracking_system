@@ -365,8 +365,8 @@ void display::tracks(int *events, LTrackerTrack &tracker, TCanvas *geom)
         Double_t z_line[2] = {zTR2, zTR1};
         TPolyLine3D *line_track = new TPolyLine3D(2, x_line, y_line, z_line);
         line_track->SetLineColor(kBlue);
-        // line_track->SetLineWidth(4);
-        line_track->SetLineWidth(3);
+        line_track->SetLineWidth(4);
+        //line_track->SetLineWidth(3);
         geom->cd();
         line_track->Draw();
 
